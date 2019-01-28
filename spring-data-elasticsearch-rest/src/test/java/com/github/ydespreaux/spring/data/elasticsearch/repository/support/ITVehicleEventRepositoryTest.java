@@ -54,9 +54,9 @@ public class ITVehicleEventRepositoryTest {
 
     private static final Integer CRON_DELAY_SECONDS = 4;
 
-    static {
-        System.setProperty("spring.elasticsearch.rest.uris", "http://localhost:9200");
-    }
+//    static {
+//        System.setProperty("spring.elasticsearch.rest.uris", "http://localhost:9200");
+//    }
 
     @Autowired
     private VehicleEventRepository repository;
