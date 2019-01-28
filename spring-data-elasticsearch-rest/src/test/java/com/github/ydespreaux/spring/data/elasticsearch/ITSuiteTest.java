@@ -40,7 +40,7 @@ import org.junit.runners.Suite;
         ITCityRepositoryContextTest.class,
         ITCityRepositoryTest.class,
         ITProductRepositoryTest.class,
-        ITVehicleEventRepositoryTest.class
+//        ITVehicleEventRepositoryTest.class
 })
 public class ITSuiteTest {
 

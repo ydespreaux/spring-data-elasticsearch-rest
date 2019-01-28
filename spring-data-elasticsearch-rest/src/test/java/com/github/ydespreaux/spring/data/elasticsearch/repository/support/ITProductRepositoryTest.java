@@ -167,16 +167,6 @@ public class ITProductRepositoryTest {
     }
 
 
-    private void assertProduct(Product actual, Product expected) {
-        assertThat(actual.getName(), is(equalTo(expected.getName())));
-        assertThat(actual.getDescription(), is(equalTo(expected.getDescription())));
-        assertThat(actual.getPopularity(), is(equalTo(expected.getPopularity())));
-        assertThat(actual.getPrice(), is(equalTo(expected.getPrice())));
-        assertThat(actual.getCategories(), is(equalTo(expected.getCategories())));
-        assertThat(actual.isAvailable(), is(equalTo(expected.isAvailable())));
-        assertThat(actual.getId(), is(equalTo(expected.getId())));
-    }
-
     private Product createProduct(String id, String name, String text, Boolean available, Float price, Integer popularity, List<String> categories) {
         return Product.builder()
                 .id(id)
@@ -188,10 +178,5 @@ public class ITProductRepositoryTest {
                 .categories(categories)
                 .build();
     }
-
-    private Product indexProduct(String id, String name, String text, Boolean available, Float price, Integer popularity, List<String> categories) {
-        return this.elasticsearchOperations.index(createProduct(id, name, text, available, price, popularity, categories), Product.class);
-    }
-
 
 }

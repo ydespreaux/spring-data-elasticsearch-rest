@@ -24,7 +24,9 @@ import com.github.ydespreaux.spring.data.elasticsearch.configuration.Elasticsear
 import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.VehicleEvent;
 import com.github.ydespreaux.spring.data.elasticsearch.repositories.rollover.VehicleEventRepository;
+import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.elasticsearch.common.geo.GeoPoint;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +55,11 @@ import static org.junit.Assert.assertThat;
 public class ITVehicleEventRepositoryTest {
 
     private static final Integer CRON_DELAY_SECONDS = 4;
+
+    @ClassRule
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2")
+            .withConfigDirectory("elastic-config");
+
 
 //    static {
 //        System.setProperty("spring.elasticsearch.rest.uris", "http://localhost:9200");
