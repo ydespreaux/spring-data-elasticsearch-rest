@@ -1,0 +1,70 @@
+{
+    "index_patterns" : "junit-*",
+    "settings" : {
+        "number_of_shards" : 2,
+        "refresh_interval" : "1s",
+        "number_of_replicas" : 1,
+        "store.type": "fs"
+    },
+    "aliases" : {
+        "junit-alias" : {}
+    },
+    "mappings": {
+      "tweet": {
+        "properties": {
+          "channel": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "firstName": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "idRH": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "lastName": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "message": {
+            "type": "text"
+          },
+          "postDate": {
+            "type": "date",
+            "format": "date_time"
+          },
+          "tweetId": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          }
+        }
+      }
+    }
+}

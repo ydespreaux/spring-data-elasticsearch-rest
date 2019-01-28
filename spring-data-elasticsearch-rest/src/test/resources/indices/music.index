@@ -1,0 +1,20 @@
+{
+    "settings" : {
+        "number_of_shards" : 1,
+        "refresh_interval" : "1s",
+        "number_of_replicas" : 1,
+        "store.type": "fs"
+    },
+    "mappings": {
+      "music": {
+        "properties": {
+          "suggest": {
+            "type": "completion"
+          },
+          "title": {
+            "type": "keyword"
+          }
+        }
+      }
+    }
+}

@@ -1,0 +1,27 @@
+{
+    "settings" : {
+        "number_of_shards" : 1,
+        "refresh_interval" : "1s",
+        "number_of_replicas" : 1,
+        "store.type": "fs"
+    },
+    "aliases": {
+        "search-vehicles-alias" : {},
+        "write-vehicles-alias" : {}
+    },
+    "mappings": {
+      "position": {
+        "properties": {
+          "vehicleId": {
+            "type": "keyword"
+          },
+          "location": {
+            "type": "geo_point"
+          },
+          "time": {
+            "type": "date"
+          }
+        }
+      }
+    }
+}

@@ -1,0 +1,231 @@
+/*
+ * Copyright (C) 2018 Yoann Despréaux
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; see the file COPYING . If not, write to the
+ * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
+ */
+package com.github.ydespreaux.spring.data.elasticsearch.core;
+
+import com.github.ydespreaux.spring.data.elasticsearch.core.query.Criteria;
+import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.common.geo.GeoDistance;
+import org.elasticsearch.common.geo.GeoPoint;
+import org.elasticsearch.index.query.*;
+import org.springframework.data.geo.Box;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.Metrics;
+import org.springframework.data.geo.Point;
+import org.springframework.util.Assert;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+
+/**
+ * CriteriaFilterProcessor generate filter-related queries for a {@link Criteria} object
+ *
+ * @author Yoann Despréaux
+ * @since 0.1.0
+ */
+@Slf4j
+final class CriteriaFilterProcessor {
+
+    /**
+     * @param array
+     * @param clazz
+     * @return
+     */
+    private static boolean isType(Object[] array, Class clazz) {
+        for (Object o : array) {
+            if (!clazz.isInstance(o)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Create query filter
+     *
+     * @param criteria
+     * @return
+     */
+    final QueryBuilder createFilterFromCriteria(Criteria criteria) {
+        List<QueryBuilder> fbList = new LinkedList<>();
+        criteria.getCriteriaChain().forEach(chainedCriteria -> {
+            if (chainedCriteria.isOr()) {
+                BoolQueryBuilder fb = QueryBuilders.boolQuery();
+                createFilterFragmentForCriteria(chainedCriteria).forEach(fb::should);
+                if (fb.hasClauses()) {
+                    fbList.add(fb);
+                }
+            } else if (chainedCriteria.isNegating()) {
+                fbList.addAll(buildNegationFilter(criteria.getField().getName(), criteria.getFilterCriteriaEntries()));
+            } else {
+                fbList.addAll(createFilterFragmentForCriteria(chainedCriteria));
+            }
+        });
+        QueryBuilder filter = null;
+        if (!fbList.isEmpty()) {
+            if (fbList.size() == 1) {
+                filter = fbList.get(0);
+            } else {
+                filter = QueryBuilders.boolQuery();
+                fbList.forEach(((BoolQueryBuilder) filter)::must);
+            }
+        }
+        return filter;
+    }
+
+    /**
+     * @param chainedCriteria
+     * @return
+     */
+    private List<QueryBuilder> createFilterFragmentForCriteria(Criteria chainedCriteria) {
+        String fieldName = chainedCriteria.getField().getName();
+        Assert.notNull(fieldName, "Unknown field");
+        return chainedCriteria.getFilterCriteriaEntries().stream()
+                .map(entry -> processCriteriaEntry(entry.getKey(), entry.getValue(), fieldName))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * @param fieldName
+     * @param entries
+     * @return
+     */
+    private List<QueryBuilder> buildNegationFilter(String fieldName, Set<Criteria.CriteriaEntry> entries) {
+        return entries.stream()
+                .map(entry -> processCriteriaEntry(entry.getKey(), entry.getValue(), fieldName))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * @param key
+     * @param value
+     * @param fieldName
+     * @return
+     */
+    private QueryBuilder processCriteriaEntry(Criteria.OperationKey key, Object value, String fieldName) {
+        if (value == null) {
+            return null;
+        }
+        if (Criteria.OperationKey.WITHIN == key) {
+            return processWithinFilter(value, fieldName);
+        } else if (Criteria.OperationKey.BOX == key) {
+            return processBoxFilter(value, fieldName);
+        }
+        if (log.isWarnEnabled()) {
+            log.warn("Key operator {} is not a filter operator", key);
+        }
+        return null;
+    }
+
+    private QueryBuilder processWithinFilter(Object value, String fieldName) {
+        GeoDistanceQueryBuilder geoDistanceQueryBuilder = QueryBuilders.geoDistanceQuery(fieldName);
+        Assert.isTrue(value instanceof Object[], "Value of a geo distance filter should be an array of two values.");
+        Object[] valArray = (Object[]) value;
+        Assert.noNullElements(valArray, "Geo distance filter takes 2 not null elements array as parameter.");
+        Assert.isTrue(valArray.length == 2, "Geo distance filter takes a 2-elements array as parameter.");
+        Assert.isTrue(valArray[0] instanceof GeoPoint || valArray[0] instanceof String || valArray[0] instanceof Point, "First element of a geo distance filter must be a GeoPoint, a Point or a text");
+        Assert.isTrue(valArray[1] instanceof String || valArray[1] instanceof Distance, "Second element of a geo distance filter must be a text or a Distance");
+
+        StringBuilder dist = new StringBuilder();
+        if (valArray[1] instanceof Distance) {
+            extractDistanceString((Distance) valArray[1], dist);
+        } else {
+            dist.append((String) valArray[1]);
+        }
+        if (valArray[0] instanceof GeoPoint) {
+            GeoPoint loc = (GeoPoint) valArray[0];
+            geoDistanceQueryBuilder.point(loc.getLat(), loc.getLon()).distance(dist.toString()).geoDistance(GeoDistance.PLANE);
+        } else if (valArray[0] instanceof Point) {
+            Point point = (Point) valArray[0];
+            geoDistanceQueryBuilder.point(point.getX(), point.getY()).distance(dist.toString()).geoDistance(GeoDistance.PLANE);
+        } else {
+            String loc = (String) valArray[0];
+            if (loc.contains(",")) {
+                String[] c = loc.split(",");
+                geoDistanceQueryBuilder.point(Double.parseDouble(c[0]), Double.parseDouble(c[1])).distance(dist.toString()).geoDistance(GeoDistance.PLANE);
+            } else {
+                geoDistanceQueryBuilder.geohash(loc).distance(dist.toString()).geoDistance(GeoDistance.PLANE);
+            }
+        }
+        return geoDistanceQueryBuilder;
+
+    }
+
+    private QueryBuilder processBoxFilter(Object value, String fieldName) {
+        GeoBoundingBoxQueryBuilder filter = QueryBuilders.geoBoundingBoxQuery(fieldName);
+        Assert.isTrue(value instanceof Object[], "Value of a boundedBy filter should be an array of one or two values.");
+        Object[] valArray = (Object[]) value;
+        Assert.noNullElements(valArray, "Geo boundedBy filter takes a not null element array as parameter.");
+
+        if (valArray.length == 1) {
+            //GeoEnvelop
+            Assert.isTrue(valArray[0] instanceof Box, "single-element of boundedBy filter must be type of Box");
+            Box box = (Box) valArray[0];
+            filter.setCorners(box.getFirst().getX(), box.getFirst().getY(), box.getSecond().getX(), box.getSecond().getY());
+        } else if (valArray.length == 2) {
+            Assert.isTrue(isType(valArray, GeoPoint.class) || isType(valArray, String.class), " both elements of boundedBy filter must be type of GeoPoint or text(format lat,lon or geohash)");
+            if (valArray[0] instanceof GeoPoint) {
+                GeoPoint topLeft = (GeoPoint) valArray[0];
+                GeoPoint bottomRight = (GeoPoint) valArray[1];
+                filter.setCorners(topLeft.getLat(), topLeft.getLon(), bottomRight.getLat(), bottomRight.getLon());
+            } else {
+                String topLeft = (String) valArray[0];
+                String bottomRight = (String) valArray[1];
+                if (topLeft.contains(",") && bottomRight.contains(",")) {
+                    String[] topLeftValues = topLeft.split(",");
+                    String[] bottomRightValues = bottomRight.split(",");
+                    filter.setCorners(Double.parseDouble(topLeftValues[0]), Double.parseDouble(topLeftValues[1]), Double.parseDouble(bottomRightValues[0]), Double.parseDouble(bottomRightValues[1]));
+                } else {
+                    filter.setCorners(topLeft, bottomRight);
+                }
+            }
+        } else {
+            //error
+            Assert.isTrue(false, "Geo distance filter takes a 1-elements array(GeoBox) or 2-elements array(GeoPoints or Strings(format lat,lon or geohash)).");
+        }
+        return filter;
+    }
+
+    /**
+     * extract the distance string from a {@link org.springframework.data.geo.Distance} object.
+     *
+     * @param distance distance object to extract string from
+     * @param sb       StringBuilder to build the distance string
+     */
+    private void extractDistanceString(Distance distance, StringBuilder sb) {
+        // handle Distance object
+        sb.append((int) distance.getValue());
+        Metrics metric = (Metrics) distance.getMetric();
+        if (metric == Metrics.KILOMETERS) {
+            sb.append("km");
+        } else if (metric == Metrics.MILES) {
+            sb.append("mi");
+        } else {
+            throw new IllegalArgumentException("Distance.metric must be km or mi");
+        }
+    }
+
+
+}

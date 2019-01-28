@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.github.ydespreaux.spring.data.autoconfigure.elasticsearch.ElasticsearchDataAutoConfiguration,\
+  com.github.ydespreaux.spring.data.autoconfigure.elasticsearch.ReactiveElasticsearchDataAutoConfiguration

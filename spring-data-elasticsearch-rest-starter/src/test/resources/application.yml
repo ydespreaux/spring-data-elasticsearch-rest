@@ -1,0 +1,19 @@
+#
+# Configuration Elasticsearch
+#
+spring:
+  main:
+    banner-mode: "off"
+  elasticsearch:
+    jest:
+      username: elastic
+      password: changeme
+    template:
+      action: CREATE_ONLY
+      scripts: classpath:templates/article.template
+    index-pattern:
+      article: "'article-%s-'yyyy"
+    aliases:
+      article: articles
+  jackson:
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSXXX

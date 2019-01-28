@@ -1,0 +1,34 @@
+#
+# Configuration Elasticsearch
+#
+spring:
+  main:
+    banner-mode: "off"
+  elasticsearch:
+    jest:
+      connection-timeout: 5000ms
+      read-timeout: 6000ms
+      username: elastic
+      password: changeme
+    template:
+      action: CREATE_OR_UPDATE
+      scripts: classpath:templates/article.template,classpath:templates/city.template
+    index-pattern:
+      article: "'article-%s-'yyyy"
+    aliases:
+      article: articles
+      city: cities
+  jackson:
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSXXX
+
+logging:
+  level:
+    com.github.ydespreaux.spring.data.elasticsearch.client.ClientLogger: TRACE
+
+---
+
+spring:
+  profiles: test-no-template
+  elasticsearch:
+    template:
+      action: none

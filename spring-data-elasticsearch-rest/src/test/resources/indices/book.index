@@ -1,0 +1,47 @@
+{
+    "settings" : {
+        "number_of_shards" : 1,
+        "refresh_interval" : "1s",
+        "number_of_replicas" : 1,
+        "store.type": "fs",
+        "analysis": {
+          "analyzer": {
+            "synonym_analyzer": {
+              "tokenizer": "whitespace",
+              "filter": [
+                "synonym_filter"
+              ]
+            }
+          },
+          "filter": {
+            "synonym_filter": {
+              "type": "synonym",
+              "synonyms_path": "synonyms/book-synonyms.txt",
+              "ignore_case": "true"
+            }
+          }
+        }
+    },
+    "mappings": {
+      "book": {
+        "properties": {
+          "title": {
+            "type": "keyword"
+          },
+          "description": {
+            "type": "text",
+            "analyzer": "synonym_analyzer"
+          },
+          "price": {
+            "type": "double"
+          },
+          "publication": {
+            "type": "date"
+          },
+          "lastUpdated": {
+            "type": "date"
+          }
+        }
+      }
+    }
+}

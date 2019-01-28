@@ -1,0 +1,372 @@
+[2019-01-23T14:34:16.727+0000][1][gc] Using Concurrent Mark Sweep
+[2019-01-23T14:34:16.728+0000][1][gc,heap,coops] Heap address: 0x00000000f0000000, size: 256 MB, Compressed Oops mode: 32-bit
+[2019-01-23T14:34:16.960+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000463 seconds, Stopping threads took: 0.0000075 seconds
+[2019-01-23T14:34:17.210+0000][1][safepoint    ] Application time: 0.2501832 seconds
+[2019-01-23T14:34:17.213+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0032664 seconds, Stopping threads took: 0.0032172 seconds
+[2019-01-23T14:34:17.270+0000][1][safepoint    ] Application time: 0.0569590 seconds
+[2019-01-23T14:34:17.271+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001294 seconds, Stopping threads took: 0.0000736 seconds
+[2019-01-23T14:34:18.025+0000][1][safepoint    ] Application time: 0.7547051 seconds
+[2019-01-23T14:34:18.025+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000638 seconds, Stopping threads took: 0.0000152 seconds
+[2019-01-23T14:34:18.170+0000][1][safepoint    ] Application time: 0.1449022 seconds
+[2019-01-23T14:34:18.170+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000675 seconds, Stopping threads took: 0.0000048 seconds
+[2019-01-23T14:34:18.188+0000][1][safepoint    ] Application time: 0.0180514 seconds
+[2019-01-23T14:34:18.189+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000701 seconds, Stopping threads took: 0.0000243 seconds
+[2019-01-23T14:34:18.195+0000][1][safepoint    ] Application time: 0.0061474 seconds
+[2019-01-23T14:34:18.195+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001242 seconds, Stopping threads took: 0.0000170 seconds
+[2019-01-23T14:34:18.431+0000][1][safepoint    ] Application time: 0.2364214 seconds
+[2019-01-23T14:34:18.431+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000632 seconds, Stopping threads took: 0.0000037 seconds
+[2019-01-23T14:34:18.739+0000][1][safepoint    ] Application time: 0.3079501 seconds
+[2019-01-23T14:34:18.740+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000981 seconds, Stopping threads took: 0.0000080 seconds
+[2019-01-23T14:34:19.740+0000][1][safepoint    ] Application time: 1.0001689 seconds
+[2019-01-23T14:34:19.740+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001076 seconds, Stopping threads took: 0.0000067 seconds
+[2019-01-23T14:34:20.294+0000][1][safepoint    ] Application time: 0.5540863 seconds
+[2019-01-23T14:34:20.294+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001014 seconds, Stopping threads took: 0.0000092 seconds
+[2019-01-23T14:34:20.296+0000][1][safepoint    ] Application time: 0.0015759 seconds
+[2019-01-23T14:34:20.298+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0012073 seconds, Stopping threads took: 0.0000048 seconds
+[2019-01-23T14:34:20.406+0000][1][safepoint    ] Application time: 0.1077998 seconds
+[2019-01-23T14:34:20.406+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001842 seconds, Stopping threads took: 0.0000266 seconds
+[2019-01-23T14:34:20.580+0000][1][safepoint    ] Application time: 0.1742335 seconds
+[2019-01-23T14:34:20.580+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001307 seconds, Stopping threads took: 0.0000121 seconds
+[2019-01-23T14:34:21.023+0000][1][safepoint    ] Application time: 0.4427120 seconds
+[2019-01-23T14:34:21.031+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0075470 seconds, Stopping threads took: 0.0073737 seconds
+[2019-01-23T14:34:21.119+0000][1][safepoint    ] Application time: 0.0878096 seconds
+[2019-01-23T14:34:21.119+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001985 seconds, Stopping threads took: 0.0000204 seconds
+[2019-01-23T14:34:21.144+0000][1][safepoint    ] Application time: 0.0254464 seconds
+[2019-01-23T14:34:21.145+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0005771 seconds, Stopping threads took: 0.0000259 seconds
+[2019-01-23T14:34:21.180+0000][1][safepoint    ] Application time: 0.0344622 seconds
+[2019-01-23T14:34:21.180+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0003237 seconds, Stopping threads took: 0.0002808 seconds
+[2019-01-23T14:34:21.180+0000][1][safepoint    ] Application time: 0.0002773 seconds
+[2019-01-23T14:34:21.180+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000382 seconds, Stopping threads took: 0.0000144 seconds
+[2019-01-23T14:34:21.180+0000][1][safepoint    ] Application time: 0.0000814 seconds
+[2019-01-23T14:34:21.180+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000325 seconds, Stopping threads took: 0.0000115 seconds
+[2019-01-23T14:34:21.180+0000][1][safepoint    ] Application time: 0.0000657 seconds
+[2019-01-23T14:34:21.180+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000305 seconds, Stopping threads took: 0.0000099 seconds
+[2019-01-23T14:34:21.181+0000][1][safepoint    ] Application time: 0.0001761 seconds
+[2019-01-23T14:34:21.181+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000321 seconds, Stopping threads took: 0.0000127 seconds
+[2019-01-23T14:34:21.911+0000][1][safepoint    ] Application time: 0.7303704 seconds
+[2019-01-23T14:34:21.922+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0108632 seconds, Stopping threads took: 0.0105814 seconds
+[2019-01-23T14:34:21.929+0000][1][safepoint    ] Application time: 0.0067412 seconds
+[2019-01-23T14:34:21.936+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0076537 seconds, Stopping threads took: 0.0074146 seconds
+[2019-01-23T14:34:22.341+0000][1][safepoint    ] Application time: 0.4045369 seconds
+[2019-01-23T14:34:22.341+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001867 seconds, Stopping threads took: 0.0000200 seconds
+[2019-01-23T14:34:22.420+0000][1][safepoint    ] Application time: 0.0788823 seconds
+[2019-01-23T14:34:22.421+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0005057 seconds, Stopping threads took: 0.0001017 seconds
+[2019-01-23T14:34:22.453+0000][1][safepoint    ] Application time: 0.0318422 seconds
+[2019-01-23T14:34:22.453+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001205 seconds, Stopping threads took: 0.0000048 seconds
+[2019-01-23T14:34:22.847+0000][1][safepoint    ] Application time: 0.3940510 seconds
+[2019-01-23T14:34:22.847+0000][1][gc,start     ] GC(0) Pause Initial Mark
+[2019-01-23T14:34:22.882+0000][1][gc           ] GC(0) Pause Initial Mark 61M->61M(247M) 34.919ms
+[2019-01-23T14:34:22.882+0000][1][gc,cpu       ] GC(0) User=0.07s Sys=0.00s Real=0.03s
+[2019-01-23T14:34:22.882+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0351570 seconds, Stopping threads took: 0.0000551 seconds
+[2019-01-23T14:34:22.882+0000][1][gc           ] GC(0) Concurrent Mark
+[2019-01-23T14:34:22.884+0000][1][gc           ] GC(0) Concurrent Mark 1.781ms
+[2019-01-23T14:34:22.884+0000][1][gc,cpu       ] GC(0) User=0.00s Sys=0.00s Real=0.00s
+[2019-01-23T14:34:22.884+0000][1][gc           ] GC(0) Concurrent Preclean
+[2019-01-23T14:34:22.884+0000][1][gc           ] GC(0) Concurrent Preclean 0.434ms
+[2019-01-23T14:34:22.884+0000][1][gc,cpu       ] GC(0) User=0.00s Sys=0.00s Real=0.00s
+[2019-01-23T14:34:22.884+0000][1][gc           ] GC(0) Concurrent Abortable Preclean
+[2019-01-23T14:34:22.937+0000][1][safepoint    ] Application time: 0.0546525 seconds
+[2019-01-23T14:34:22.937+0000][1][gc,start     ] GC(1) Pause Young (Allocation Failure)
+[2019-01-23T14:34:22.937+0000][1][gc,task      ] GC(1) Using 2 workers of 2 for evacuation
+[2019-01-23T14:34:22.949+0000][1][gc,age       ] GC(1) Desired survivor size 4456448 bytes, new threshold 1 (max threshold 6)
+[2019-01-23T14:34:22.949+0000][1][gc,age       ] GC(1) Age table with threshold 1 (max threshold 6)
+[2019-01-23T14:34:22.949+0000][1][gc,age       ] GC(1) - age   1:    7418168 bytes,    7418168 total
+[2019-01-23T14:34:22.949+0000][1][gc,heap      ] GC(1) ParNew: 69952K->7301K(78656K)
+[2019-01-23T14:34:22.949+0000][1][gc,heap      ] GC(1) CMS: 0K->0K(174784K)
+[2019-01-23T14:34:22.949+0000][1][gc,metaspace ] GC(1) Metaspace: 21422K->21422K(1069056K)
+[2019-01-23T14:34:22.949+0000][1][gc           ] GC(1) Pause Young (Allocation Failure) 68M->7M(247M) 12.419ms
+[2019-01-23T14:34:22.949+0000][1][gc,cpu       ] GC(1) User=0.02s Sys=0.00s Real=0.01s
+[2019-01-23T14:34:22.949+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0125401 seconds, Stopping threads took: 0.0000203 seconds
+[2019-01-23T14:34:22.954+0000][1][safepoint    ] Application time: 0.0051348 seconds
+[2019-01-23T14:34:22.957+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0028957 seconds, Stopping threads took: 0.0028557 seconds
+[2019-01-23T14:34:22.961+0000][1][safepoint    ] Application time: 0.0034862 seconds
+[2019-01-23T14:34:22.961+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000792 seconds, Stopping threads took: 0.0000226 seconds
+[2019-01-23T14:34:22.996+0000][1][safepoint    ] Application time: 0.0348951 seconds
+[2019-01-23T14:34:22.998+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0019130 seconds, Stopping threads took: 0.0001560 seconds
+[2019-01-23T14:34:23.107+0000][1][safepoint    ] Application time: 0.1088828 seconds
+[2019-01-23T14:34:23.108+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0013637 seconds, Stopping threads took: 0.0000085 seconds
+[2019-01-23T14:34:23.156+0000][1][safepoint    ] Application time: 0.0475891 seconds
+[2019-01-23T14:34:23.156+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000492 seconds, Stopping threads took: 0.0000064 seconds
+[2019-01-23T14:34:23.331+0000][1][safepoint    ] Application time: 0.1749252 seconds
+[2019-01-23T14:34:23.331+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001230 seconds, Stopping threads took: 0.0000150 seconds
+[2019-01-23T14:34:23.622+0000][1][safepoint    ] Application time: 0.2907124 seconds
+[2019-01-23T14:34:23.622+0000][1][gc,start     ] GC(2) Pause Young (Allocation Failure)
+[2019-01-23T14:34:23.622+0000][1][gc,task      ] GC(2) Using 2 workers of 2 for evacuation
+[2019-01-23T14:34:23.671+0000][1][gc,age       ] GC(2) Desired survivor size 4456448 bytes, new threshold 6 (max threshold 6)
+[2019-01-23T14:34:23.671+0000][1][gc,age       ] GC(2) Age table with threshold 6 (max threshold 6)
+[2019-01-23T14:34:23.671+0000][1][gc,age       ] GC(2) - age   1:    2306280 bytes,    2306280 total
+[2019-01-23T14:34:23.671+0000][1][gc,heap      ] GC(2) ParNew: 77253K->5122K(78656K)
+[2019-01-23T14:34:23.671+0000][1][gc,heap      ] GC(2) CMS: 0K->6665K(174784K)
+[2019-01-23T14:34:23.671+0000][1][gc,metaspace ] GC(2) Metaspace: 22583K->22583K(1071104K)
+[2019-01-23T14:34:23.671+0000][1][gc           ] GC(2) Pause Young (Allocation Failure) 75M->11M(247M) 49.232ms
+[2019-01-23T14:34:23.671+0000][1][gc,cpu       ] GC(2) User=0.09s Sys=0.00s Real=0.05s
+[2019-01-23T14:34:23.671+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0493941 seconds, Stopping threads took: 0.0000194 seconds
+[2019-01-23T14:34:23.671+0000][1][gc           ] GC(0) Concurrent Abortable Preclean 786.922ms
+[2019-01-23T14:34:23.671+0000][1][gc,cpu       ] GC(0) User=1.19s Sys=0.04s Real=0.79s
+[2019-01-23T14:34:23.676+0000][1][safepoint    ] Application time: 0.0050711 seconds
+[2019-01-23T14:34:23.677+0000][1][gc,start     ] GC(0) Pause Remark
+[2019-01-23T14:34:23.694+0000][1][gc           ] GC(0) Pause Remark 14M->14M(247M) 16.978ms
+[2019-01-23T14:34:23.694+0000][1][gc,cpu       ] GC(0) User=0.02s Sys=0.00s Real=0.01s
+[2019-01-23T14:34:23.694+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0174860 seconds, Stopping threads took: 0.0004047 seconds
+[2019-01-23T14:34:23.704+0000][1][gc           ] GC(0) Concurrent Sweep
+[2019-01-23T14:34:23.707+0000][1][gc           ] GC(0) Concurrent Sweep 2.633ms
+[2019-01-23T14:34:23.707+0000][1][gc,cpu       ] GC(0) User=0.01s Sys=0.00s Real=0.01s
+[2019-01-23T14:34:23.707+0000][1][gc           ] GC(0) Concurrent Reset
+[2019-01-23T14:34:23.707+0000][1][gc           ] GC(0) Concurrent Reset 0.235ms
+[2019-01-23T14:34:23.707+0000][1][gc,cpu       ] GC(0) User=0.00s Sys=0.00s Real=0.00s
+[2019-01-23T14:34:23.707+0000][1][gc,heap      ] GC(0) Old: 0K->6665K(174784K)
+[2019-01-23T14:34:23.859+0000][1][safepoint    ] Application time: 0.1652048 seconds
+[2019-01-23T14:34:23.859+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0002985 seconds, Stopping threads took: 0.0000055 seconds
+[2019-01-23T14:34:24.093+0000][1][safepoint    ] Application time: 0.2338201 seconds
+[2019-01-23T14:34:24.093+0000][1][gc,start     ] GC(3) Pause Young (Allocation Failure)
+[2019-01-23T14:34:24.093+0000][1][gc,task      ] GC(3) Using 2 workers of 2 for evacuation
+[2019-01-23T14:34:24.102+0000][1][gc,age       ] GC(3) Desired survivor size 4456448 bytes, new threshold 6 (max threshold 6)
+[2019-01-23T14:34:24.102+0000][1][gc,age       ] GC(3) Age table with threshold 6 (max threshold 6)
+[2019-01-23T14:34:24.102+0000][1][gc,age       ] GC(3) - age   1:    3898056 bytes,    3898056 total
+[2019-01-23T14:34:24.102+0000][1][gc,age       ] GC(3) - age   2:     478664 bytes,    4376720 total
+[2019-01-23T14:34:24.102+0000][1][gc,heap      ] GC(3) ParNew: 75074K->5319K(78656K)
+[2019-01-23T14:34:24.102+0000][1][gc,heap      ] GC(3) CMS: 6665K->6665K(174784K)
+[2019-01-23T14:34:24.102+0000][1][gc,metaspace ] GC(3) Metaspace: 25126K->25126K(1073152K)
+[2019-01-23T14:34:24.102+0000][1][gc           ] GC(3) Pause Young (Allocation Failure) 79M->11M(247M) 8.970ms
+[2019-01-23T14:34:24.102+0000][1][gc,cpu       ] GC(3) User=0.02s Sys=0.00s Real=0.01s
+[2019-01-23T14:34:24.102+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0091822 seconds, Stopping threads took: 0.0000099 seconds
+[2019-01-23T14:34:24.103+0000][1][safepoint    ] Application time: 0.0004926 seconds
+[2019-01-23T14:34:24.103+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001625 seconds, Stopping threads took: 0.0000566 seconds
+[2019-01-23T14:34:24.109+0000][1][safepoint    ] Application time: 0.0056984 seconds
+[2019-01-23T14:34:24.109+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001306 seconds, Stopping threads took: 0.0000336 seconds
+[2019-01-23T14:34:24.109+0000][1][safepoint    ] Application time: 0.0001451 seconds
+[2019-01-23T14:34:24.109+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001743 seconds, Stopping threads took: 0.0000044 seconds
+[2019-01-23T14:34:24.110+0000][1][safepoint    ] Application time: 0.0000890 seconds
+[2019-01-23T14:34:24.110+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000974 seconds, Stopping threads took: 0.0000485 seconds
+[2019-01-23T14:34:24.110+0000][1][safepoint    ] Application time: 0.0000831 seconds
+[2019-01-23T14:34:24.110+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000546 seconds, Stopping threads took: 0.0000036 seconds
+[2019-01-23T14:34:24.110+0000][1][safepoint    ] Application time: 0.0000833 seconds
+[2019-01-23T14:34:24.110+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001012 seconds, Stopping threads took: 0.0000454 seconds
+[2019-01-23T14:34:24.110+0000][1][safepoint    ] Application time: 0.0000637 seconds
+[2019-01-23T14:34:24.110+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000584 seconds, Stopping threads took: 0.0000038 seconds
+[2019-01-23T14:34:24.110+0000][1][safepoint    ] Application time: 0.0000943 seconds
+[2019-01-23T14:34:24.110+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000518 seconds, Stopping threads took: 0.0000067 seconds
+[2019-01-23T14:34:24.110+0000][1][safepoint    ] Application time: 0.0000898 seconds
+[2019-01-23T14:34:24.111+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000447 seconds, Stopping threads took: 0.0000036 seconds
+[2019-01-23T14:34:24.111+0000][1][safepoint    ] Application time: 0.0001143 seconds
+[2019-01-23T14:34:24.111+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001592 seconds, Stopping threads took: 0.0000477 seconds
+[2019-01-23T14:34:24.111+0000][1][safepoint    ] Application time: 0.0000897 seconds
+[2019-01-23T14:34:24.111+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001069 seconds, Stopping threads took: 0.0000254 seconds
+[2019-01-23T14:34:24.111+0000][1][safepoint    ] Application time: 0.0000924 seconds
+[2019-01-23T14:34:24.111+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000505 seconds, Stopping threads took: 0.0000044 seconds
+[2019-01-23T14:34:24.111+0000][1][safepoint    ] Application time: 0.0001546 seconds
+[2019-01-23T14:34:24.111+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000569 seconds, Stopping threads took: 0.0000122 seconds
+[2019-01-23T14:34:24.112+0000][1][safepoint    ] Application time: 0.0000808 seconds
+[2019-01-23T14:34:24.112+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000716 seconds, Stopping threads took: 0.0000307 seconds
+[2019-01-23T14:34:24.112+0000][1][safepoint    ] Application time: 0.0000860 seconds
+[2019-01-23T14:34:24.112+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000503 seconds, Stopping threads took: 0.0000074 seconds
+[2019-01-23T14:34:24.482+0000][1][safepoint    ] Application time: 0.3698663 seconds
+[2019-01-23T14:34:24.482+0000][1][gc,start     ] GC(4) Pause Young (Allocation Failure)
+[2019-01-23T14:34:24.482+0000][1][gc,task      ] GC(4) Using 2 workers of 2 for evacuation
+[2019-01-23T14:34:24.505+0000][1][gc,age       ] GC(4) Desired survivor size 4456448 bytes, new threshold 2 (max threshold 6)
+[2019-01-23T14:34:24.505+0000][1][gc,age       ] GC(4) Age table with threshold 2 (max threshold 6)
+[2019-01-23T14:34:24.505+0000][1][gc,age       ] GC(4) - age   1:    2605320 bytes,    2605320 total
+[2019-01-23T14:34:24.505+0000][1][gc,age       ] GC(4) - age   2:    2189240 bytes,    4794560 total
+[2019-01-23T14:34:24.505+0000][1][gc,age       ] GC(4) - age   3:     478640 bytes,    5273200 total
+[2019-01-23T14:34:24.505+0000][1][gc,heap      ] GC(4) ParNew: 75271K->7465K(78656K)
+[2019-01-23T14:34:24.505+0000][1][gc,heap      ] GC(4) CMS: 6665K->6665K(174784K)
+[2019-01-23T14:34:24.505+0000][1][gc,metaspace ] GC(4) Metaspace: 25413K->25413K(1073152K)
+[2019-01-23T14:34:24.505+0000][1][gc           ] GC(4) Pause Young (Allocation Failure) 80M->13M(247M) 23.399ms
+[2019-01-23T14:34:24.505+0000][1][gc,cpu       ] GC(4) User=0.03s Sys=0.01s Real=0.02s
+[2019-01-23T14:34:24.505+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0235608 seconds, Stopping threads took: 0.0000198 seconds
+[2019-01-23T14:34:24.515+0000][1][safepoint    ] Application time: 0.0094054 seconds
+[2019-01-23T14:34:24.520+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0044598 seconds, Stopping threads took: 0.0044008 seconds
+[2019-01-23T14:34:24.522+0000][1][safepoint    ] Application time: 0.0026709 seconds
+[2019-01-23T14:34:24.525+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0026566 seconds, Stopping threads took: 0.0026065 seconds
+[2019-01-23T14:34:25.070+0000][1][safepoint    ] Application time: 0.5449819 seconds
+[2019-01-23T14:34:25.071+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0006025 seconds, Stopping threads took: 0.0000196 seconds
+[2019-01-23T14:34:25.093+0000][1][safepoint    ] Application time: 0.0224926 seconds
+[2019-01-23T14:34:25.093+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001072 seconds, Stopping threads took: 0.0000196 seconds
+[2019-01-23T14:34:25.101+0000][1][safepoint    ] Application time: 0.0080114 seconds
+[2019-01-23T14:34:25.102+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000669 seconds, Stopping threads took: 0.0000178 seconds
+[2019-01-23T14:34:25.308+0000][1][safepoint    ] Application time: 0.2060577 seconds
+[2019-01-23T14:34:25.308+0000][1][gc,start     ] GC(5) Pause Young (Allocation Failure)
+[2019-01-23T14:34:25.308+0000][1][gc,task      ] GC(5) Using 2 workers of 2 for evacuation
+[2019-01-23T14:34:25.368+0000][1][gc,age       ] GC(5) Desired survivor size 4456448 bytes, new threshold 6 (max threshold 6)
+[2019-01-23T14:34:25.368+0000][1][gc,age       ] GC(5) Age table with threshold 6 (max threshold 6)
+[2019-01-23T14:34:25.368+0000][1][gc,age       ] GC(5) - age   1:    2634840 bytes,    2634840 total
+[2019-01-23T14:34:25.368+0000][1][gc,age       ] GC(5) - age   2:     994800 bytes,    3629640 total
+[2019-01-23T14:34:25.368+0000][1][gc,heap      ] GC(5) ParNew: 77417K->4795K(78656K)
+[2019-01-23T14:34:25.368+0000][1][gc,heap      ] GC(5) CMS: 6665K->9302K(174784K)
+[2019-01-23T14:34:25.368+0000][1][gc,metaspace ] GC(5) Metaspace: 25820K->25820K(1073152K)
+[2019-01-23T14:34:25.368+0000][1][gc           ] GC(5) Pause Young (Allocation Failure) 82M->13M(247M) 60.386ms
+[2019-01-23T14:34:25.368+0000][1][gc,cpu       ] GC(5) User=0.06s Sys=0.00s Real=0.06s
+[2019-01-23T14:34:25.368+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0605884 seconds, Stopping threads took: 0.0000356 seconds
+[2019-01-23T14:34:25.611+0000][1][safepoint    ] Application time: 0.2422783 seconds
+[2019-01-23T14:34:25.611+0000][1][gc,start     ] GC(6) Pause Young (Allocation Failure)
+[2019-01-23T14:34:25.611+0000][1][gc,task      ] GC(6) Using 2 workers of 2 for evacuation
+[2019-01-23T14:34:25.614+0000][1][gc,age       ] GC(6) Desired survivor size 4456448 bytes, new threshold 6 (max threshold 6)
+[2019-01-23T14:34:25.614+0000][1][gc,age       ] GC(6) Age table with threshold 6 (max threshold 6)
+[2019-01-23T14:34:25.614+0000][1][gc,age       ] GC(6) - age   1:     166216 bytes,     166216 total
+[2019-01-23T14:34:25.614+0000][1][gc,age       ] GC(6) - age   2:    2015592 bytes,    2181808 total
+[2019-01-23T14:34:25.614+0000][1][gc,age       ] GC(6) - age   3:     994800 bytes,    3176608 total
+[2019-01-23T14:34:25.614+0000][1][gc,heap      ] GC(6) ParNew: 74747K->3857K(78656K)
+[2019-01-23T14:34:25.614+0000][1][gc,heap      ] GC(6) CMS: 9302K->9302K(174784K)
+[2019-01-23T14:34:25.614+0000][1][gc,metaspace ] GC(6) Metaspace: 25928K->25928K(1073152K)
+[2019-01-23T14:34:25.614+0000][1][gc           ] GC(6) Pause Young (Allocation Failure) 82M->12M(247M) 3.490ms
+[2019-01-23T14:34:25.614+0000][1][gc,cpu       ] GC(6) User=0.01s Sys=0.00s Real=0.00s
+[2019-01-23T14:34:25.615+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0040357 seconds, Stopping threads took: 0.0000191 seconds
+[2019-01-23T14:34:26.000+0000][1][safepoint    ] Application time: 0.3851934 seconds
+[2019-01-23T14:34:26.000+0000][1][gc,start     ] GC(7) Pause Young (Allocation Failure)
+[2019-01-23T14:34:26.000+0000][1][gc,task      ] GC(7) Using 2 workers of 2 for evacuation
+[2019-01-23T14:34:26.004+0000][1][gc,age       ] GC(7) Desired survivor size 4456448 bytes, new threshold 4 (max threshold 6)
+[2019-01-23T14:34:26.004+0000][1][gc,age       ] GC(7) Age table with threshold 4 (max threshold 6)
+[2019-01-23T14:34:26.004+0000][1][gc,age       ] GC(7) - age   1:    1432576 bytes,    1432576 total
+[2019-01-23T14:34:26.004+0000][1][gc,age       ] GC(7) - age   2:     146160 bytes,    1578736 total
+[2019-01-23T14:34:26.004+0000][1][gc,age       ] GC(7) - age   3:    2015592 bytes,    3594328 total
+[2019-01-23T14:34:26.004+0000][1][gc,age       ] GC(7) - age   4:     994800 bytes,    4589128 total
+[2019-01-23T14:34:26.004+0000][1][gc,heap      ] GC(7) ParNew: 73809K->6581K(78656K)
+[2019-01-23T14:34:26.004+0000][1][gc,heap      ] GC(7) CMS: 9302K->9302K(174784K)
+[2019-01-23T14:34:26.004+0000][1][gc,metaspace ] GC(7) Metaspace: 26429K->26429K(1073152K)
+[2019-01-23T14:34:26.004+0000][1][gc           ] GC(7) Pause Young (Allocation Failure) 81M->15M(247M) 4.278ms
+[2019-01-23T14:34:26.004+0000][1][gc,cpu       ] GC(7) User=0.02s Sys=0.00s Real=0.00s
+[2019-01-23T14:34:26.004+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0044025 seconds, Stopping threads took: 0.0000128 seconds
+[2019-01-23T14:34:26.004+0000][1][safepoint    ] Application time: 0.0001205 seconds
+[2019-01-23T14:34:26.007+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0025560 seconds, Stopping threads took: 0.0025035 seconds
+[2019-01-23T14:34:26.007+0000][1][safepoint    ] Application time: 0.0000711 seconds
+[2019-01-23T14:34:26.010+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0025416 seconds, Stopping threads took: 0.0025078 seconds
+[2019-01-23T14:34:26.010+0000][1][safepoint    ] Application time: 0.0002367 seconds
+[2019-01-23T14:34:26.011+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0009675 seconds, Stopping threads took: 0.0009207 seconds
+[2019-01-23T14:34:26.011+0000][1][safepoint    ] Application time: 0.0000665 seconds
+[2019-01-23T14:34:26.011+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0003342 seconds, Stopping threads took: 0.0003003 seconds
+[2019-01-23T14:34:26.011+0000][1][safepoint    ] Application time: 0.0000665 seconds
+[2019-01-23T14:34:26.012+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0004461 seconds, Stopping threads took: 0.0003231 seconds
+[2019-01-23T14:34:26.012+0000][1][safepoint    ] Application time: 0.0000603 seconds
+[2019-01-23T14:34:26.012+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0002581 seconds, Stopping threads took: 0.0002192 seconds
+[2019-01-23T14:34:26.012+0000][1][safepoint    ] Application time: 0.0000676 seconds
+[2019-01-23T14:34:26.013+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0003956 seconds, Stopping threads took: 0.0003248 seconds
+[2019-01-23T14:34:26.013+0000][1][safepoint    ] Application time: 0.0000571 seconds
+[2019-01-23T14:34:26.013+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0003389 seconds, Stopping threads took: 0.0002850 seconds
+[2019-01-23T14:34:26.013+0000][1][safepoint    ] Application time: 0.0000758 seconds
+[2019-01-23T14:34:26.014+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0003298 seconds, Stopping threads took: 0.0003005 seconds
+[2019-01-23T14:34:26.014+0000][1][safepoint    ] Application time: 0.0000616 seconds
+[2019-01-23T14:34:26.014+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0003715 seconds, Stopping threads took: 0.0003322 seconds
+[2019-01-23T14:34:26.014+0000][1][safepoint    ] Application time: 0.0000689 seconds
+[2019-01-23T14:34:26.014+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0003521 seconds, Stopping threads took: 0.0003118 seconds
+[2019-01-23T14:34:26.014+0000][1][safepoint    ] Application time: 0.0000502 seconds
+[2019-01-23T14:34:26.015+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0003450 seconds, Stopping threads took: 0.0003085 seconds
+[2019-01-23T14:34:26.015+0000][1][safepoint    ] Application time: 0.0000671 seconds
+[2019-01-23T14:34:26.015+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0004760 seconds, Stopping threads took: 0.0004462 seconds
+[2019-01-23T14:34:26.665+0000][1][safepoint    ] Application time: 0.6499889 seconds
+[2019-01-23T14:34:26.666+0000][1][gc,start     ] GC(8) Pause Young (Allocation Failure)
+[2019-01-23T14:34:26.666+0000][1][gc,task      ] GC(8) Using 2 workers of 2 for evacuation
+[2019-01-23T14:34:26.686+0000][1][gc,age       ] GC(8) Desired survivor size 4456448 bytes, new threshold 4 (max threshold 6)
+[2019-01-23T14:34:26.686+0000][1][gc,age       ] GC(8) Age table with threshold 4 (max threshold 6)
+[2019-01-23T14:34:26.686+0000][1][gc,age       ] GC(8) - age   1:    1675768 bytes,    1675768 total
+[2019-01-23T14:34:26.686+0000][1][gc,age       ] GC(8) - age   2:    1417280 bytes,    3093048 total
+[2019-01-23T14:34:26.686+0000][1][gc,age       ] GC(8) - age   3:     146160 bytes,    3239208 total
+[2019-01-23T14:34:26.686+0000][1][gc,age       ] GC(8) - age   4:    2013200 bytes,    5252408 total
+[2019-01-23T14:34:26.686+0000][1][gc,heap      ] GC(8) ParNew: 76533K->8368K(78656K)
+[2019-01-23T14:34:26.687+0000][1][gc,heap      ] GC(8) CMS: 9302K->10279K(174784K)
+[2019-01-23T14:34:26.687+0000][1][gc,metaspace ] GC(8) Metaspace: 27221K->27221K(1075200K)
+[2019-01-23T14:34:26.687+0000][1][gc           ] GC(8) Pause Young (Allocation Failure) 83M->18M(247M) 20.998ms
+[2019-01-23T14:34:26.687+0000][1][gc,cpu       ] GC(8) User=0.02s Sys=0.00s Real=0.03s
+[2019-01-23T14:34:26.687+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0211578 seconds, Stopping threads took: 0.0000188 seconds
+[2019-01-23T14:34:26.726+0000][1][safepoint    ] Application time: 0.0395087 seconds
+[2019-01-23T14:34:26.726+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000762 seconds, Stopping threads took: 0.0000175 seconds
+[2019-01-23T14:34:27.163+0000][1][safepoint    ] Application time: 0.4363230 seconds
+[2019-01-23T14:34:27.163+0000][1][gc,start     ] GC(9) Pause Young (Allocation Failure)
+[2019-01-23T14:34:27.163+0000][1][gc,task      ] GC(9) Using 2 workers of 2 for evacuation
+[2019-01-23T14:34:27.184+0000][1][gc,age       ] GC(9) Desired survivor size 4456448 bytes, new threshold 6 (max threshold 6)
+[2019-01-23T14:34:27.184+0000][1][gc,age       ] GC(9) Age table with threshold 6 (max threshold 6)
+[2019-01-23T14:34:27.184+0000][1][gc,age       ] GC(9) - age   1:    1576504 bytes,    1576504 total
+[2019-01-23T14:34:27.184+0000][1][gc,age       ] GC(9) - age   2:     430968 bytes,    2007472 total
+[2019-01-23T14:34:27.184+0000][1][gc,age       ] GC(9) - age   3:    1417192 bytes,    3424664 total
+[2019-01-23T14:34:27.184+0000][1][gc,age       ] GC(9) - age   4:     146160 bytes,    3570824 total
+[2019-01-23T14:34:27.184+0000][1][gc,heap      ] GC(9) ParNew: 78320K->4893K(78656K)
+[2019-01-23T14:34:27.184+0000][1][gc,heap      ] GC(9) CMS: 10279K->12260K(174784K)
+[2019-01-23T14:34:27.184+0000][1][gc,metaspace ] GC(9) Metaspace: 27276K->27276K(1075200K)
+[2019-01-23T14:34:27.184+0000][1][gc           ] GC(9) Pause Young (Allocation Failure) 86M->16M(247M) 21.487ms
+[2019-01-23T14:34:27.184+0000][1][gc,cpu       ] GC(9) User=0.04s Sys=0.00s Real=0.02s
+[2019-01-23T14:34:27.184+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0216193 seconds, Stopping threads took: 0.0000227 seconds
+[2019-01-23T14:34:27.498+0000][1][safepoint    ] Application time: 0.3142097 seconds
+[2019-01-23T14:34:27.499+0000][1][gc,start     ] GC(10) Pause Young (Allocation Failure)
+[2019-01-23T14:34:27.499+0000][1][gc,task      ] GC(10) Using 2 workers of 2 for evacuation
+[2019-01-23T14:34:27.504+0000][1][gc,age       ] GC(10) Desired survivor size 4456448 bytes, new threshold 6 (max threshold 6)
+[2019-01-23T14:34:27.504+0000][1][gc,age       ] GC(10) Age table with threshold 6 (max threshold 6)
+[2019-01-23T14:34:27.504+0000][1][gc,age       ] GC(10) - age   1:     908016 bytes,     908016 total
+[2019-01-23T14:34:27.504+0000][1][gc,age       ] GC(10) - age   2:     240928 bytes,    1148944 total
+[2019-01-23T14:34:27.504+0000][1][gc,age       ] GC(10) - age   3:     430968 bytes,    1579912 total
+[2019-01-23T14:34:27.504+0000][1][gc,age       ] GC(10) - age   4:    1417064 bytes,    2996976 total
+[2019-01-23T14:34:27.504+0000][1][gc,age       ] GC(10) - age   5:     145872 bytes,    3142848 total
+[2019-01-23T14:34:27.504+0000][1][gc,heap      ] GC(10) ParNew: 74845K->3838K(78656K)
+[2019-01-23T14:34:27.504+0000][1][gc,heap      ] GC(10) CMS: 12260K->12260K(174784K)
+[2019-01-23T14:34:27.504+0000][1][gc,metaspace ] GC(10) Metaspace: 27515K->27515K(1075200K)
+[2019-01-23T14:34:27.504+0000][1][gc           ] GC(10) Pause Young (Allocation Failure) 85M->15M(247M) 5.669ms
+[2019-01-23T14:34:27.504+0000][1][gc,cpu       ] GC(10) User=0.01s Sys=0.00s Real=0.00s
+[2019-01-23T14:34:27.504+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0058165 seconds, Stopping threads took: 0.0000249 seconds
+[2019-01-23T14:34:28.204+0000][1][safepoint    ] Application time: 0.7000162 seconds
+[2019-01-23T14:34:28.204+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000995 seconds, Stopping threads took: 0.0000089 seconds
+[2019-01-23T14:34:28.640+0000][1][safepoint    ] Application time: 0.4353852 seconds
+[2019-01-23T14:34:28.640+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0004721 seconds, Stopping threads took: 0.0000078 seconds
+[2019-01-23T14:34:29.641+0000][1][safepoint    ] Application time: 1.0001797 seconds
+[2019-01-23T14:34:29.663+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0216722 seconds, Stopping threads took: 0.0214046 seconds
+[2019-01-23T14:34:29.854+0000][1][safepoint    ] Application time: 0.1908517 seconds
+[2019-01-23T14:34:29.854+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0004426 seconds, Stopping threads took: 0.0003804 seconds
+[2019-01-23T14:34:29.859+0000][1][safepoint    ] Application time: 0.0049747 seconds
+[2019-01-23T14:34:29.859+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000527 seconds, Stopping threads took: 0.0000062 seconds
+[2019-01-23T14:34:30.382+0000][1][safepoint    ] Application time: 0.5231179 seconds
+[2019-01-23T14:34:30.382+0000][1][gc,start     ] GC(11) Pause Young (Allocation Failure)
+[2019-01-23T14:34:30.382+0000][1][gc,task      ] GC(11) Using 2 workers of 2 for evacuation
+[2019-01-23T14:34:30.408+0000][1][gc,age       ] GC(11) Desired survivor size 4456448 bytes, new threshold 1 (max threshold 6)
+[2019-01-23T14:34:30.408+0000][1][gc,age       ] GC(11) Age table with threshold 1 (max threshold 6)
+[2019-01-23T14:34:30.409+0000][1][gc,age       ] GC(11) - age   1:    6314168 bytes,    6314168 total
+[2019-01-23T14:34:30.409+0000][1][gc,age       ] GC(11) - age   2:     323080 bytes,    6637248 total
+[2019-01-23T14:34:30.409+0000][1][gc,age       ] GC(11) - age   3:     240664 bytes,    6877912 total
+[2019-01-23T14:34:30.409+0000][1][gc,age       ] GC(11) - age   4:     427736 bytes,    7305648 total
+[2019-01-23T14:34:30.409+0000][1][gc,age       ] GC(11) - age   5:    1414704 bytes,    8720352 total
+[2019-01-23T14:34:30.409+0000][1][gc,age       ] GC(11) - age   6:     145808 bytes,    8866160 total
+[2019-01-23T14:34:30.409+0000][1][gc,heap      ] GC(11) ParNew: 73790K->8704K(78656K)
+[2019-01-23T14:34:30.409+0000][1][gc,heap      ] GC(11) CMS: 12260K->12755K(174784K)
+[2019-01-23T14:34:30.409+0000][1][gc,metaspace ] GC(11) Metaspace: 33870K->33870K(1081344K)
+[2019-01-23T14:34:30.409+0000][1][gc           ] GC(11) Pause Young (Allocation Failure) 84M->20M(247M) 26.273ms
+[2019-01-23T14:34:30.409+0000][1][gc,cpu       ] GC(11) User=0.06s Sys=0.00s Real=0.03s
+[2019-01-23T14:34:30.409+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0264242 seconds, Stopping threads took: 0.0000204 seconds
+[2019-01-23T14:34:31.411+0000][1][safepoint    ] Application time: 1.0021549 seconds
+[2019-01-23T14:34:31.415+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0039610 seconds, Stopping threads took: 0.0039348 seconds
+[2019-01-23T14:34:32.360+0000][1][safepoint    ] Application time: 0.9449032 seconds
+[2019-01-23T14:34:32.360+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001052 seconds, Stopping threads took: 0.0000213 seconds
+[2019-01-23T14:34:32.401+0000][1][safepoint    ] Application time: 0.0405930 seconds
+[2019-01-23T14:34:32.420+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0191320 seconds, Stopping threads took: 0.0188890 seconds
+[2019-01-23T14:34:32.506+0000][1][safepoint    ] Application time: 0.0862399 seconds
+[2019-01-23T14:34:32.515+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0093882 seconds, Stopping threads took: 0.0081478 seconds
+[2019-01-23T14:34:32.543+0000][1][safepoint    ] Application time: 0.0271417 seconds
+[2019-01-23T14:34:32.548+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0056702 seconds, Stopping threads took: 0.0055422 seconds
+[2019-01-23T14:34:32.576+0000][1][safepoint    ] Application time: 0.0274865 seconds
+[2019-01-23T14:34:32.582+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0060503 seconds, Stopping threads took: 0.0059863 seconds
+[2019-01-23T14:34:32.582+0000][1][safepoint    ] Application time: 0.0001459 seconds
+[2019-01-23T14:34:32.582+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001080 seconds, Stopping threads took: 0.0000545 seconds
+[2019-01-23T14:34:32.616+0000][1][safepoint    ] Application time: 0.0336439 seconds
+[2019-01-23T14:34:32.621+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0051953 seconds, Stopping threads took: 0.0051170 seconds
+[2019-01-23T14:34:32.633+0000][1][safepoint    ] Application time: 0.0122086 seconds
+[2019-01-23T14:34:32.634+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0006201 seconds, Stopping threads took: 0.0004446 seconds
+[2019-01-23T14:34:32.650+0000][1][safepoint    ] Application time: 0.0156258 seconds
+[2019-01-23T14:34:32.651+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0006673 seconds, Stopping threads took: 0.0003143 seconds
+[2019-01-23T14:34:32.673+0000][1][safepoint    ] Application time: 0.0218629 seconds
+[2019-01-23T14:34:32.682+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0087277 seconds, Stopping threads took: 0.0086772 seconds
+[2019-01-23T14:34:32.682+0000][1][safepoint    ] Application time: 0.0004815 seconds
+[2019-01-23T14:34:32.682+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000575 seconds, Stopping threads took: 0.0000212 seconds
+[2019-01-23T14:34:32.682+0000][1][safepoint    ] Application time: 0.0000517 seconds
+[2019-01-23T14:34:32.682+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000389 seconds, Stopping threads took: 0.0000024 seconds
+[2019-01-23T14:34:32.682+0000][1][safepoint    ] Application time: 0.0000535 seconds
+[2019-01-23T14:34:32.682+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000301 seconds, Stopping threads took: 0.0000065 seconds
+[2019-01-23T14:34:32.683+0000][1][safepoint    ] Application time: 0.0001070 seconds
+[2019-01-23T14:34:32.683+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0000683 seconds, Stopping threads took: 0.0000192 seconds
+[2019-01-23T14:34:32.688+0000][1][safepoint    ] Application time: 0.0053945 seconds
+[2019-01-23T14:34:32.692+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0034121 seconds, Stopping threads took: 0.0015308 seconds
+[2019-01-23T14:34:32.698+0000][1][safepoint    ] Application time: 0.0064279 seconds
+[2019-01-23T14:34:32.698+0000][1][safepoint    ] Total time for which application threads were stopped: 0.0001626 seconds, Stopping threads took: 0.0000582 seconds
+[2019-01-23T14:34:32.706+0000][1][gc,heap,exit ] Heap
+[2019-01-23T14:34:32.706+0000][1][gc,heap,exit ]  par new generation   total 78656K, used 71547K [0x00000000f0000000, 0x00000000f5550000, 0x00000000f5550000)
+[2019-01-23T14:34:32.706+0000][1][gc,heap,exit ]   eden space 69952K,  89% used [0x00000000f0000000, 0x00000000f3d5ed18, 0x00000000f4450000)
+[2019-01-23T14:34:32.706+0000][1][gc,heap,exit ]   from space 8704K, 100% used [0x00000000f4cd0000, 0x00000000f5550000, 0x00000000f5550000)
+[2019-01-23T14:34:32.706+0000][1][gc,heap,exit ]   to   space 8704K,   0% used [0x00000000f4450000, 0x00000000f4450000, 0x00000000f4cd0000)
+[2019-01-23T14:34:32.706+0000][1][gc,heap,exit ]  concurrent mark-sweep generation total 174784K, used 12755K [0x00000000f5550000, 0x0000000100000000, 0x0000000100000000)
+[2019-01-23T14:34:32.706+0000][1][gc,heap,exit ]  Metaspace       used 33955K, capacity 35534K, committed 35916K, reserved 1081344K
+[2019-01-23T14:34:32.706+0000][1][gc,heap,exit ]   class space    used 3747K, capacity 4336K, committed 4428K, reserved 1048576K
+[2019-01-23T14:34:32.706+0000][1][safepoint    ] Application time: 0.0082188 seconds

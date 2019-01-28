@@ -1,0 +1,40 @@
+version: '3.4'
+networks:
+  net-data:
+    driver: bridge
+services:
+  sonarqube:
+    container_name: sonarqube
+    image: sonarqube:6.6
+    ports:
+    - "9000:9000"
+    - "9095:9092"
+    volumes:
+    - ./sonarqube/data:/opt/sonarqube/data
+
+  data-elasticsearch:
+    container_name: data-elasticsearch
+    build: elasticsearch/
+    ports:
+    - "9200:9200"
+    - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+    - net-data
+    volumes:
+    - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    - ./elasticsearch/data:/usr/share/elasticsearch/data
+    - ./elasticsearch/logs:/usr/share/elasticsearch/logs
+
+  data-kibana:
+    container_name: data-kibana
+    build: kibana/
+    ports:
+    - "5601:5601"
+    networks:
+    - net-data
+    depends_on:
+    - data-elasticsearch
+    volumes:
+    - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
