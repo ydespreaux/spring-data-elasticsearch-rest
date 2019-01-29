@@ -76,6 +76,10 @@ import org.elasticsearch.script.mustache.SearchTemplateResponse;
 
 import java.io.IOException;
 
+/**
+ * @author Yoann Despréaux
+ * @since 1.0.0
+ */
 public interface RestElasticsearchClient {
 
     RequestOptions getDefaultRequestOptions();

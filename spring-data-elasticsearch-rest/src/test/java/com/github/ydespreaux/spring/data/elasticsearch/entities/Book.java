@@ -20,7 +20,7 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.entities;
 
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Document;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.IndexedDocument;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
@@ -31,7 +31,7 @@ import java.util.Objects;
 
 /**
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Getter
 @Setter
@@ -39,7 +39,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@Document(indexName = "books", type = "book", indexPath = "classpath:indices/book.index")
+@IndexedDocument(indexName = "books", type = "book", settingsAndMappingPath = "classpath:indices/book.index")
 public class Book {
 
     @Id

@@ -24,7 +24,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.core.query;
  * SourceFilter implementation for providing includes and excludes.
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public class FetchSourceFilter implements SourceFilter {
 
@@ -50,7 +50,7 @@ public class FetchSourceFilter implements SourceFilter {
      * SourceFilter builder
      *
      * @author Yoann Despréaux
-     * @since 0.0.1
+     * @since 1.0.0
      */
     public static class FetchSourceFilterBuilder {
 

@@ -77,6 +77,10 @@ import org.elasticsearch.script.mustache.SearchTemplateResponse;
 
 import java.io.IOException;
 
+/**
+ * @author Yoann Despréaux
+ * @since 1.0.0
+ */
 @Slf4j
 public class DefaultRestElasticsearchClient implements RestElasticsearchClient {
 

@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public class DefaultResultsMapper implements ResultsMapper {
 

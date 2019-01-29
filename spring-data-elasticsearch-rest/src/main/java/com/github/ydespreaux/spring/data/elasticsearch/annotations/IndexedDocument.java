@@ -29,12 +29,12 @@ import java.lang.annotation.*;
  * Cette annotation permet de définir un document à indexer dans elasticsearch utilisant un index time-based.
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
-@Inherited
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-public @interface Document {
+public @interface IndexedDocument {
 
     /**
      * Création de l'index si ce dernier n'existe pas.
@@ -81,7 +81,7 @@ public @interface Document {
      *
      * @return the index path
      */
-    String indexPath() default "";
+    String settingsAndMappingPath() default "";
 
     /**
      * @return

@@ -27,7 +27,7 @@ import org.junit.runners.Suite;
 
 /**
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({

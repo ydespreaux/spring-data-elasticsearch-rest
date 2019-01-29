@@ -38,7 +38,7 @@ import java.util.Objects;
  * Elasticsearch specific {@link org.springframework.data.mapping.PersistentProperty} implementation processing
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public class SimpleElasticsearchPersistentProperty extends
         AnnotationBasedPersistentProperty<ElasticsearchPersistentProperty> implements ElasticsearchPersistentProperty {

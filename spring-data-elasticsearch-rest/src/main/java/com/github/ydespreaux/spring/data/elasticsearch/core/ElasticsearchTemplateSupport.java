@@ -20,12 +20,14 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core;
 
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Document;
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Projection;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.IndexedDocument;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.ProjectionDocument;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.RolloverDocument;
 import com.github.ydespreaux.spring.data.elasticsearch.core.converter.ElasticsearchConverter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.*;
 import com.github.ydespreaux.spring.data.elasticsearch.core.request.RequestsBuilder;
+import com.github.ydespreaux.spring.data.elasticsearch.core.triggers.TriggerManager;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
@@ -59,7 +61,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 /**
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Slf4j
 public abstract class ElasticsearchTemplateSupport implements ApplicationContextAware {
@@ -76,6 +78,9 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
     @Getter
     private final ResultsMapper resultsMapper;
 
+    @Getter
+    private final TriggerManager triggerManager;
+
     private RequestsBuilder requestsBuilder;
 
     /**
@@ -90,9 +95,11 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
      * @param resultsMapper          the given result mapper
      */
     public ElasticsearchTemplateSupport(final ElasticsearchConverter elasticsearchConverter,
-                                        final ResultsMapper resultsMapper) {
+                                        final ResultsMapper resultsMapper,
+                                        final TriggerManager triggerManager) {
         this.elasticsearchConverter = elasticsearchConverter;
         this.resultsMapper = resultsMapper;
+        this.triggerManager = triggerManager;
     }
 
     /**
@@ -130,8 +137,10 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
      * @see ElasticsearchOperations#getPersistentEntityFor(Class)  method
      */
     public <T> ElasticsearchPersistentEntity<T> getPersistentEntityFor(Class<T> clazz) {
-        Assert.isTrue(clazz.isAnnotationPresent(Document.class) || clazz.isAnnotationPresent(Projection.class), "Unable to identify template. " + clazz.getSimpleName()
-                + " is not a TimeBasedDocument. Make sure the document class is annotated with @TimeBasedDocument");
+        Assert.isTrue(clazz.isAnnotationPresent(IndexedDocument.class)
+                || clazz.isAnnotationPresent(RolloverDocument.class)
+                || clazz.isAnnotationPresent(ProjectionDocument.class), "Unable to identify document. " + clazz.getSimpleName()
+                + " is not a elasticsearch document. Make sure the document class is annotated with @Document or @DocumentRollover or @Projection");
         return getElasticsearchConverter().getRequiredPersistentEntity(clazz);
     }
 
@@ -150,7 +159,7 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
     protected <T> IndexRequest createIndexRequest(T source, Class<?> clazz) {
         Objects.requireNonNull(source);
         ElasticsearchPersistentEntity<T> persistentEntity = (ElasticsearchPersistentEntity<T>) getPersistentEntityFor(clazz);
-        String indexName = persistentEntity.getIndexName(source);
+        String indexName = persistentEntity.getAliasOrIndexWriter(source);
         String type = persistentEntity.getTypeName();
         String id = persistentEntity.getPersistentEntityId(source);
         IndexRequest indexRequest = id != null ? new IndexRequest(indexName, type, id) : new IndexRequest(indexName, type);
@@ -512,7 +521,7 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
     protected <T> void setPersistentEntityIndexAndTypeAndSourceFilter(Query query, Class<T> clazz) {
         ElasticsearchPersistentEntity<T> persistentEntity = getPersistentEntityFor(clazz);
         if (query.getIndices().isEmpty()) {
-            query.addIndices(persistentEntity.getAliasOrIndexName());
+            query.addIndices(persistentEntity.getAliasOrIndexReader());
         }
         if (query.getTypes().isEmpty()) {
             query.addTypes(persistentEntity.getTypeName());

@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
  * ElasticsearchStringQuery
  *
  * @author Yoann Despréaux
- * @since 0.1.0
+ * @since 1.0.0
  */
 public class ElasticsearchStringQuery extends AbstractElasticsearchRepositoryQuery {
 

@@ -25,7 +25,7 @@ import org.elasticsearch.action.search.SearchResponse;
 /**
  * @param <T>
  * @author Yoann Despréaux
- * @since 0.1.0
+ * @since 1.0.0
  */
 public interface ResultsExtractor<T> {
 

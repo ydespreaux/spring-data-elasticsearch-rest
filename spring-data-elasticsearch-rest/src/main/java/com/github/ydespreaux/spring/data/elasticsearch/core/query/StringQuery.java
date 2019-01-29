@@ -26,7 +26,7 @@ import org.springframework.data.domain.Sort;
  * StringQuery
  *
  * @author Yoann Despréaux
- * @since 0.1.0
+ * @since 1.0.0
  */
 public class StringQuery extends AbstractQuery {
 

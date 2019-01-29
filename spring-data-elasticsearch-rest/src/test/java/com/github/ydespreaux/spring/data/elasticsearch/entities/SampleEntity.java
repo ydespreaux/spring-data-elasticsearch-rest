@@ -20,10 +20,10 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.entities;
 
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Document;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.IndexedDocument;
 import org.springframework.data.annotation.Id;
 
-@Document(indexName = "sample-index", type = "sample-type")
+@IndexedDocument(indexName = "sample-index", type = "sample-type")
 public class SampleEntity {
 
     @Id

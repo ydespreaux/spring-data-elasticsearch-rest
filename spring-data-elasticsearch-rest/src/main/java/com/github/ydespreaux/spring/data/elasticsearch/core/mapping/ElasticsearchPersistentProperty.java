@@ -27,7 +27,7 @@ import org.springframework.data.mapping.PersistentProperty;
  * ElasticsearchPersistentProperty
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public interface ElasticsearchPersistentProperty extends PersistentProperty<ElasticsearchPersistentProperty> {
 

@@ -34,7 +34,7 @@ import java.lang.annotation.*;
  * Spring Data repositories by default.
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

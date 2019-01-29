@@ -24,7 +24,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.core.query;
  * Defines a IndexBoost to be applied on the "indices_boost" query clause
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public class IndexBoost {
 

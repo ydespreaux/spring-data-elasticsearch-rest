@@ -37,7 +37,7 @@ import static org.junit.Assert.assertThat;
  * Tests for {@link OffsetTimeTypeAdapter}.
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 @RunWith(SpringRunner.class)
 public class OffsetTimeTypeAdapterTest {

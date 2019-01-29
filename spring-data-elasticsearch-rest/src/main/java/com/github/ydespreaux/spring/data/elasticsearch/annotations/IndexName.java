@@ -28,7 +28,7 @@ import java.lang.annotation.*;
  * Specifies that this field is used for storing the document score.
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

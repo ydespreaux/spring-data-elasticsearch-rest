@@ -20,7 +20,9 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.repository.config;
 
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Document;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.IndexedDocument;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.ProjectionDocument;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.RolloverDocument;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.ElasticsearchRepository;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.support.ElasticsearchRepositoryFactoryBean;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -34,7 +36,6 @@ import org.w3c.dom.Element;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 /**
  * {@link org.springframework.data.repository.config.RepositoryConfigurationExtension} implementation to configure
@@ -42,7 +43,7 @@ import java.util.Collections;
  * the equivalent XML element.
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public class ElasticsearchRepositoryConfigExtension extends RepositoryConfigurationExtensionSupport {
 
@@ -92,7 +93,7 @@ public class ElasticsearchRepositoryConfigExtension extends RepositoryConfigurat
      */
     @Override
     protected Collection<Class<? extends Annotation>> getIdentifyingAnnotations() {
-        return Collections.<Class<? extends Annotation>>singleton(Document.class);
+        return Arrays.asList(IndexedDocument.class, RolloverDocument.class, ProjectionDocument.class);
     }
 
     /*
@@ -101,7 +102,7 @@ public class ElasticsearchRepositoryConfigExtension extends RepositoryConfigurat
      */
     @Override
     protected Collection<Class<?>> getIdentifyingTypes() {
-        return Arrays.<Class<?>>asList(ElasticsearchRepository.class);
+        return Arrays.asList(ElasticsearchRepository.class);
     }
 
     @Override

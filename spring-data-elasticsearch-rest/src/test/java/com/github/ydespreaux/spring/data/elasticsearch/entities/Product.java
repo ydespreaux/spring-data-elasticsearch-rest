@@ -19,7 +19,7 @@
  */
 package com.github.ydespreaux.spring.data.elasticsearch.entities;
 
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Document;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.IndexedDocument;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 
@@ -31,7 +31,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @ToString
-@Document(indexName = "products", type = "product", indexPath = "classpath:indices/product.index")
+@IndexedDocument(indexName = "products", type = "product", settingsAndMappingPath = "classpath:indices/product.index")
 public class Product {
 
     @Id

@@ -26,10 +26,10 @@ import java.lang.annotation.*;
  * @author Yoann Despréaux
  * @since 0.0.3
  */
-@Inherited
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-public @interface Projection {
+public @interface ProjectionDocument {
 
     /**
      * @return

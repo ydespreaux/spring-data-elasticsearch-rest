@@ -54,7 +54,7 @@ public class RolloverTrigger implements Trigger {
     public Runnable processor() {
         return () -> {
             RolloverConfig config = entityInformation.getRolloverConfig();
-            elasticsearchOperations.rolloverIndex(config.getAlias().getName(), null, entityInformation.getIndexPath(), config.getRolloverConditions());
+            elasticsearchOperations.rolloverIndex(config.getAlias().getName(), null, entityInformation.getIndexPath(), config.getConditions());
         };
     }
 }

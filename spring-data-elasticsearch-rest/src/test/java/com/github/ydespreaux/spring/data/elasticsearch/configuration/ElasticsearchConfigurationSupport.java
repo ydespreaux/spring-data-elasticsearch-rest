@@ -52,8 +52,9 @@ public class ElasticsearchConfigurationSupport {
     ElasticsearchOperations restElasticsearchTemplate(
             final RestElasticsearchClient client,
             final ElasticsearchConverter converter,
-            final ResultsMapper resultsMapper) {
-        return new ElasticsearchTemplate(client, converter, resultsMapper);
+            final ResultsMapper resultsMapper,
+            final TriggerManager triggerManager) {
+        return new ElasticsearchTemplate(client, converter, resultsMapper, triggerManager);
     }
 
     @Bean

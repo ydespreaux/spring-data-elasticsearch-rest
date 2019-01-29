@@ -31,9 +31,10 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.elasticsearch.action.ActionRequest;
 
 /**
- * Lagstash aspect
+ * ClientLogger aspect
  *
- * @author xpax624
+ * @author Yoann Despréaux
+ * @since 1.0.0
  */
 @Slf4j
 @Aspect

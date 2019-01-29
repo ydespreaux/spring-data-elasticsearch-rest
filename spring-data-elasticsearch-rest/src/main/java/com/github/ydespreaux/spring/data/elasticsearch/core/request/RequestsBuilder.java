@@ -182,7 +182,7 @@ public class RequestsBuilder {
      */
     public <T> IndexRequest indexRequest(T source, ElasticsearchPersistentEntity<T> persistentEntity, ResultsMapper mapper) {
         Objects.requireNonNull(source);
-        String indexName = persistentEntity.getIndexName(source);
+        String indexName = persistentEntity.getAliasOrIndexWriter(source);
         String type = persistentEntity.getTypeName();
         String id = persistentEntity.getPersistentEntityId(source);
         IndexRequest indexRequest = id != null ? new IndexRequest(indexName, type, id) : new IndexRequest(indexName, type);

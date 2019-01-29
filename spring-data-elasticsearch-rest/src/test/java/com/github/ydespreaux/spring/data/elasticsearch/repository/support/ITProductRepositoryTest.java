@@ -50,6 +50,10 @@ import static org.junit.Assert.assertThat;
 @Profile("test-no-template")
 public class ITProductRepositoryTest {
 
+//    static {
+//        System.setProperty("spring.elasticsearch.rest.uris", "http://localhost:9200");
+//    }
+
     private static final String PRODUCT_INDEX_NAME = "products";
 
     @Autowired

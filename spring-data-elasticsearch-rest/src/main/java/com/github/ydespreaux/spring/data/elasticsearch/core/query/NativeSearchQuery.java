@@ -38,7 +38,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
  * NativeSearchQuery
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public class NativeSearchQuery extends AbstractQuery implements SearchQuery {
 

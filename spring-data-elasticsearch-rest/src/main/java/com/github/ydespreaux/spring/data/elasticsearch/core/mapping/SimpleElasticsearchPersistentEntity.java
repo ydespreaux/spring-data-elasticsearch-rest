@@ -20,15 +20,12 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core.mapping;
 
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Document;
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Projection;
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Rollover;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.*;
 import com.github.ydespreaux.spring.data.elasticsearch.core.IndexTimeBasedParameter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.IndexTimeBasedSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.FetchSourceFilter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.SourceFilter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.request.config.RolloverConfig;
-import com.github.ydespreaux.spring.data.elasticsearch.core.triggers.TriggerManager;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
@@ -38,6 +35,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.data.mapping.MappingException;
 import org.springframework.data.mapping.model.BasicPersistentEntity;
 import org.springframework.data.util.TypeInformation;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.time.Clock;
@@ -49,7 +47,7 @@ import java.util.regex.Pattern;
 /**
  * @param <T> generic type
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Slf4j
 @Getter
@@ -86,38 +84,85 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
      */
     private void afterPropertiesSet() {
         this.entityClass = this.getTypeInformation().getType();
-        boolean isProjection = this.entityClass.isAnnotationPresent(Projection.class);
-        Projection projection = isProjection ? this.entityClass.getAnnotation(Projection.class) : null;
-
-        Class<?> targetClass = isProjection ? projection.target() : this.entityClass;
-        Document document = targetClass.getAnnotation(Document.class);
-        if (document != null) {
-            this.typeName = document.type();
-            this.createIndex = isProjection ? false : document.createIndex();
-            this.indexPath = isProjection ? null : document.indexPath();
-            this.sourceFilter = isProjection ? new FetchSourceFilter.FetchSourceFilterBuilder().withIncludes(projection.fields()).build() : null;
-
-            Environment env = context.getEnvironment();
-            this.aliasName = getEnvironmentValue(env, document.aliasName());
-            this.indexName = getEnvironmentValue(env, document.indexName());
-            this.indexPattern = getEnvironmentValue(env, document.indexPattern());
-            this.indexTimeBased = StringUtils.hasText(this.indexPattern);
-            try {
-                this.indexSupport = document.indexTimeBasedSupport().newInstance();
-            } catch (Exception e) {
-                throw new ElasticsearchException(e);
-            }
-            this.scrollTime = Duration.ofSeconds(document.scrollTimeSeconds());
-
-            Rollover rolloverAnnotation = targetClass.getAnnotation(Rollover.class);
-            if (rolloverAnnotation != null) {
-                this.rollover = new RolloverConfig(rolloverAnnotation);
-                if (!this.rollover.hasConditions()) {
-                    throw new IllegalArgumentException("No condition defined");
-                }
-            }
+        if (this.entityClass.isAnnotationPresent(ProjectionDocument.class)) {
+            afterProjectionDocumentPropertySet(this.entityClass.getAnnotation(ProjectionDocument.class));
+        } else if (this.entityClass.isAnnotationPresent(IndexedDocument.class)) {
+            afterIndexedDocumentPropertySet(this.entityClass.getAnnotation(IndexedDocument.class));
+        } else if (this.entityClass.isAnnotationPresent(RolloverDocument.class)) {
+            afterRolloverDocumentPropertySet(this.entityClass.getAnnotation(RolloverDocument.class));
         }
     }
+
+    private void afterProjectionDocumentPropertySet(ProjectionDocument document) {
+        this.sourceFilter = new FetchSourceFilter.FetchSourceFilterBuilder().withIncludes(document.fields()).build();
+        Class<?> targetClass = document.target();
+        Assert.isTrue(targetClass.isAnnotationPresent(IndexedDocument.class) || targetClass.isAnnotationPresent(RolloverDocument.class),
+                "Invalid document projection. " + targetClass.getSimpleName()
+                        + "TargetClass is not a elasticsearch document. Make sure the target document class is annotated with @Document or @DocumentRollover");
+        if (targetClass.isAnnotationPresent(IndexedDocument.class)) {
+            afterIndexedDocumentPropertySet(targetClass.getAnnotation(IndexedDocument.class));
+        } else if (targetClass.isAnnotationPresent(RolloverDocument.class)) {
+            afterRolloverDocumentPropertySet(targetClass.getAnnotation(RolloverDocument.class));
+        }
+    }
+
+    private void afterIndexedDocumentPropertySet(IndexedDocument document) {
+        this.typeName = document.type();
+        this.createIndex = document.createIndex();
+        this.indexPath = document.settingsAndMappingPath();
+
+        Environment env = context.getEnvironment();
+        this.aliasName = getEnvironmentValue(env, document.aliasName());
+        this.indexName = getEnvironmentValue(env, document.indexName());
+        this.indexPattern = getEnvironmentValue(env, document.indexPattern());
+        this.indexTimeBased = StringUtils.hasText(this.indexPattern);
+        try {
+            this.indexSupport = document.indexTimeBasedSupport().newInstance();
+        } catch (Exception e) {
+            throw new ElasticsearchException(e);
+        }
+        this.scrollTime = Duration.ofSeconds(document.scrollTimeSeconds());
+    }
+
+    private void afterRolloverDocumentPropertySet(RolloverDocument document) {
+        this.typeName = document.type();
+        this.createIndex = document.createIndex();
+        this.indexPath = document.settingsAndMappingPath();
+
+        Environment env = context.getEnvironment();
+        this.aliasName = getEnvironmentValue(env, document.aliasName());
+        this.indexName = getEnvironmentValue(env, document.indexName());
+        this.indexPattern = getEnvironmentValue(env, document.indexPattern());
+        this.indexTimeBased = StringUtils.hasText(this.indexPattern);
+        this.indexSupport = new IndexTimeBasedSupport();
+        this.scrollTime = Duration.ofSeconds(document.scrollTimeSeconds());
+
+        Rollover rolloverAnnotation = document.rollover();
+        Alias aliasAnnotation = rolloverAnnotation.alias();
+        Trigger triggerAnnotation = rolloverAnnotation.trigger();
+
+        this.rollover = RolloverConfig.builder()
+                .alias(RolloverConfig.RolloverAlias.builder()
+                        .name(getEnvironmentValue(env, aliasAnnotation.name()))
+                        .indexRouting(getEnvironmentValue(env, aliasAnnotation.indexRouting()))
+                        .filter(getEnvironmentValue(env, aliasAnnotation.filter()))
+                        .searchRouting(getEnvironmentValue(env, aliasAnnotation.searchRouting()))
+                        .build())
+                .conditions(RolloverConfig.RolloverConditions.builder()
+                        .maxAge(rolloverAnnotation.maxAge())
+                        .maxDocs(rolloverAnnotation.maxDoc())
+                        .maxSize(rolloverAnnotation.maxSize())
+                        .build())
+                .trigger(RolloverConfig.TriggerConfig.builder()
+                        .enabled(triggerAnnotation.enabled())
+                        .cronExpression(getEnvironmentValue(env, triggerAnnotation.cronExpression()))
+                        .build())
+                .build();
+        if (!this.rollover.hasConditions()) {
+            throw new IllegalArgumentException("No condition defined");
+        }
+    }
+
 
     @Override
     public void addPersistentProperty(ElasticsearchPersistentProperty property) {
@@ -147,38 +192,29 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
         }
     }
 
-    /**
-     * Retourne le nom de l'alias ou l'ndex de l'entité courante.
-     *
-     * @return the index or alias name
-     */
-    @Override
-    public String getAliasOrIndexName() {
-        return StringUtils.isEmpty(this.aliasName) ? this.indexName : this.aliasName;
-    }
-
-    /**
-     * @param source the source
-     * @return the index name
-     */
     @Override
     public String getIndexName(T source) {
-        if (isRolloverIndex()) {
-            return this.rollover.getAlias().getName();
-        } else if (isIndexTimeBased()) {
-            return this.indexSupport.buildIndex(IndexTimeBasedParameter.of(indexPattern, LocalDate.now(Clock.systemUTC()), source));
-        } else {
-            return this.indexName;
-        }
-    }
-
-    @Override
-    public String getNewIndexName(T source) {
         if (isIndexTimeBased()) {
             return this.indexSupport.buildIndex(IndexTimeBasedParameter.of(indexPattern, LocalDate.now(Clock.systemUTC()), source));
         } else {
             return this.indexName;
         }
+    }
+
+    @Override
+    public String getAliasOrIndexReader() {
+        return StringUtils.isEmpty(this.aliasName) ? this.indexName : this.aliasName;
+    }
+
+    @Override
+    public String getAliasOrIndexWriter(T source) {
+        if (this.isRolloverIndex()) {
+            return this.rollover.getAlias().getName();
+        }
+        if (isIndexTimeBased()) {
+            return this.indexSupport.buildIndex(IndexTimeBasedParameter.of(indexPattern, LocalDate.now(Clock.systemUTC()), source));
+        }
+        return this.indexName;
     }
 
     @Override
@@ -351,11 +387,6 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     @Override
     public RolloverConfig getRolloverConfig() {
         return this.rollover;
-    }
-
-    @Override
-    public TriggerManager getTriggerManagement() {
-        return this.context.getBean(TriggerManager.class);
     }
 
     /**

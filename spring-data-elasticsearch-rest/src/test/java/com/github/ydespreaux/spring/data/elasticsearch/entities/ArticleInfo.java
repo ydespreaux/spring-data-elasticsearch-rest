@@ -20,14 +20,14 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.entities;
 
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Projection;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.ProjectionDocument;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 
 @Getter
 @Setter
-@Projection(target = Article.class, fields = {"name", "description"})
+@ProjectionDocument(target = Article.class, fields = {"name", "description"})
 public class ArticleInfo {
 
     @Id

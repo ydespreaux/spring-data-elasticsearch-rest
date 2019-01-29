@@ -29,7 +29,7 @@ import org.springframework.util.ObjectUtils;
  * level.
  *
  * @author Yoann Despréaux
- * @since 4.0
+ * @since 1.0.0
  */
 @Slf4j
 public final class ClientLogger {

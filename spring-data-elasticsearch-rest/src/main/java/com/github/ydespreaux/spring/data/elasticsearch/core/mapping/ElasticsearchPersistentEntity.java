@@ -34,16 +34,9 @@ import java.time.Duration;
 /**
  * @param <T> generic type
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, ElasticsearchPersistentProperty>, ElasticsearchEntityInformation<T, String> {
-
-    /**
-     * Retourne le nom de l'alias ou l'ndex de l'entité courante.
-     *
-     * @return the index or alias name
-     */
-    String getAliasOrIndexName();
 
     /**
      * Retourne le type de document de l'entité courante.
@@ -53,10 +46,9 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
     String getTypeName();
 
     /**
-     * Retourne le nom de l'index de l'entité courante à indexer.
-     *
-     * @param source the document
-     * @return the index name
+     * Get the index name.
+     * @param source
+     * @return
      */
     String getIndexName(T source);
 

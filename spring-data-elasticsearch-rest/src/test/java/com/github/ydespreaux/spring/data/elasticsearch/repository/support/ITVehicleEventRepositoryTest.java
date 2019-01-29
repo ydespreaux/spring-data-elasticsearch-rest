@@ -22,11 +22,10 @@ package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
 
 import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchRolloverConfiguration;
 import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
+import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.VehicleEvent;
 import com.github.ydespreaux.spring.data.elasticsearch.repositories.rollover.VehicleEventRepository;
-import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.elasticsearch.common.geo.GeoPoint;
-import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,10 +55,9 @@ public class ITVehicleEventRepositoryTest {
 
     private static final Integer CRON_DELAY_SECONDS = 4;
 
-    @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2")
-            .withConfigDirectory("elastic-config");
-
+//    @ClassRule
+//    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2")
+//            .withConfigDirectory("elastic-config");
 
 //    static {
 //        System.setProperty("spring.elasticsearch.rest.uris", "http://localhost:9200");
@@ -73,8 +71,9 @@ public class ITVehicleEventRepositoryTest {
 
     private List<VehicleEvent> vehicles;
 
-    //    @Test
+    @Test
     public void save() throws InterruptedException {
+        cleanRolloverIndex();
         VehicleEvent vehicle_1 = repository.save(VehicleEvent.builder()
                 .vehicleId("v-001")
                 .location(new GeoPoint(40, 70))
@@ -102,13 +101,20 @@ public class ITVehicleEventRepositoryTest {
         this.vehicles = prepareData();
     }
 
+    @Test
+    public void deleteAll() throws InterruptedException {
+        this.vehicles = prepareData();
+    }
+
+    @Test
+    public void deleteById() throws InterruptedException {
+        this.vehicles = prepareData();
+    }
+
 
     private List<VehicleEvent> prepareData() throws InterruptedException {
         // Clean data
-        this.repository.deleteAll();
-//        ElasticsearchPersistentEntity<VehicleEvent> persistentEntity = this.elasticsearchOperations.getPersistentEntityFor(VehicleEvent.class);
-//        this.elasticsearchOperations.deleteIndexByAlias(persistentEntity.getAliasOrIndexName());
-//        this.elasticsearchOperations.createRolloverIndexWithSettingsAndMapping(persistentEntity.getRolloverConfig(), persistentEntity.getIndexName(null), persistentEntity.getIndexPath());
+        cleanRolloverIndex();
         // Insert data
         List<VehicleEvent> vehicles = new ArrayList<>(5);
         vehicles.add(repository.save(VehicleEvent.builder()
@@ -141,5 +147,11 @@ public class ITVehicleEventRepositoryTest {
                 .build()));
         this.repository.refresh();
         return vehicles;
+    }
+
+    private void cleanRolloverIndex() {
+        ElasticsearchPersistentEntity<VehicleEvent> persistentEntity = this.elasticsearchOperations.getPersistentEntityFor(VehicleEvent.class);
+        this.elasticsearchOperations.deleteIndexByAlias(persistentEntity.getAliasOrIndexReader());
+        this.elasticsearchOperations.createRolloverIndexWithSettingsAndMapping(persistentEntity.getRolloverConfig(), persistentEntity.getAliasOrIndexWriter(null), persistentEntity.getIndexPath());
     }
 }

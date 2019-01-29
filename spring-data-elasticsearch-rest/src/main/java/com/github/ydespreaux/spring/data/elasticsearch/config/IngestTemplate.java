@@ -39,6 +39,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * @author Yoann Despréaux
+ * @since 1.0.0
+ */
 @Slf4j
 public class IngestTemplate implements ApplicationContextAware, InitializingBean {
 
@@ -156,7 +160,7 @@ public class IngestTemplate implements ApplicationContextAware, InitializingBean
 
     /**
      * @author yoann.despreaux
-     * @since 0.0.1
+     * @since 1.0.0
      */
     @Getter
     @Setter

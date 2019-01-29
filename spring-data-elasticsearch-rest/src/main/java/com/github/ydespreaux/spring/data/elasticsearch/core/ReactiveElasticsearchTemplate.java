@@ -23,6 +23,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.core;
 import com.github.ydespreaux.spring.data.elasticsearch.client.reactive.ReactiveRestElasticsearchClient;
 import com.github.ydespreaux.spring.data.elasticsearch.core.converter.ElasticsearchConverter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
+import com.github.ydespreaux.spring.data.elasticsearch.core.triggers.TriggerManager;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
@@ -47,8 +48,12 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
      * @param elasticsearchConverter the given elasticsearchConverter.
      * @param resultsMapper          the given result mapper
      */
-    public ReactiveElasticsearchTemplate(ReactiveRestElasticsearchClient client, ElasticsearchConverter elasticsearchConverter, ResultsMapper resultsMapper) {
-        super(elasticsearchConverter, resultsMapper);
+    public ReactiveElasticsearchTemplate(
+            ReactiveRestElasticsearchClient client,
+            ElasticsearchConverter elasticsearchConverter,
+            ResultsMapper resultsMapper,
+            TriggerManager triggerManager) {
+        super(elasticsearchConverter, resultsMapper, triggerManager);
         this.client = client;
         this.exceptionTranslator = new ElasticsearchExceptionTranslator();
     }
@@ -108,12 +113,12 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
 //
 //    /**
 //     * @param indexName the index name
-//     * @param indexPath the path of the json index file
+//     * @param settingsAndMappingPath the path of the json index file
 //     * @return true if the index was created
 //     */
 //    @Override
-//    public Mono<Boolean> createIndexWithSettingsAndMapping(String indexName, String indexPath) {
-//        CreateIndexRequest request = this.requestsBuilder().createIndexRequest(indexName, indexPath);
+//    public Mono<Boolean> createIndexWithSettingsAndMapping(String indexName, String settingsAndMappingPath) {
+//        CreateIndexRequest request = this.requestsBuilder().createIndexRequest(indexName, settingsAndMappingPath);
 //        return Mono.<CreateIndexResponse>create(sink -> this.getClient().indices().createAsync(request, RequestOptions.DEFAULT, listenerToSink(sink)))
 //                .map(CreateIndexResponse::isAcknowledged)
 //                .onErrorResume(error -> Mono.error(new ElasticsearchException("Failed to create index request: " + request.toString(), error)));
@@ -277,7 +282,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
     public <T> Mono<T> findById(String id, Class<T> entityType) {
         Assert.notNull(id, "Id must not be null!");
         ElasticsearchPersistentEntity<T> persistentEntity = getPersistentEntityFor(entityType);
-        return doFindById(id, persistentEntity.getAliasOrIndexName(), persistentEntity.getTypeName())
+        return doFindById(id, persistentEntity.getAliasOrIndexReader(), persistentEntity.getTypeName())
                 .filter(GetResponse::isExists)
                 .map(it -> this.getResultsMapper().mapResult(it, entityType))
                 .onErrorResume(IndexNotFoundException.class, ex -> Mono.empty());
