@@ -20,16 +20,24 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
 
-import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchQueryConfiguration;
-import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
+import com.github.ydespreaux.spring.data.elasticsearch.AbstractElasticsearchTest;
+import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
+import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.Product;
 import com.github.ydespreaux.spring.data.elasticsearch.repositories.query.ProductRepository;
+import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.elasticsearch.rest.RestClientAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -46,38 +54,49 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
         RestClientAutoConfiguration.class,
-        ElasticsearchQueryConfiguration.class})
+        ITProductRepositoryTest.ElasticsearchConfiguration.class})
 @Profile("test-no-template")
-public class ITProductRepositoryTest {
+public class ITProductRepositoryTest extends AbstractElasticsearchTest<Product> {
 
-//    static {
-//        System.setProperty("spring.elasticsearch.rest.uris", "http://localhost:9200");
-//    }
+    @ClassRule
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
+
+    public ITProductRepositoryTest() {
+        super(Product.class);
+    }
 
     private static final String PRODUCT_INDEX_NAME = "products";
 
     @Autowired
     private ProductRepository repository;
 
-    @Autowired
-    private ElasticsearchOperations elasticsearchOperations;
-
-    @Before
-    public void setUp() {
-        prepareData();
-    }
-
-    private void prepareData() {
-        elasticsearchOperations.deleteIndexByName(PRODUCT_INDEX_NAME);
-        elasticsearchOperations.createIndexWithSettingsAndMapping(PRODUCT_INDEX_NAME, "classpath:indices/product.index");
-        repository.save(Arrays.asList(
+    @Override
+    protected List<Product> generateData() {
+        return Arrays.asList(
                 createProduct("1", "Sugar", "Cane sugar", false, 1.0f, 2, Arrays.asList("C1", "C2")),
                 createProduct("2", "Sugar", "Cane sugar", true, 1.2f, 1, Arrays.asList("C1")),
                 createProduct("3", "Sugar", "Beet sugar", true, 1.1f, 4, Arrays.asList("C2")),
                 createProduct("4", "Salt", "Rock salt", true, 1.9f, 2, Arrays.asList("C3", "C4")),
-                createProduct("5", "Salt", "Sea salt", false, 2.1f, 4, Arrays.asList("C1", "C3"))));
-        elasticsearchOperations.refresh(Product.class);
+                createProduct("5", "Salt", "Sea salt", false, 2.1f, 4, Arrays.asList("C1", "C3"))
+        );
+    }
 
+    @Before
+    public void setUp() {
+        cleanAndInsertData();
+    }
+
+    @Configuration
+    @EnableAspectJAutoProxy
+    @EnableAutoConfiguration
+    @EnableElasticsearchRepositories(
+            basePackages = "com.github.ydespreaux.spring.data.elasticsearch.repositories.query")
+    static class ElasticsearchConfiguration extends ElasticsearchConfigurationSupport {
+
+        @Bean
+        ClientLoggerAspect clientLoggerAspect() {
+            return new ClientLoggerAspect();
+        }
     }
 
     @Test

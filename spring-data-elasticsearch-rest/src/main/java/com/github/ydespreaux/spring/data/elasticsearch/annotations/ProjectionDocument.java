@@ -27,6 +27,7 @@ import java.lang.annotation.*;
  * @since 0.0.3
  */
 @Documented
+@Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface ProjectionDocument {

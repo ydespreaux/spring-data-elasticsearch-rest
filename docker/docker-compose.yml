@@ -24,6 +24,7 @@ services:
     - net-data
     volumes:
     - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    - ./elasticsearch/config/synonyms/book-synonyms.txt:/usr/share/elasticsearch/config/synonyms/book-synonyms.txt
     - ./elasticsearch/data:/usr/share/elasticsearch/data
     - ./elasticsearch/logs:/usr/share/elasticsearch/logs
 

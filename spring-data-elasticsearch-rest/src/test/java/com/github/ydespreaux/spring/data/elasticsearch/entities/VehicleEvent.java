@@ -43,7 +43,7 @@ import java.time.LocalDateTime;
         indexName = "vehicles-event",
         type = "position",
         settingsAndMappingPath = "classpath:indices/vehicles-event.index",
-        rollover = @Rollover(alias = @Alias(name = "write-vehicles-alias"), maxDoc = 1, trigger = @Trigger(enabled = true, cronExpression = "*/2 * * * * *")))
+        rollover = @Rollover(alias = @Alias(name = "write-vehicles-alias"), maxDoc = 2, trigger = @Trigger(enabled = true, cronExpression = "*/2 * * * * *")))
 public class VehicleEvent {
 
     @Id

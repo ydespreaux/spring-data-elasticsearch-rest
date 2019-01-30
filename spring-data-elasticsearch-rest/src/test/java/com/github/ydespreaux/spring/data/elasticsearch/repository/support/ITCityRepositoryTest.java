@@ -20,27 +20,35 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
 
-import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchTemplateConfiguration;
-import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
+import com.github.ydespreaux.spring.data.elasticsearch.AbstractElasticsearchTest;
+import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
+import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.core.scroll.ScrolledPage;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.City;
 import com.github.ydespreaux.spring.data.elasticsearch.repositories.template.CityRepository;
+import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.elasticsearch.common.geo.GeoPoint;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.elasticsearch.rest.RestClientAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.geo.Box;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,18 +58,22 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 
-@DirtiesContext
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
         RestClientAutoConfiguration.class,
-        ElasticsearchTemplateConfiguration.class})
-public class ITCityRepositoryTest {
+        ITCityRepositoryTest.ElasticsearchConfiguration.class})
+public class ITCityRepositoryTest extends AbstractElasticsearchTest<City> {
+
+
+    @ClassRule
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
+
+    public ITCityRepositoryTest() {
+        super(City.class);
+    }
 
     @Autowired
     private CityRepository repository;
-
-    @Autowired
-    private ElasticsearchOperations elasticsearchOperations;
 
     private City castries = null;
     private City mauguio = null;
@@ -72,22 +84,33 @@ public class ITCityRepositoryTest {
     private GeoPoint topLeftBox = new GeoPoint(43.679112, 3.958448);
     private GeoPoint bottomRightBox = new GeoPoint(43.608526, 4.021915);
 
-    @Before
-    public void setUp() {
-        prepareData();
+    @Override
+    protected List<City> generateData() {
+        montpellier = createCity("Montpellier", new GeoPoint(43.613712, 3.872191), 275318L, "SE");
+        mauguio = createCity("Mauguio", new GeoPoint(43.615463, 4.009743), 16795L, "SE");
+        castries = createCity("Castries", new GeoPoint(43.677644, 3.985277), 6075L, "SE");
+        vendargues = createCity("Vendargues", new GeoPoint(43.656904, 3.969566), 6186L, "SE");
+        sommieres = createCity("Sommières", new GeoPoint(43.782759, 4.089557), 4644L, "SE");
+        return Arrays.asList(montpellier, mauguio, castries, vendargues, sommieres);
     }
 
-    private void prepareData() {
-        this.repository.deleteAll();
+    @Before
+    public void setUp() {
+        cleanAndInsertData();
+    }
 
-        montpellier = indexCity("Montpellier", new GeoPoint(43.613712, 3.872191), 275318L, "SE");
-        mauguio = indexCity("Mauguio", new GeoPoint(43.615463, 4.009743), 16795L, "SE");
-        castries = indexCity("Castries", new GeoPoint(43.677644, 3.985277), 6075L, "SE");
-        vendargues = indexCity("Vendargues", new GeoPoint(43.656904, 3.969566), 6186L, "SE");
-        sommieres = indexCity("Sommières", new GeoPoint(43.782759, 4.089557), 4644L, "SE");
+    @Configuration
+    @EnableAspectJAutoProxy
+    @EnableAutoConfiguration
+    @EnableElasticsearchRepositories(
+            basePackages = "com.github.ydespreaux.spring.data.elasticsearch.repositories.template",
+            namedQueriesLocation = "classpath:named-queries/*-named-queries.properties")
+    static class ElasticsearchConfiguration extends ElasticsearchConfigurationSupport {
 
-        this.repository.refresh();
-
+        @Bean
+        ClientLoggerAspect clientLoggerAspect() {
+            return new ClientLoggerAspect();
+        }
     }
 
     @Test
@@ -667,10 +690,6 @@ public class ITCityRepositoryTest {
                 .population(population)
                 .region(region)
                 .build();
-    }
-
-    private City indexCity(String name, GeoPoint location, Long population, String region) {
-        return this.elasticsearchOperations.index(createCity(name, location, population, region), City.class);
     }
 
     private String transformLocation(GeoPoint point) {

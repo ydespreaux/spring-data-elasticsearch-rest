@@ -40,13 +40,30 @@ public class TriggerManager implements Closeable {
 
     private final TaskScheduler taskScheduler;
     private final Map<KeyTrigger, ScheduledFuture<?>> schedulers = new ConcurrentHashMap<>();
+    private final Map<KeyTrigger, Trigger> triggers = new ConcurrentHashMap<>();
 
     public TriggerManager(TaskScheduler taskScheduler) {
         this.taskScheduler = taskScheduler;
     }
 
-    public void startTrigger(Trigger trigger) {
+    public void stopAll() {
+        this.schedulers.keySet().forEach(this::cancelScheduler);
+    }
+
+    public void restartAll() {
+        this.triggers.values().forEach(this::startTrigger);
+    }
+
+    public KeyTrigger registerTrigger(Trigger trigger) {
         KeyTrigger key = generateKey(trigger);
+        if (!this.triggers.containsKey(key)) {
+            this.triggers.put(key, trigger);
+        }
+        return key;
+    }
+
+    public void startTrigger(Trigger trigger) {
+        KeyTrigger key = registerTrigger(trigger);
         if (schedulers.containsKey(key)) {
             cancelScheduler(key);
         }
@@ -63,7 +80,7 @@ public class TriggerManager implements Closeable {
         }
     }
 
-    private KeyTrigger generateKey(Trigger trigger) {
+    public KeyTrigger generateKey(Trigger trigger) {
         return KeyTrigger.builder()
                 .javaType(trigger.getEntityInformation().getJavaType())
                 .triggerType(trigger.getClass())

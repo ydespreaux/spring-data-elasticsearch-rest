@@ -32,6 +32,7 @@ import java.lang.annotation.*;
  * @since 1.0.0
  */
 @Documented
+@Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface IndexedDocument {

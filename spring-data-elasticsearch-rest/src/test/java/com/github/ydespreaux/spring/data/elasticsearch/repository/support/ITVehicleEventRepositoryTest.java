@@ -20,17 +20,25 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
 
-import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchRolloverConfiguration;
+import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
+import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
-import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.VehicleEvent;
 import com.github.ydespreaux.spring.data.elasticsearch.repositories.rollover.VehicleEventRepository;
+import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.elasticsearch.common.geo.GeoPoint;
+import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.elasticsearch.rest.RestClientAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -39,6 +47,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.*;
@@ -49,19 +58,16 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
         RestClientAutoConfiguration.class,
-        ElasticsearchRolloverConfiguration.class})
+        ITVehicleEventRepositoryTest.ElasticsearchConfiguration.class})
 @Profile("test-no-template")
 public class ITVehicleEventRepositoryTest {
 
+    @ClassRule
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
+    private static List<VehicleEvent> vehicles;
+
     private static final Integer CRON_DELAY_SECONDS = 4;
 
-//    @ClassRule
-//    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2")
-//            .withConfigDirectory("elastic-config");
-
-//    static {
-//        System.setProperty("spring.elasticsearch.rest.uris", "http://localhost:9200");
-//    }
 
     @Autowired
     private VehicleEventRepository repository;
@@ -69,52 +75,52 @@ public class ITVehicleEventRepositoryTest {
     @Autowired
     private ElasticsearchOperations elasticsearchOperations;
 
-    private List<VehicleEvent> vehicles;
+    @Before
+    public void onSetup() throws InterruptedException {
+        if (vehicles == null) {
+            vehicles = prepareData();
+        }
+    }
 
     @Test
-    public void save() throws InterruptedException {
-        cleanRolloverIndex();
+    public void save() {
         VehicleEvent vehicle_1 = repository.save(VehicleEvent.builder()
-                .vehicleId("v-001")
+                .vehicleId("v-100")
                 .location(new GeoPoint(40, 70))
                 .time(LocalDateTime.now(Clock.systemUTC())).build());
-
         assertThat(vehicle_1.getDocumentId(), is(notNullValue()));
         assertThat(vehicle_1.getVersion(), is(equalTo(1L)));
-        assertThat(vehicle_1.getIndexName(), is(equalTo("vehicles-event-000001")));
+        assertThat(vehicle_1.getIndexName(), is(startsWith("vehicles-event-")));
+    }
 
-        TimeUnit.SECONDS.sleep(CRON_DELAY_SECONDS);
+    @Test
+    public void findById() {
+        VehicleEvent myVehicule = vehicles.get(0);
+        Optional<VehicleEvent> vehicleEvent = repository.findById(myVehicule.getDocumentId());
+        assertThat(vehicleEvent.isPresent(), is(true));
+    }
 
-        VehicleEvent vehicle_2 = repository.save(VehicleEvent.builder()
-                .documentId("2")
-                .vehicleId("v-002")
+    @Test
+    public void deleteById() {
+        VehicleEvent vehicle_1 = repository.save(VehicleEvent.builder()
+                .vehicleId("v-101")
                 .location(new GeoPoint(40, 70))
                 .time(LocalDateTime.now(Clock.systemUTC())).build());
-
-        assertThat(vehicle_2.getDocumentId(), is(equalTo("2")));
-        assertThat(vehicle_2.getVersion(), is(equalTo(1L)));
-        assertThat(vehicle_2.getIndexName(), is(equalTo("vehicles-event-000002")));
+        repository.refresh();
+        this.repository.deleteById(vehicle_1.getDocumentId());
+        repository.refresh();
+        assertThat(repository.findById(vehicle_1.getDocumentId()).isPresent(), is(false));
     }
 
     @Test
-    public void findById() throws InterruptedException {
-        this.vehicles = prepareData();
+    public void deleteByIdFromIndexReader() {
+        VehicleEvent myVehicule = vehicles.get(0);
+        this.repository.deleteById(myVehicule.getDocumentId());
+        repository.refresh();
+        assertThat(repository.findById(myVehicule.getDocumentId()).isPresent(), is(true));
     }
-
-    @Test
-    public void deleteAll() throws InterruptedException {
-        this.vehicles = prepareData();
-    }
-
-    @Test
-    public void deleteById() throws InterruptedException {
-        this.vehicles = prepareData();
-    }
-
 
     private List<VehicleEvent> prepareData() throws InterruptedException {
-        // Clean data
-        cleanRolloverIndex();
         // Insert data
         List<VehicleEvent> vehicles = new ArrayList<>(5);
         vehicles.add(repository.save(VehicleEvent.builder()
@@ -122,18 +128,17 @@ public class ITVehicleEventRepositoryTest {
                 .location(new GeoPoint(23.251, 60.189))
                 .time(LocalDateTime.of(2019, 12, 31, 19, 30, 28))
                 .build()));
-        TimeUnit.SECONDS.sleep(CRON_DELAY_SECONDS);
         vehicles.add(repository.save(VehicleEvent.builder()
                 .vehicleId("v-001")
                 .location(new GeoPoint(23.2511, 60.1898))
                 .time(LocalDateTime.of(2019, 12, 31, 19, 31, 28))
                 .build()));
+        TimeUnit.SECONDS.sleep(CRON_DELAY_SECONDS);
         vehicles.add(repository.save(VehicleEvent.builder()
                 .vehicleId("v-002")
                 .location(new GeoPoint(40, 70))
                 .time(LocalDateTime.of(2019, 2, 12, 10, 25, 28))
                 .build()));
-        TimeUnit.SECONDS.sleep(CRON_DELAY_SECONDS);
         vehicles.add(repository.save(VehicleEvent.builder()
                 .vehicleId("v-002")
                 .location(new GeoPoint(40.0001, 70.001))
@@ -149,9 +154,17 @@ public class ITVehicleEventRepositoryTest {
         return vehicles;
     }
 
-    private void cleanRolloverIndex() {
-        ElasticsearchPersistentEntity<VehicleEvent> persistentEntity = this.elasticsearchOperations.getPersistentEntityFor(VehicleEvent.class);
-        this.elasticsearchOperations.deleteIndexByAlias(persistentEntity.getAliasOrIndexReader());
-        this.elasticsearchOperations.createRolloverIndexWithSettingsAndMapping(persistentEntity.getRolloverConfig(), persistentEntity.getAliasOrIndexWriter(null), persistentEntity.getIndexPath());
+    @Configuration
+    @EnableAspectJAutoProxy
+    @EnableAutoConfiguration
+    @EnableElasticsearchRepositories(
+            basePackages = "com.github.ydespreaux.spring.data.elasticsearch.repositories.rollover")
+    static class ElasticsearchConfiguration extends ElasticsearchConfigurationSupport {
+
+        @Bean
+        ClientLoggerAspect clientLoggerAspect() {
+            return new ClientLoggerAspect();
+        }
     }
+
 }

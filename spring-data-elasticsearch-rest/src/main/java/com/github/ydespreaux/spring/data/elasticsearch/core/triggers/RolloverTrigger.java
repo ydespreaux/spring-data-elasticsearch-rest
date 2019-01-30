@@ -23,6 +23,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.core.triggers;
 import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
 import com.github.ydespreaux.spring.data.elasticsearch.core.request.config.RolloverConfig;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.support.ElasticsearchEntityInformation;
+import org.elasticsearch.ElasticsearchException;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.util.StringUtils;
 
@@ -54,7 +55,10 @@ public class RolloverTrigger implements Trigger {
     public Runnable processor() {
         return () -> {
             RolloverConfig config = entityInformation.getRolloverConfig();
-            elasticsearchOperations.rolloverIndex(config.getAlias().getName(), null, entityInformation.getIndexPath(), config.getConditions());
+            try {
+                elasticsearchOperations.rolloverIndex(config.getAlias().getName(), null, entityInformation.getIndexPath(), config.getConditions());
+            } catch (ElasticsearchException e) {
+            }
         };
     }
 }

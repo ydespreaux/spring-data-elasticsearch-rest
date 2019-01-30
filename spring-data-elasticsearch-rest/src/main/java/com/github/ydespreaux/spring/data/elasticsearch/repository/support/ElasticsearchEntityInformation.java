@@ -29,15 +29,22 @@ import org.springframework.data.repository.core.EntityInformation;
  */
 public interface ElasticsearchEntityInformation<T, K> extends EntityInformation<T, K> {
 
-    Boolean createIndex();
-
-    String getAliasOrIndexReader();
-
     default String getAliasOrIndexWriter() {
         return getAliasOrIndexWriter(null);
     }
 
+    Boolean createIndex();
+
+    String getAliasOrIndexReader();
+
     String getAliasOrIndexWriter(T source);
+
+    /**
+     * Get the current index name for writing operations.
+     *
+     * @return
+     */
+    String getIndexName();
 
     Boolean isIndexTimeBased();
 

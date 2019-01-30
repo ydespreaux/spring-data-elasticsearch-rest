@@ -30,7 +30,7 @@ import org.springframework.data.annotation.Id;
 @Builder
 @Getter
 @Setter
-@IndexedDocument(indexName = "musics", type = "music", settingsAndMappingPath = "classpath:indices/music.index")
+@IndexedDocument(aliasName = "musics", indexName = "music", type = "album", settingsAndMappingPath = "classpath:indices/music.index")
 public class Music {
 
     @Id

@@ -115,8 +115,7 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <includes>
-                        <include>**/ITSuiteTest.java</include>
-                        <include>**/ITReactiveElasticsearchTemplateTest.java</include>
+                        <include>**/IT*.java</include>
                     </includes>
                 </configuration>
                 <executions>

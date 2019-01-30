@@ -30,6 +30,7 @@ import java.lang.annotation.*;
  * @since 1.0.0
  */
 @Documented
+@Inherited
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RolloverDocument {

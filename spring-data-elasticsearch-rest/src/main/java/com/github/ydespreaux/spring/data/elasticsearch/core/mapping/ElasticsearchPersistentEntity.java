@@ -46,13 +46,6 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
     String getTypeName();
 
     /**
-     * Get the index name.
-     * @param source
-     * @return
-     */
-    String getIndexName(T source);
-
-    /**
      * @param entity the source of docuement
      * @param id     the identifier
      */

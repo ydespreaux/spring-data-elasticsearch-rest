@@ -20,24 +20,31 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch;
 
-import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchCompletionConfiguration;
+import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
+import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
 import com.github.ydespreaux.spring.data.elasticsearch.core.completion.Completion;
 import com.github.ydespreaux.spring.data.elasticsearch.core.completion.StringSuggestExtractor;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.Music;
+import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.search.suggest.SuggestBuilder;
 import org.elasticsearch.search.suggest.SuggestBuilders;
 import org.elasticsearch.search.suggest.SuggestionBuilder;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.elasticsearch.rest.RestClientAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Profile;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
@@ -47,47 +54,27 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@DirtiesContext
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
         RestClientAutoConfiguration.class,
-        ElasticsearchCompletionConfiguration.class})
+        ITElasticsearchTemplateCompletionTest.ElasticsearchConfiguration.class})
 @Profile("test-no-template")
-public class ITElasticsearchTemplateCompletionTest {
+public class ITElasticsearchTemplateCompletionTest extends AbstractElasticsearchTest<Music> {
+
+
+    @ClassRule
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
+
+    public ITElasticsearchTemplateCompletionTest() {
+        super(Music.class);
+    }
 
     @Autowired
     private ElasticsearchOperations template;
 
-    private List<Music> data;
-
-    @Before
-    public void onSetup() {
-        this.data = this.prepareData();
-    }
-
-    @Test
-    public void shouldFindSuggestionsUsingCompletion() {
-        SuggestionBuilder completionSuggestionFuzzyBuilder = SuggestBuilders.completionSuggestion("suggest").prefix("m", Fuzziness.AUTO);
-        final List<String> suggestions = template.suggest(new SuggestBuilder().addSuggestion("test-suggest", completionSuggestionFuzzyBuilder), Music.class, new StringSuggestExtractor());
-        assertThat(suggestions.size(), is(2));
-        assertThat(suggestions.get(0), is(equalTo("Mickael Jackson")));
-        assertThat(suggestions.get(1), is(equalTo("Muse")));
-    }
-
-    @Test
-    public void shouldFindSuggestionsUsingSearch() {
-        SuggestionBuilder completionSuggestionFuzzyBuilder = SuggestBuilders.completionSuggestion("suggest").prefix("m", Fuzziness.AUTO);
-        SearchResponse response = template.suggest(new SuggestBuilder().addSuggestion("test-suggest", completionSuggestionFuzzyBuilder), "musics");
-        final List<String> suggestions = new StringSuggestExtractor().extract(response);
-        assertThat(suggestions.size(), is(2));
-        assertThat(suggestions.get(0), is(equalTo("Mickael Jackson")));
-        assertThat(suggestions.get(1), is(equalTo("Muse")));
-    }
-
-    private List<Music> prepareData() {
-        this.template.deleteAll(Music.class);
-
-        List<Music> musics = Arrays.asList(
+    @Override
+    protected List<Music> generateData() {
+        return Arrays.asList(
                 Music.builder()
                         .id("1")
                         .title("Nevermind")
@@ -110,8 +97,42 @@ public class ITElasticsearchTemplateCompletionTest {
                                 .build())
                         .build()
         );
-        this.template.bulkIndex(musics);
-        this.template.refresh(Music.class);
-        return musics;
+    }
+
+    @Before
+    public void onSetup() {
+        this.cleanAndInsertData();
+    }
+
+    @Test
+    public void shouldFindSuggestionsUsingCompletion() {
+        SuggestionBuilder completionSuggestionFuzzyBuilder = SuggestBuilders.completionSuggestion("suggest").prefix("m", Fuzziness.AUTO);
+        final List<String> suggestions = template.suggest(new SuggestBuilder().addSuggestion("test-suggest", completionSuggestionFuzzyBuilder), Music.class, new StringSuggestExtractor());
+        assertThat(suggestions.size(), is(2));
+        assertThat(suggestions.get(0), is(equalTo("Mickael Jackson")));
+        assertThat(suggestions.get(1), is(equalTo("Muse")));
+    }
+
+    @Test
+    public void shouldFindSuggestionsUsingSearch() {
+        SuggestionBuilder completionSuggestionFuzzyBuilder = SuggestBuilders.completionSuggestion("suggest").prefix("m", Fuzziness.AUTO);
+        SearchResponse response = template.suggest(new SuggestBuilder().addSuggestion("test-suggest", completionSuggestionFuzzyBuilder), "musics");
+        final List<String> suggestions = new StringSuggestExtractor().extract(response);
+        assertThat(suggestions.size(), is(2));
+        assertThat(suggestions.get(0), is(equalTo("Mickael Jackson")));
+        assertThat(suggestions.get(1), is(equalTo("Muse")));
+    }
+
+    @Configuration
+    @EnableAspectJAutoProxy
+    @EnableAutoConfiguration
+    @EnableElasticsearchRepositories(
+            basePackages = "com.github.ydespreaux.spring.data.elasticsearch.repositories.completion")
+    static class ElasticsearchConfiguration extends ElasticsearchConfigurationSupport {
+
+        @Bean
+        ClientLoggerAspect clientLoggerAspect() {
+            return new ClientLoggerAspect();
+        }
     }
 }
