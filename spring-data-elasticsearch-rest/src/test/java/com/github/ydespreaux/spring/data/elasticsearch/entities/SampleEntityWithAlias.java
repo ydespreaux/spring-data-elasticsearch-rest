@@ -22,44 +22,29 @@ package com.github.ydespreaux.spring.data.elasticsearch.entities;
 
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.*;
 import lombok.*;
-import org.elasticsearch.common.geo.GeoPoint;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 
-import java.time.LocalDateTime;
-
-/**
- * @author Yoann Despréaux
- * @since 1.0.0
- */
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @ToString
-@RolloverDocument(
-        alias = @Alias(name = "search-vehicles-alias"),
-        index = @Index(
-                name = "vehicles-event",
-                type = "position",
-                settingsAndMappingPath = "classpath:indices/vehicles-event.index"
-        ),
-        rollover = @Rollover(
-                alias = @Alias(name = "write-vehicles-alias"),
-                maxDoc = 2
-        )
+@IndexedDocument(
+        alias = @Alias(name = "search-sample-entity"),
+        index = @Index(name = "sample-entity-alias-index", type = "sample-type")
 )
-public class VehicleEvent {
+public class SampleEntityWithAlias {
 
     @Id
-    private String documentId;
+    private String id;
+    private String name;
+
     @IndexName
     private String indexName;
     @Version
     private Long version;
-
-    private String vehicleId;
-    private GeoPoint location;
-    private LocalDateTime time;
+    @Score
+    private Float score;
 }

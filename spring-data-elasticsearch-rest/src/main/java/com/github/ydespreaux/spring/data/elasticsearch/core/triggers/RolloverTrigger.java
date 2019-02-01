@@ -21,23 +21,24 @@
 package com.github.ydespreaux.spring.data.elasticsearch.core.triggers;
 
 import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
-import com.github.ydespreaux.spring.data.elasticsearch.core.request.config.RolloverConfig;
-import com.github.ydespreaux.spring.data.elasticsearch.repository.support.ElasticsearchEntityInformation;
+import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.util.StringUtils;
 
-public class RolloverTrigger implements Trigger {
+@Slf4j
+public class RolloverTrigger<T> implements Trigger<T> {
 
     private static final String DEFAULT_CRON_EXPRESSION = "0 */1 * * * *";
 
     private final ElasticsearchOperations elasticsearchOperations;
-    private final ElasticsearchEntityInformation<?, ?> entityInformation;
+    private final ElasticsearchPersistentEntity<T> persistentEntity;
     private final CronTrigger cronTrigger;
 
-    public RolloverTrigger(ElasticsearchOperations elasticsearchOperations, ElasticsearchEntityInformation<?, ?> entityInformation, String cronExpression) {
+    public RolloverTrigger(ElasticsearchOperations elasticsearchOperations, ElasticsearchPersistentEntity<T> persistentEntity, String cronExpression) {
         this.elasticsearchOperations = elasticsearchOperations;
-        this.entityInformation = entityInformation;
+        this.persistentEntity = persistentEntity;
         this.cronTrigger = StringUtils.isEmpty(cronExpression) ? new CronTrigger(DEFAULT_CRON_EXPRESSION) : new CronTrigger(cronExpression);
     }
 
@@ -47,17 +48,19 @@ public class RolloverTrigger implements Trigger {
     }
 
     @Override
-    public ElasticsearchEntityInformation<?, ?> getEntityInformation() {
-        return this.entityInformation;
+    public ElasticsearchPersistentEntity<T> getPersistentEntity() {
+        return this.persistentEntity;
     }
 
     @Override
     public Runnable processor() {
         return () -> {
-            RolloverConfig config = entityInformation.getRolloverConfig();
             try {
-                elasticsearchOperations.rolloverIndex(config.getAlias().getName(), null, entityInformation.getIndexPath(), config.getConditions());
+                elasticsearchOperations.rolloverIndex(persistentEntity.getJavaType());
             } catch (ElasticsearchException e) {
+                if (log.isWarnEnabled()) {
+                    log.warn("Rollover index {} failed : {}", persistentEntity.getAliasOrIndexWriter(), e.getLocalizedMessage());
+                }
             }
         };
     }

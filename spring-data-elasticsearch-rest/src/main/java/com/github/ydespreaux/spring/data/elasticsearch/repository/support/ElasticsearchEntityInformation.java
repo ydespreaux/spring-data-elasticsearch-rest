@@ -20,7 +20,6 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
 
-import com.github.ydespreaux.spring.data.elasticsearch.core.request.config.RolloverConfig;
 import org.springframework.data.repository.core.EntityInformation;
 
 /**
@@ -29,28 +28,10 @@ import org.springframework.data.repository.core.EntityInformation;
  */
 public interface ElasticsearchEntityInformation<T, K> extends EntityInformation<T, K> {
 
-    default String getAliasOrIndexWriter() {
-        return getAliasOrIndexWriter(null);
-    }
-
-    Boolean createIndex();
-
-    String getAliasOrIndexReader();
-
-    String getAliasOrIndexWriter(T source);
-
     /**
-     * Get the current index name for writing operations.
      *
      * @return
      */
-    String getIndexName();
+    Boolean createIndex();
 
-    Boolean isIndexTimeBased();
-
-    String getIndexPath();
-
-    boolean isRolloverIndex();
-
-    RolloverConfig getRolloverConfig();
 }

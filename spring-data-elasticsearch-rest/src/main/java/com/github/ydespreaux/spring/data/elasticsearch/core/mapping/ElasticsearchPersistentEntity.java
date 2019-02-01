@@ -21,7 +21,9 @@
 package com.github.ydespreaux.spring.data.elasticsearch.core.mapping;
 
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.SourceFilter;
+import com.github.ydespreaux.spring.data.elasticsearch.core.request.config.RolloverConfig;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.support.ElasticsearchEntityInformation;
+import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
@@ -44,6 +46,46 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
      * @return the type name
      */
     String getTypeName();
+
+    /**
+     * @return
+     */
+    Alias getAlias();
+
+    /**
+     * @return
+     */
+    String getAliasOrIndexReader();
+
+    /**
+     * @return
+     */
+    default String getAliasOrIndexWriter() {
+        return getAliasOrIndexWriter(null);
+    }
+
+    /**
+     * @param source
+     * @return
+     */
+    String getAliasOrIndexWriter(T source);
+
+    /**
+     * Get the current index name for writing operations.
+     *
+     * @return
+     */
+    String getIndexName();
+
+    /**
+     * @return
+     */
+    boolean isRolloverIndex();
+
+    /**
+     * @return
+     */
+    RolloverConfig getRolloverConfig();
 
     /**
      * @param entity the source of docuement

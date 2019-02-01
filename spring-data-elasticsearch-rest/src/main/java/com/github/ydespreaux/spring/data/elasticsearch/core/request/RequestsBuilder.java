@@ -78,48 +78,69 @@ public class RequestsBuilder {
      * @param indexName
      * @return
      */
-    public CreateIndexRequest createIndexRequest(String indexName) {
-        return Requests.createIndexRequest(indexName);
+    public CreateIndexRequest createIndexRequest(Alias alias, String indexName) {
+        CreateIndexRequest request = Requests.createIndexRequest(indexName);
+        if (alias != null) {
+            request.alias(alias);
+        }
+        return request;
     }
 
     /**
+     *
+     * @param alias
      * @param indexName
      * @param indexPath
      * @return
      */
-    public CreateIndexRequest createIndexRequest(String indexName, String indexPath) {
+    public CreateIndexRequest createIndexRequest(Alias alias, String indexName, String indexPath) {
         CreateIndexRequest indexRequest = new CreateIndexBuilder()
                 .name(indexName)
                 .sources(getResources(indexPath))
                 .build();
+        if (alias != null && !indexRequest.aliases().contains(alias)) {
+            indexRequest.alias(alias);
+        }
         return indexRequest;
     }
 
     /**
-     * @param alias
+     *
+     * @param aliasReader
+     * @param aliasWriter
      * @param newIndexName
      * @return
      */
-    public CreateIndexRequest createRolloverIndex(Alias alias, String newIndexName) {
-        Assert.notNull(alias, "alias no defined");
+    public CreateIndexRequest createRolloverIndex(Alias aliasReader, Alias aliasWriter, String newIndexName) {
+        Assert.notNull(aliasWriter, "alias no defined");
         CreateIndexRequest indexRequest = Requests.createIndexRequest(newIndexName);
-        indexRequest.aliases().add(alias);
+        if (aliasReader != null) {
+            indexRequest.alias(aliasReader);
+        }
+        indexRequest.alias(aliasWriter);
         return indexRequest;
     }
 
     /**
-     * @param alias
+     *
+     * @param aliasReader
+     * @param aliasWriter
      * @param newIndexName
      * @param indexPath
      * @return
      */
-    public CreateIndexRequest createRolloverIndex(Alias alias, String newIndexName, String indexPath) {
-        Assert.notNull(alias, "alias no defined");
+    public CreateIndexRequest createRolloverIndex(Alias aliasReader, Alias aliasWriter, String newIndexName, String indexPath) {
+        Assert.notNull(aliasWriter, "aliasWriter no defined");
         CreateIndexRequest indexRequest = new CreateIndexBuilder()
                 .name(newIndexName)
                 .sources(getResources(indexPath))
                 .build();
-        indexRequest.aliases().add(alias);
+        if (aliasReader != null && !indexRequest.aliases().contains(aliasReader)) {
+            indexRequest.alias(aliasReader);
+        }
+        if (!indexRequest.aliases().contains(aliasWriter)) {
+            indexRequest.alias(aliasWriter);
+        }
         return indexRequest;
     }
 

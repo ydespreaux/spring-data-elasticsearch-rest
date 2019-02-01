@@ -20,6 +20,7 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
 
+import com.github.ydespreaux.spring.data.elasticsearch.AbstractElasticsearchTest;
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
 import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
@@ -46,9 +47,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
@@ -60,11 +61,14 @@ import static org.junit.Assert.assertThat;
         RestClientAutoConfiguration.class,
         ITVehicleEventRepositoryTest.ElasticsearchConfiguration.class})
 @Profile("test-no-template")
-public class ITVehicleEventRepositoryTest {
+public class ITVehicleEventRepositoryTest extends AbstractElasticsearchTest<VehicleEvent> {
 
     @ClassRule
     public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
-    private static List<VehicleEvent> vehicles;
+
+    public ITVehicleEventRepositoryTest() {
+        super(VehicleEvent.class);
+    }
 
     private static final Integer CRON_DELAY_SECONDS = 4;
 
@@ -76,10 +80,16 @@ public class ITVehicleEventRepositoryTest {
     private ElasticsearchOperations elasticsearchOperations;
 
     @Before
-    public void onSetup() throws InterruptedException {
-        if (vehicles == null) {
-            vehicles = prepareData();
-        }
+    public void onSetup() {
+        cleanData();
+    }
+
+    @Test
+    public void findById() {
+        List<VehicleEvent> vehicles = insertData();
+        VehicleEvent myVehicule = vehicles.get(0);
+        Optional<VehicleEvent> vehicleEvent = repository.findById(myVehicule.getDocumentId());
+        assertThat(vehicleEvent.isPresent(), is(true));
     }
 
     @Test
@@ -94,10 +104,12 @@ public class ITVehicleEventRepositoryTest {
     }
 
     @Test
-    public void findById() {
+    public void deleteByIdFromIndexReader() {
+        List<VehicleEvent> vehicles = insertData();
         VehicleEvent myVehicule = vehicles.get(0);
-        Optional<VehicleEvent> vehicleEvent = repository.findById(myVehicule.getDocumentId());
-        assertThat(vehicleEvent.isPresent(), is(true));
+        this.repository.deleteById(myVehicule.getDocumentId());
+        repository.refresh();
+        assertThat(repository.findById(myVehicule.getDocumentId()).isPresent(), is(true));
     }
 
     @Test
@@ -112,46 +124,57 @@ public class ITVehicleEventRepositoryTest {
         assertThat(repository.findById(vehicle_1.getDocumentId()).isPresent(), is(false));
     }
 
-    @Test
-    public void deleteByIdFromIndexReader() {
-        VehicleEvent myVehicule = vehicles.get(0);
-        this.repository.deleteById(myVehicule.getDocumentId());
-        repository.refresh();
-        assertThat(repository.findById(myVehicule.getDocumentId()).isPresent(), is(true));
-    }
-
-    private List<VehicleEvent> prepareData() throws InterruptedException {
+    @Override
+    protected List<VehicleEvent> generateData() {
         // Insert data
         List<VehicleEvent> vehicles = new ArrayList<>(5);
-        vehicles.add(repository.save(VehicleEvent.builder()
+        vehicles.add(VehicleEvent.builder()
                 .vehicleId("v-001")
                 .location(new GeoPoint(23.251, 60.189))
                 .time(LocalDateTime.of(2019, 12, 31, 19, 30, 28))
-                .build()));
-        vehicles.add(repository.save(VehicleEvent.builder()
+                .build());
+        vehicles.add(VehicleEvent.builder()
                 .vehicleId("v-001")
                 .location(new GeoPoint(23.2511, 60.1898))
                 .time(LocalDateTime.of(2019, 12, 31, 19, 31, 28))
-                .build()));
-        TimeUnit.SECONDS.sleep(CRON_DELAY_SECONDS);
-        vehicles.add(repository.save(VehicleEvent.builder()
+                .build());
+        vehicles.add(VehicleEvent.builder()
                 .vehicleId("v-002")
                 .location(new GeoPoint(40, 70))
                 .time(LocalDateTime.of(2019, 2, 12, 10, 25, 28))
-                .build()));
-        vehicles.add(repository.save(VehicleEvent.builder()
+                .build());
+        vehicles.add(VehicleEvent.builder()
                 .vehicleId("v-002")
                 .location(new GeoPoint(40.0001, 70.001))
                 .time(LocalDateTime.of(2019, 2, 12, 10, 25, 29))
-                .build()));
-        TimeUnit.SECONDS.sleep(CRON_DELAY_SECONDS);
-        vehicles.add(repository.save(VehicleEvent.builder()
+                .build());
+        vehicles.add(VehicleEvent.builder()
                 .vehicleId("v-002")
                 .location(new GeoPoint(40.0002, 70.0002))
                 .time(LocalDateTime.of(2019, 2, 12, 10, 25, 30))
-                .build()));
-        this.repository.refresh();
+                .build());
         return vehicles;
+    }
+
+    /**
+     * @param tryCount
+     * @return
+     */
+    @Override
+    protected List<VehicleEvent> insertData(int tryCount) {
+        List<VehicleEvent> data = generateData();
+        if (data != null && !data.isEmpty()) {
+            elasticsearchOperations.bulkIndex(Arrays.asList(data.get(0), data.get(1)), VehicleEvent.class);
+            elasticsearchOperations.refresh(VehicleEvent.class);
+            elasticsearchOperations.rolloverIndex(VehicleEvent.class);
+            elasticsearchOperations.bulkIndex(Arrays.asList(data.get(2), data.get(3)), VehicleEvent.class);
+            elasticsearchOperations.refresh(VehicleEvent.class);
+            elasticsearchOperations.rolloverIndex(VehicleEvent.class);
+            elasticsearchOperations.bulkIndex(Arrays.asList(data.get(4)), VehicleEvent.class);
+            elasticsearchOperations.refresh(VehicleEvent.class);
+            elasticsearchOperations.rolloverIndex(VehicleEvent.class);
+        }
+        return data;
     }
 
     @Configuration

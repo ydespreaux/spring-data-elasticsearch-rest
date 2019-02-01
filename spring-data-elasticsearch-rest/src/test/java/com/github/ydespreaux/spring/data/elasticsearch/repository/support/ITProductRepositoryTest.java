@@ -83,7 +83,7 @@ public class ITProductRepositoryTest extends AbstractElasticsearchTest<Product> 
 
     @Before
     public void setUp() {
-        cleanAndInsertData();
+        cleanData();
     }
 
     @Configuration
@@ -101,91 +101,109 @@ public class ITProductRepositoryTest extends AbstractElasticsearchTest<Product> 
 
     @Test
     public void countByAvailableTrue() {
+        insertData();
         assertThat(this.repository.countByAvailableTrue(), is(equalTo(3L)));
     }
 
     @Test
     public void countByAvailableFalse() {
+        insertData();
         assertThat(this.repository.countByAvailableFalse(), is(equalTo(2L)));
     }
 
     @Test
     public void findByAvailableTrue() {
+        insertData();
         assertThat(this.repository.findByAvailableTrue().size(), is(equalTo(3)));
     }
 
     @Test
     public void findByAvailableFalse() {
+        insertData();
         assertThat(this.repository.findByAvailableFalse().size(), is(equalTo(2)));
     }
 
     @Test
     public void findByNameAndText() {
+        insertData();
         assertThat(this.repository.findByNameAndText("Sugar", "Cane sugar").size(), is(equalTo(2)));
     }
 
     @Test
     public void findByNameAndPrice() {
+        insertData();
         assertThat(this.repository.findByNameAndPrice("Sugar", 1.1f).size(), is(equalTo(1)));
     }
 
     @Test
     public void findByNameOrText() {
+        insertData();
         assertThat(this.repository.findByNameOrText("Sugar", "Sea salt").size(), is(equalTo(4)));
     }
 
     @Test
     public void findByNameOrPrice() {
+        insertData();
         assertThat(this.repository.findByNameOrPrice("Sugar", 2.1f).size(), is(equalTo(4)));
     }
 
     @Test
     public void findByPriceInWithArray() {
+        insertData();
         assertThat(this.repository.findByPriceIn(new Float[]{1.2f, 1.1f}).size(), is(equalTo(2)));
     }
 
     @Test
     public void findByPriceIn() {
+        insertData();
         assertThat(this.repository.findByPriceIn(Arrays.asList(1.2f, 1.1f)).size(), is(equalTo(2)));
     }
 
     @Test
     public void findByPriceNotIn() {
+        insertData();
         assertThat(this.repository.findByPriceNotIn(Arrays.asList(1.2f, 1.1f)).size(), is(equalTo(3)));
     }
 
     @Test
     public void findByPriceNot() {
+        insertData();
         assertThat(this.repository.findByPriceNot(1.2f).size(), is(equalTo(4)));
     }
 
     @Test
     public void findByPriceBetween() {
+        insertData();
         assertThat(this.repository.findByPriceBetween(1.0f, 2.0f).size(), is(equalTo(4)));
     }
 
     @Test
     public void findByPriceLessThan() {
+        insertData();
         assertThat(this.repository.findByPriceLessThan(1.1f).size(), is(equalTo(1)));
     }
 
     @Test
     public void findByPriceLessThanEqual() {
+        insertData();
         assertThat(this.repository.findByPriceLessThanEqual(1.1f).size(), is(equalTo(2)));
     }
 
     @Test
     public void findByPriceGreaterThan() {
+        insertData();
         assertThat(this.repository.findByPriceGreaterThan(1.2f).size(), is(equalTo(2)));
     }
 
     @Test
     public void findByPriceGreaterThanEqual() {
+        insertData();
         assertThat(this.repository.findByPriceGreaterThanEqual(1.2f).size(), is(equalTo(3)));
     }
 
     @Test
     public void findByIdNotIn() {
+        insertData();
         assertThat(this.repository.findByIdNotIn(Arrays.asList("1", "2", "3")).size(), is(equalTo(2)));
     }
 

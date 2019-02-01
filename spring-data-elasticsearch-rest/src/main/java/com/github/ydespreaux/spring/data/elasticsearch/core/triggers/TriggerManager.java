@@ -40,7 +40,6 @@ public class TriggerManager implements Closeable {
 
     private final TaskScheduler taskScheduler;
     private final Map<KeyTrigger, ScheduledFuture<?>> schedulers = new ConcurrentHashMap<>();
-    private final Map<KeyTrigger, Trigger> triggers = new ConcurrentHashMap<>();
 
     public TriggerManager(TaskScheduler taskScheduler) {
         this.taskScheduler = taskScheduler;
@@ -50,20 +49,8 @@ public class TriggerManager implements Closeable {
         this.schedulers.keySet().forEach(this::cancelScheduler);
     }
 
-    public void restartAll() {
-        this.triggers.values().forEach(this::startTrigger);
-    }
-
-    public KeyTrigger registerTrigger(Trigger trigger) {
-        KeyTrigger key = generateKey(trigger);
-        if (!this.triggers.containsKey(key)) {
-            this.triggers.put(key, trigger);
-        }
-        return key;
-    }
-
     public void startTrigger(Trigger trigger) {
-        KeyTrigger key = registerTrigger(trigger);
+        KeyTrigger key = generateKey(trigger);
         if (schedulers.containsKey(key)) {
             cancelScheduler(key);
         }
@@ -82,7 +69,7 @@ public class TriggerManager implements Closeable {
 
     public KeyTrigger generateKey(Trigger trigger) {
         return KeyTrigger.builder()
-                .javaType(trigger.getEntityInformation().getJavaType())
+                .javaType(trigger.getPersistentEntity().getJavaType())
                 .triggerType(trigger.getClass())
                 .build();
     }
@@ -101,8 +88,8 @@ public class TriggerManager implements Closeable {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    public void close() throws IOException {
-
+    public void close() {
+        this.schedulers.keySet().forEach(this::cancelScheduler);
     }
 
     @Getter

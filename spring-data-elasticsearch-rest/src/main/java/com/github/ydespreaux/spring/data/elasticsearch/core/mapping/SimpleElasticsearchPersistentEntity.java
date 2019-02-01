@@ -57,7 +57,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
 
     private ApplicationContext context;
     private Class<T> entityClass;
-    private String aliasName;
+    private org.elasticsearch.action.admin.indices.alias.Alias alias;
     private String indexName;
     private String indexPattern;
     private String typeName;
@@ -107,46 +107,62 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     }
 
     private void afterIndexedDocumentPropertySet(IndexedDocument document) {
-        this.typeName = document.type();
-        this.createIndex = document.createIndex();
-        this.indexPath = document.settingsAndMappingPath();
-
-        Environment env = context.getEnvironment();
-        this.aliasName = getEnvironmentValue(env, document.aliasName());
-        this.indexName = getEnvironmentValue(env, document.indexName());
-        this.indexPattern = getEnvironmentValue(env, document.indexPattern());
-        this.indexTimeBased = StringUtils.hasText(this.indexPattern);
-        try {
-            this.indexSupport = document.indexTimeBasedSupport().newInstance();
-        } catch (Exception e) {
-            throw new ElasticsearchException(e);
-        }
+        afterPropertySet(document.index());
+        afterPropertySet(document.alias());
         this.scrollTime = Duration.ofSeconds(document.scrollTimeSeconds());
     }
 
     private void afterRolloverDocumentPropertySet(RolloverDocument document) {
-        this.typeName = document.type();
-        this.createIndex = document.createIndex();
-        this.indexPath = document.settingsAndMappingPath();
-
-        Environment env = context.getEnvironment();
-        this.aliasName = getEnvironmentValue(env, document.aliasName());
-        this.indexName = getEnvironmentValue(env, document.indexName());
-        this.indexPattern = getEnvironmentValue(env, document.indexPattern());
-        this.indexTimeBased = StringUtils.hasText(this.indexPattern);
-        this.indexSupport = new IndexTimeBasedSupport();
+        afterPropertySet(document.index());
+        afterPropertySet(document.alias());
+        afterPropertySet(document.rollover());
         this.scrollTime = Duration.ofSeconds(document.scrollTimeSeconds());
+    }
 
-        Rollover rolloverAnnotation = document.rollover();
+    private void afterPropertySet(Alias aliasAnnotation) {
+        if (StringUtils.isEmpty(aliasAnnotation.name())) {
+            return;
+        }
+        this.alias = new org.elasticsearch.action.admin.indices.alias.Alias(getEnvironmentValue(aliasAnnotation.name()));
+        if (StringUtils.hasText(aliasAnnotation.searchRouting())) {
+            this.alias.searchRouting(getEnvironmentValue(aliasAnnotation.searchRouting()));
+        }
+        if (StringUtils.hasText(aliasAnnotation.indexRouting())) {
+            this.alias.searchRouting(getEnvironmentValue(aliasAnnotation.indexRouting()));
+        }
+        if (StringUtils.hasText(aliasAnnotation.filter())) {
+            this.alias.searchRouting(getEnvironmentValue(aliasAnnotation.filter()));
+        }
+    }
+
+    private void afterPropertySet(Index indexAnnotation) {
+        if (StringUtils.isEmpty(indexAnnotation.name()) && StringUtils.isEmpty(indexAnnotation.indexPattern())) {
+            throw new IllegalArgumentException("Index name or index pattern no defined");
+        }
+        this.createIndex = indexAnnotation.createIndex();
+        this.typeName = getEnvironmentValue(indexAnnotation.type());
+        this.indexName = getEnvironmentValue(indexAnnotation.name());
+        this.indexPattern = getEnvironmentValue(indexAnnotation.indexPattern());
+        this.indexPath = getEnvironmentValue(indexAnnotation.settingsAndMappingPath());
+        this.indexTimeBased = StringUtils.hasText(this.indexPattern);
+        if (this.indexTimeBased) {
+            try {
+                this.indexSupport = indexAnnotation.indexTimeBasedSupport().newInstance();
+            } catch (Exception e) {
+                throw new ElasticsearchException(e);
+            }
+        }
+    }
+
+    private void afterPropertySet(Rollover rolloverAnnotation) {
         Alias aliasAnnotation = rolloverAnnotation.alias();
         Trigger triggerAnnotation = rolloverAnnotation.trigger();
-
         this.rollover = RolloverConfig.builder()
                 .alias(RolloverConfig.RolloverAlias.builder()
-                        .name(getEnvironmentValue(env, aliasAnnotation.name()))
-                        .indexRouting(getEnvironmentValue(env, aliasAnnotation.indexRouting()))
-                        .filter(getEnvironmentValue(env, aliasAnnotation.filter()))
-                        .searchRouting(getEnvironmentValue(env, aliasAnnotation.searchRouting()))
+                        .name(getEnvironmentValue(aliasAnnotation.name()))
+                        .indexRouting(getEnvironmentValue(aliasAnnotation.indexRouting()))
+                        .filter(getEnvironmentValue(aliasAnnotation.filter()))
+                        .searchRouting(getEnvironmentValue(aliasAnnotation.searchRouting()))
                         .build())
                 .conditions(RolloverConfig.RolloverConditions.builder()
                         .maxAge(rolloverAnnotation.maxAge())
@@ -155,14 +171,13 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
                         .build())
                 .trigger(RolloverConfig.TriggerConfig.builder()
                         .enabled(triggerAnnotation.enabled())
-                        .cronExpression(getEnvironmentValue(env, triggerAnnotation.cronExpression()))
+                        .cronExpression(getEnvironmentValue(triggerAnnotation.cronExpression()))
                         .build())
                 .build();
         if (!this.rollover.hasConditions()) {
             throw new IllegalArgumentException("No condition defined");
         }
     }
-
 
     @Override
     public void addPersistentProperty(ElasticsearchPersistentProperty property) {
@@ -203,7 +218,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
 
     @Override
     public String getAliasOrIndexReader() {
-        return StringUtils.isEmpty(this.aliasName) ? this.indexName : this.aliasName;
+        return this.alias != null ? this.alias.name() : this.indexName;
     }
 
     @Override
@@ -363,6 +378,11 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
         return this.createIndex;
     }
 
+    @Override
+    public org.elasticsearch.action.admin.indices.alias.Alias getAlias() {
+        return this.alias;
+    }
+
     /**
      * @return true if the current index is a time based index
      */
@@ -418,11 +438,11 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     }
 
     /**
-     * @param environment the environment
      * @param expression  the SPel expression
      * @return evaluate the expression
      */
-    private String getEnvironmentValue(Environment environment, String expression) {
+    private String getEnvironmentValue(String expression) {
+        Environment environment = context.getEnvironment();
         String value = null;
         // Create the matcher
         Matcher matcher = pattern.matcher(expression);

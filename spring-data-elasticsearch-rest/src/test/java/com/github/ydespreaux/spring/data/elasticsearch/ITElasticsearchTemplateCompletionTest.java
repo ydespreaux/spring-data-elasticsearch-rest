@@ -101,11 +101,12 @@ public class ITElasticsearchTemplateCompletionTest extends AbstractElasticsearch
 
     @Before
     public void onSetup() {
-        this.cleanAndInsertData();
+        this.cleanData();
     }
 
     @Test
     public void shouldFindSuggestionsUsingCompletion() {
+        insertData();
         SuggestionBuilder completionSuggestionFuzzyBuilder = SuggestBuilders.completionSuggestion("suggest").prefix("m", Fuzziness.AUTO);
         final List<String> suggestions = template.suggest(new SuggestBuilder().addSuggestion("test-suggest", completionSuggestionFuzzyBuilder), Music.class, new StringSuggestExtractor());
         assertThat(suggestions.size(), is(2));
@@ -115,6 +116,7 @@ public class ITElasticsearchTemplateCompletionTest extends AbstractElasticsearch
 
     @Test
     public void shouldFindSuggestionsUsingSearch() {
+        insertData();
         SuggestionBuilder completionSuggestionFuzzyBuilder = SuggestBuilders.completionSuggestion("suggest").prefix("m", Fuzziness.AUTO);
         SearchResponse response = template.suggest(new SuggestBuilder().addSuggestion("test-suggest", completionSuggestionFuzzyBuilder), "musics");
         final List<String> suggestions = new StringSuggestExtractor().extract(response);

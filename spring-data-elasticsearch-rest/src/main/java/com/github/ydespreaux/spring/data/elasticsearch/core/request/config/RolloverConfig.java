@@ -68,11 +68,12 @@ public class RolloverConfig {
         private String searchRouting;
 
         public Alias createDefaultAlias() {
-            return new Alias(this.name)
+            Alias alias = new Alias(this.name)
                     .writeIndex(true)
-                    .filter(filter)
-                    .indexRouting(indexRouting)
-                    .searchRouting(searchRouting);
+                    .filter(StringUtils.hasText(filter) ? filter : null)
+                    .indexRouting(StringUtils.hasText(indexRouting) ? indexRouting : null)
+                    .searchRouting(StringUtils.hasText(searchRouting) ? searchRouting : null);
+            return alias;
         }
 
     }

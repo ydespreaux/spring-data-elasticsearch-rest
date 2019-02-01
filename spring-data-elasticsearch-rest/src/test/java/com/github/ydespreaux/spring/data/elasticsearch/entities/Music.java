@@ -20,6 +20,8 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.entities;
 
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.Alias;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.Index;
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.IndexedDocument;
 import com.github.ydespreaux.spring.data.elasticsearch.core.completion.Completion;
 import lombok.Builder;
@@ -30,7 +32,14 @@ import org.springframework.data.annotation.Id;
 @Builder
 @Getter
 @Setter
-@IndexedDocument(aliasName = "musics", indexName = "music", type = "album", settingsAndMappingPath = "classpath:indices/music.index")
+@IndexedDocument(
+        alias = @Alias(name = "musics"),
+        index = @Index(
+                name = "music",
+                type = "album",
+                settingsAndMappingPath = "classpath:indices/music.index"
+        )
+)
 public class Music {
 
     @Id

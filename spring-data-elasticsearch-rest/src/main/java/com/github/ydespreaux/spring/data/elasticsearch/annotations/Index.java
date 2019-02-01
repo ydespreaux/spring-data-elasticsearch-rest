@@ -20,43 +20,50 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.annotations;
 
+import com.github.ydespreaux.spring.data.elasticsearch.core.IndexTimeBasedSupport;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Cette annotation permet de définir un document à indexer dans elasticsearch utilisant un index time-based.
- *
  * @author Yoann Despréaux
  * @since 1.0.0
  */
-@Documented
-@Inherited
-@Target({ElementType.TYPE})
+@Target({})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RolloverDocument {
+@Documented
+public @interface Index {
 
     /**
-     * Nom de l'alias ou de l'index permettant d'effectuer des recherches dans elasticsearch
+     * Création de l'index si ce dernier n'existe pas.
+     * La création de l'index se base sur le template correspondant pour la configuration, le mapping etc...
+     */
+    boolean createIndex() default true;
+
+    String name() default "";
+
+    String settingsAndMappingPath() default "";
+
+    /**
+     * Type du document à indexer
      *
-     * @return the index name
+     * @return the type name
      */
-    Alias alias() default @Alias;
+    String type();
 
     /**
+     * @return
+     */
+    String indexPattern() default "";
+
+    /**
+     * La classe IndexTimeBasedSupport permet de générer le nom de l'index pour l'indexation de documents
+     * en fonction de la date courante ainsi que le document à indexer.
      *
-     * @return
+     * @return the index time based support
      */
-    Index index();
-
-    /**
-     * @return
-     */
-    Rollover rollover();
-
-    /**
-     * @return
-     */
-    long scrollTimeSeconds() default 300;
+    Class<? extends IndexTimeBasedSupport> indexTimeBasedSupport() default IndexTimeBasedSupport.class;
 
 }
-
