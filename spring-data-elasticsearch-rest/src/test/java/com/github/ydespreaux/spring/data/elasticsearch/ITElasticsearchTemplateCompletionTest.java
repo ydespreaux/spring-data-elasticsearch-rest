@@ -27,14 +27,12 @@ import com.github.ydespreaux.spring.data.elasticsearch.core.completion.Completio
 import com.github.ydespreaux.spring.data.elasticsearch.core.completion.StringSuggestExtractor;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.Music;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
-import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.search.suggest.SuggestBuilder;
 import org.elasticsearch.search.suggest.SuggestBuilders;
 import org.elasticsearch.search.suggest.SuggestionBuilder;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,10 +58,6 @@ import static org.hamcrest.Matchers.is;
         ITElasticsearchTemplateCompletionTest.ElasticsearchConfiguration.class})
 @Profile("test-no-template")
 public class ITElasticsearchTemplateCompletionTest extends AbstractElasticsearchTest<Music> {
-
-
-    @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
 
     public ITElasticsearchTemplateCompletionTest() {
         super(Music.class);

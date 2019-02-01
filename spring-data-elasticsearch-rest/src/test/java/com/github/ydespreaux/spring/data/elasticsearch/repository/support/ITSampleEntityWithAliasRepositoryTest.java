@@ -27,10 +27,8 @@ import com.github.ydespreaux.spring.data.elasticsearch.core.scroll.ScrolledPage;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.SampleEntityWithAlias;
 import com.github.ydespreaux.spring.data.elasticsearch.repositories.sampleindex.SampleEntityWithAliasRepository;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
-import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,8 +60,6 @@ import static org.junit.Assert.assertThat;
 @Profile("test-no-template")
 public class ITSampleEntityWithAliasRepositoryTest extends AbstractElasticsearchTest<SampleEntityWithAlias> {
 
-    @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
     private static final String INDEX_NAME = "sample-entity-alias-index";
     @Autowired
     private SampleEntityWithAliasRepository repository;

@@ -27,10 +27,8 @@ import com.github.ydespreaux.spring.data.elasticsearch.core.scroll.ScrolledPage;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.City;
 import com.github.ydespreaux.spring.data.elasticsearch.repositories.template.CityRepository;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
-import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.elasticsearch.common.geo.GeoPoint;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,9 +62,6 @@ import static org.junit.Assert.assertTrue;
         ITCityRepositoryTest.ElasticsearchConfiguration.class})
 public class ITCityRepositoryTest extends AbstractElasticsearchTest<City> {
 
-
-    @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
 
     @Before
     public void setUp() {

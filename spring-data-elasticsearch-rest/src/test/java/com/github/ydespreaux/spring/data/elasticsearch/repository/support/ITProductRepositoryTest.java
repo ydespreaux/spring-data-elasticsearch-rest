@@ -26,9 +26,7 @@ import com.github.ydespreaux.spring.data.elasticsearch.configuration.Elasticsear
 import com.github.ydespreaux.spring.data.elasticsearch.entities.Product;
 import com.github.ydespreaux.spring.data.elasticsearch.repositories.query.ProductRepository;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
-import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,9 +55,6 @@ import static org.junit.Assert.assertThat;
         ITProductRepositoryTest.ElasticsearchConfiguration.class})
 @Profile("test-no-template")
 public class ITProductRepositoryTest extends AbstractElasticsearchTest<Product> {
-
-    @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
 
     public ITProductRepositoryTest() {
         super(Product.class);

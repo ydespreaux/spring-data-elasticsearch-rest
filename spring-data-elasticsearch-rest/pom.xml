@@ -115,7 +115,8 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <includes>
-                        <include>**/IT*.java</include>
+                        <!--<include>**/IT*.java</include>-->
+                        <include>**/IT*SuiteTest.java</include>
                     </includes>
                 </configuration>
                 <executions>
