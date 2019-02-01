@@ -136,7 +136,7 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
     /**
      * @return the index path
      */
-    String getIndexPath();
+    String getIndexSettingAndMappingPath();
 
     /**
      * @return the parent id property

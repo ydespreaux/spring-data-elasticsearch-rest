@@ -262,9 +262,9 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
      */
     @Override
     public void setPersistentEntityIndexName(T entity, String indexName) {
-        ElasticsearchPersistentProperty indexNameProperty = getIndexNameProperty();
-        if (indexNameProperty != null) {
-            getPropertyAccessor(entity).setProperty(indexNameProperty, indexName);
+        ElasticsearchPersistentProperty property = getIndexNameProperty();
+        if (property != null) {
+            getPropertyAccessor(entity).setProperty(property, indexName);
         }
     }
 
@@ -395,7 +395,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
      * @return the index path
      */
     @Override
-    public String getIndexPath() {
+    public String getIndexSettingAndMappingPath() {
         return this.indexPath;
     }
 

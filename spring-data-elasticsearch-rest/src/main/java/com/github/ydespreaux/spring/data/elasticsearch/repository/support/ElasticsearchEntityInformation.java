@@ -28,10 +28,5 @@ import org.springframework.data.repository.core.EntityInformation;
  */
 public interface ElasticsearchEntityInformation<T, K> extends EntityInformation<T, K> {
 
-    /**
-     *
-     * @return
-     */
-    Boolean createIndex();
 
 }

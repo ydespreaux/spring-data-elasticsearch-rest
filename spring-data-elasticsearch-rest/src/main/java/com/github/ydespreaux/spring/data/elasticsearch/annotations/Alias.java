@@ -34,6 +34,11 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Alias {
 
+    /**
+     * Alias name
+     *
+     * @return
+     */
     String name() default "";
 
     String filter() default "";
