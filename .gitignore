@@ -4,6 +4,6 @@ target/
 bin/
 .settings/
 .idea/
-docker/sonarqube/
+docker/
 *.iml
 
