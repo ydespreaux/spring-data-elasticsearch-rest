@@ -239,7 +239,7 @@
                 <sonar.projectKey>${project.artifactId}:${project.version}</sonar.projectKey>
                 <sonar.projectName>${project.name}</sonar.projectName>
                 <sonar.host.url>http://localhost:9000</sonar.host.url>
-                <sonar.login>0c955cf9d63358cfe11bda444af7d08672976740</sonar.login>
+                <sonar.login>382b6ea1aedb427181c8b71affa698fca944b3f3</sonar.login>
             </properties>
         </profile>
     </profiles>
