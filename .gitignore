@@ -4,6 +4,8 @@ target/
 bin/
 .settings/
 .idea/
-docker/
+docker/sonarqube
+docker/elasticsearch/data
+docker/elasticsearch/logs
 *.iml
 

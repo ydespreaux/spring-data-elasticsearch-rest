@@ -24,7 +24,7 @@ import java.lang.annotation.*;
 
 /**
  * @author Yoann Despréaux
- * @since 0.0.3
+ * @since 1.0.0
  */
 @Documented
 @Inherited
