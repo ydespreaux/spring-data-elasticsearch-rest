@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 ### Added
-- Mapping annotation
+- Mapping annotation (o)
 
 ### Changed
 
