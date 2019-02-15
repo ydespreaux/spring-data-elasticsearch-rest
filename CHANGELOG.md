@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+- Reactive repository
 
 ### Changed
 
