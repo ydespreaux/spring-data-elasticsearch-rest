@@ -4,7 +4,6 @@
 
     <artifactId>spring-data-elasticsearch-rest</artifactId>
     <packaging>jar</packaging>
-
     <name>spring-data-elasticsearch-rest</name>
     <description>Data Elasticsearch with RestClient</description>
 
