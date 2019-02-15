@@ -31,8 +31,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        ITElasticsearchDataAutoConfigurationTest.class,
-        ITReactiveElasticsearchDataAutoConfigurationTest.class
+        ITElasticsearchConfigurationTest.class,
+        ITReactiveElasticsearchConfigurationTest.class
 })
 public class ITSuiteTest {
 
