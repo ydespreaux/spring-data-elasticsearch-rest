@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 ### Added
+- Mapping annotation
+
+### Changed
+
+### Fixed
+
+
+## [1.1.0-SNAPSHOT]
+### Added
 - Reactive repository
 
 ### Changed
