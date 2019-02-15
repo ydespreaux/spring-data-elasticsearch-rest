@@ -20,6 +20,8 @@
 
 package com.github.ydespreaux.spring.data.autoconfigure.elasticsearch;
 
+import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
+import org.junit.ClassRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -34,10 +36,7 @@ import org.junit.runners.Suite;
 })
 public class ITSuiteTest {
 
-//    @ClassRule
-//    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
+    @ClassRule
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
 
-    static {
-        System.setProperty("spring.elasticsearch.rest.uris", "http://localhost:9200");
-    }
 }

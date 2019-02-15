@@ -6,9 +6,9 @@ Spring Data implementation for ElasticSearch based on Elasticsearch Rest client
 
 ## Versions
 
-|   spring-testcontainers    |   testcontainers |
-|:--------------------------:|:----------------:|
-|   1.0.0                    |       1.8.3      |
+|   spring-data-elasticsearch-rest   |   spring-boot    |   elasticsearch  |
+|:----------------------------------:|:----------------:|:----------------:|
+|   1.0.0                            |       2.1.0      |       6.4.2      |
 
 ## Maven dependency
 
