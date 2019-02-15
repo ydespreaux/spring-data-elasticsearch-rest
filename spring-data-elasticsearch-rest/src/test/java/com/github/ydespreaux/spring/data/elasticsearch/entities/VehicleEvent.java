@@ -47,7 +47,8 @@ import java.time.LocalDateTime;
         ),
         rollover = @Rollover(
                 alias = @Alias(name = "write-vehicles-alias"),
-                maxDoc = 2
+                maxDoc = 2,
+                trigger = @Trigger(enabled = "${index.vehicles.trigger.enabled}", cronExpression = "*/2 * * * * *")
         )
 )
 public class VehicleEvent {

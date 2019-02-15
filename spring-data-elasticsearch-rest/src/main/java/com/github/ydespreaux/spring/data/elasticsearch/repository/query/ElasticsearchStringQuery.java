@@ -92,9 +92,6 @@ public class ElasticsearchStringQuery extends AbstractElasticsearchRepositoryQue
 
     private String getParameterWithIndex(ParametersParameterAccessor accessor, int index) {
         Object parameter = accessor.getBindableValue(index);
-        if (parameter == null) {
-            return "null";
-        }
         if (conversionService.canConvert(parameter.getClass(), String.class)) {
             return conversionService.convert(parameter, String.class);
         }

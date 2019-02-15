@@ -18,17 +18,18 @@
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
  */
 
-package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
+package com.github.ydespreaux.spring.data.elasticsearch.core;
 
 import com.github.ydespreaux.spring.data.elasticsearch.AbstractElasticsearchTest;
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
 import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
-import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.VehicleEvent;
 import com.github.ydespreaux.spring.data.elasticsearch.repositories.rollover.VehicleEventRepository;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.elasticsearch.common.geo.GeoPoint;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,16 +58,16 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
         RestClientAutoConfiguration.class,
-        ITVehicleEventRepositoryTest.ElasticsearchConfiguration.class})
+        ITElasticsearchTemplateRolloverTest.ElasticsearchConfiguration.class})
 @Profile("test-no-template")
-public class ITVehicleEventRepositoryTest extends AbstractElasticsearchTest<VehicleEvent> {
+public class ITElasticsearchTemplateRolloverTest extends AbstractElasticsearchTest<VehicleEvent> {
 
-    public ITVehicleEventRepositoryTest() {
+    @ClassRule
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
+
+    public ITElasticsearchTemplateRolloverTest() {
         super(VehicleEvent.class);
     }
-
-    private static final Integer CRON_DELAY_SECONDS = 4;
-
 
     @Autowired
     private VehicleEventRepository repository;

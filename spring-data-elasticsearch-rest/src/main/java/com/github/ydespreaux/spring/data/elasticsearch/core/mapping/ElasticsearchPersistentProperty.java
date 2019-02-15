@@ -60,6 +60,11 @@ public interface ElasticsearchPersistentProperty extends PersistentProperty<Elas
      */
     boolean isIndexNameProperty();
 
+    /**
+     * @return
+     */
+    boolean isCompletionProperty();
+
 
     enum PropertyToFieldNameConverter implements Converter<ElasticsearchPersistentProperty, String> {
 

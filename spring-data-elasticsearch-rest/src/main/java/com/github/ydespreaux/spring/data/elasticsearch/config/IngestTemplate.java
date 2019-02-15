@@ -24,7 +24,6 @@ import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperati
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
@@ -43,7 +42,7 @@ import java.util.stream.Collectors;
  * @since 1.0.0
  */
 @Slf4j
-public class IngestTemplate implements ApplicationContextAware, InitializingBean {
+public class IngestTemplate implements ApplicationContextAware {
 
     private final TemplateProperties properties;
     private final ElasticsearchOperations operations;
@@ -59,15 +58,10 @@ public class IngestTemplate implements ApplicationContextAware, InitializingBean
         this.applicationContext = applicationContext;
     }
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        ingest();
-    }
-
     /**
      *
      */
-    private void ingest() {
+    public void ingest() {
         final TemplateAction templateAction = this.properties.getAction();
         if (templateAction == TemplateAction.NONE) {
             return;

@@ -68,6 +68,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     private ElasticsearchPersistentProperty parentIdProperty;
     private ElasticsearchPersistentProperty scoreProperty;
     private ElasticsearchPersistentProperty indexNameProperty;
+    private ElasticsearchPersistentProperty completionProperty;
     private SourceFilter sourceFilter;
     private Duration scrollTime;
     private RolloverConfig rollover;
@@ -170,13 +171,23 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
                         .maxSize(rolloverAnnotation.maxSize())
                         .build())
                 .trigger(RolloverConfig.TriggerConfig.builder()
-                        .enabled(triggerAnnotation.enabled())
+                        .enabled(isTriggerEnabled(triggerAnnotation))
                         .cronExpression(getEnvironmentValue(triggerAnnotation.cronExpression()))
                         .build())
                 .build();
         if (!this.rollover.hasConditions()) {
             throw new IllegalArgumentException("No condition defined");
         }
+    }
+
+    private boolean isTriggerEnabled(Trigger triggerAnnotation) {
+        if (triggerAnnotation.value()) {
+            return true;
+        }
+        if (StringUtils.hasText(triggerAnnotation.enabled())) {
+            return Boolean.valueOf(getEnvironmentValue(triggerAnnotation.enabled()));
+        }
+        return false;
     }
 
     @Override
@@ -204,6 +215,13 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
                                 + "as index name property. Check your mapping configuration!", property.getField(), indexNameProperty.getField()));
             }
             this.indexNameProperty = property;
+        } else if (property.isCompletionProperty()) {
+            if (this.completionProperty != null) {
+                throw new MappingException(
+                        String.format("Attempt to add completion property %s but already have property %s registered "
+                                + "as completion property. Check your mapping configuration!", property.getField(), completionProperty.getField()));
+            }
+            this.completionProperty = property;
         }
     }
 
@@ -344,6 +362,14 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
         }
         getPropertyAccessor(result) //
                 .setProperty(getScoreProperty(), score);
+    }
+
+    /**
+     * @return
+     */
+    @Override
+    public boolean hasCompletionProperty() {
+        return this.completionProperty != null;
     }
 
     /**

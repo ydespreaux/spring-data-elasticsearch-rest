@@ -5,7 +5,8 @@ networks:
 services:
   sonarqube:
     container_name: sonarqube
-    image: sonarqube:6.6
+    #    image: sonarqube:6.6
+    image: sonarqube
     ports:
     - "9000:9000"
     - "9095:9092"

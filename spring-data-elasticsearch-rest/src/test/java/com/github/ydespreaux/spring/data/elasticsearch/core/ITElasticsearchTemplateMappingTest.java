@@ -18,17 +18,16 @@
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
  */
 
-package com.github.ydespreaux.spring.data.elasticsearch;
+package com.github.ydespreaux.spring.data.elasticsearch.core;
 
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
 import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
-import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
-import com.github.ydespreaux.spring.data.elasticsearch.core.IndexTimeBasedParameter;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.ArticleTimeBasedSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.City;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.CityTimeBasedSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import com.github.ydespreaux.spring.data.elasticsearch.utils.AdminClientUtils;
+import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
 import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
@@ -41,6 +40,7 @@ import org.elasticsearch.common.settings.Settings;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
 import org.junit.Assert;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +64,10 @@ import static org.hamcrest.Matchers.*;
         ITElasticsearchTemplateMappingTest.ElasticsearchConfiguration.class})
 @Profile("test-no-template")
 public class ITElasticsearchTemplateMappingTest {
+
+    @ClassRule
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2")
+            .withConfigDirectory("elastic-config");
 
     private static final String INDEX_BOOK_NAME = "books";
 

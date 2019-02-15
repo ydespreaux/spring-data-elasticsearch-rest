@@ -36,6 +36,7 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.unit.TimeValue;
@@ -45,7 +46,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
-import org.elasticsearch.search.suggest.SuggestBuilder;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
@@ -65,7 +66,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
  * @since 1.0.0
  */
 @Slf4j
-public abstract class ElasticsearchTemplateSupport implements ApplicationContextAware {
+public abstract class ElasticsearchTemplateSupport implements ApplicationContextAware, InitializingBean {
 
     /**
      * {@link ElasticsearchConverter} property.
@@ -130,6 +131,11 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
             ((ApplicationContextAware) elasticsearchConverter).setApplicationContext(applicationContext);
         }
     }
+
+    @Override
+    public void afterPropertiesSet() {
+    }
+
 
     /**
      * @param clazz the entity class
@@ -485,15 +491,36 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
     }
 
     /**
-     * @param suggestion
-     * @param indices
+     *
+     * @param query
+     * @param clazz
+     * @param <T>
      * @return
      */
-    protected SearchRequest prepareSuggestSearch(SuggestBuilder suggestion, String... indices) {
-        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
-                .suggest(suggestion);
-        return new SearchRequest(indices).source(sourceBuilder);
+    protected <T> SearchRequest prepareSuggest(SuggestQuery query, Class<T> clazz) {
+        setPersistentEntityIndexAndTypeAndSourceFilter(query, clazz);
+        return prepareSuggest(query);
     }
+
+    /**
+     * @param query
+     * @return
+     */
+    protected SearchRequest prepareSuggest(SuggestQuery query) {
+        assertNotNullIndices(query);
+        assertNotNullTypes(query);
+
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
+                .suggest(query.getSuggestion());
+        if (query.getSourceFilter() != null) {
+            SourceFilter sourceFilter = query.getSourceFilter();
+            sourceBuilder.fetchSource(sourceFilter.getIncludes(), sourceFilter.getExcludes());
+        }
+        return new SearchRequest(toArray(query.getIndices()))
+                .types(toArray(query.getTypes()))
+                .source(sourceBuilder);
+    }
+
 
     /**
      * @param sort
@@ -564,5 +591,9 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
 
     protected ElasticsearchException buildSearchException(Exception e, SearchRequest request) {
         return new ElasticsearchException("Error for continueScroll request: " + request.toString(), e);
+    }
+
+    protected ElasticsearchException buildClearScrollException(Exception e, ClearScrollRequest request) {
+        return new ElasticsearchException("Error for clear scroll request: " + request.toString(), e);
     }
 }

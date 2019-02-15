@@ -21,6 +21,7 @@
 package com.github.ydespreaux.spring.data.elasticsearch.entities;
 
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.Alias;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.CompletionField;
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.Index;
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.IndexedDocument;
 import com.github.ydespreaux.spring.data.elasticsearch.core.completion.Completion;
@@ -45,5 +46,7 @@ public class Music {
     @Id
     private String id;
     private String title;
+
+    @CompletionField
     private Completion suggest;
 }

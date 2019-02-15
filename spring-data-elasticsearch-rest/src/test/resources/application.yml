@@ -3,11 +3,6 @@
 #
 spring:
   elasticsearch:
-    jest:
-      connection-timeout: 5000ms
-      read-timeout: 6000ms
-      username: elastic
-      password: changeme
     template:
       action: CREATE_OR_UPDATE
       scripts: classpath:templates/article.template,classpath:templates/city.template
@@ -19,9 +14,9 @@ spring:
   jackson:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSXXX
 
-#logging:
-#  level:
-#    com.github.ydespreaux.spring.data.elasticsearch.client.ClientLogger: TRACE
+logging:
+  level:
+    com.github.ydespreaux.spring.data.elasticsearch.client.ClientLogger: TRACE
 
 ---
 
@@ -30,3 +25,12 @@ spring:
   elasticsearch:
     template:
       action: none
+
+---
+
+spring:
+  profiles: test-trigger-rollover
+index:
+  vehicles:
+    trigger:
+      enabled: true

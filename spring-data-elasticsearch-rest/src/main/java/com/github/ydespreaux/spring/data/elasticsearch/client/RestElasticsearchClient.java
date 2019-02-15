@@ -94,8 +94,8 @@ public interface RestElasticsearchClient {
         return clusterPutSettings(request, getDefaultRequestOptions());
     }
 
-    default ClusterGetSettingsResponse clusterPutSettings(ClusterGetSettingsRequest request) throws IOException {
-        return clusterPutSettings(request, getDefaultRequestOptions());
+    default ClusterGetSettingsResponse clusterGetSettings(ClusterGetSettingsRequest request) throws IOException {
+        return clusterGetSettings(request, getDefaultRequestOptions());
     }
 
     default GetSettingsResponse getSettings(GetSettingsRequest request) throws IOException {
@@ -219,7 +219,7 @@ public interface RestElasticsearchClient {
 
     ClusterUpdateSettingsResponse clusterPutSettings(ClusterUpdateSettingsRequest request, RequestOptions options) throws IOException;
 
-    ClusterGetSettingsResponse clusterPutSettings(ClusterGetSettingsRequest request, RequestOptions options) throws IOException;
+    ClusterGetSettingsResponse clusterGetSettings(ClusterGetSettingsRequest request, RequestOptions options) throws IOException;
 
     GetSettingsResponse getSettings(GetSettingsRequest request, RequestOptions options) throws IOException;
 

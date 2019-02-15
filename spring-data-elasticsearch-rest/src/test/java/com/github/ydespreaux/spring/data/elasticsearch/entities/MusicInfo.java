@@ -18,26 +18,21 @@
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
  */
 
-package com.github.ydespreaux.spring.data.autoconfigure.elasticsearch;
+package com.github.ydespreaux.spring.data.elasticsearch.entities;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.ProjectionDocument;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.annotation.Id;
 
-/**
- * @author Yoann Despréaux
- * @since 1.0.0
- */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-        ITElasticsearchDataAutoConfigurationTest.class,
-        ITReactiveElasticsearchDataAutoConfigurationTest.class
-})
-public class ITSuiteTest {
+@Builder
+@Getter
+@Setter
+@ProjectionDocument(target = Music.class, fields = {"title"})
+public class MusicInfo {
 
-//    @ClassRule
-//    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
-
-    static {
-        System.setProperty("spring.elasticsearch.rest.uris", "http://localhost:9200");
-    }
+    @Id
+    private String id;
+    private String title;
 }

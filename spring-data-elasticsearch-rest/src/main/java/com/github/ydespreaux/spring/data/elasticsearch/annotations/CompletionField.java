@@ -18,26 +18,21 @@
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
  */
 
-package com.github.ydespreaux.spring.data.autoconfigure.elasticsearch;
+package com.github.ydespreaux.spring.data.elasticsearch.annotations;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import org.springframework.data.annotation.Persistent;
+
+import java.lang.annotation.*;
 
 /**
+ * Parent
+ *
  * @author Yoann Despréaux
  * @since 1.0.0
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-        ITElasticsearchDataAutoConfigurationTest.class,
-        ITReactiveElasticsearchDataAutoConfigurationTest.class
-})
-public class ITSuiteTest {
-
-//    @ClassRule
-//    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
-
-    static {
-        System.setProperty("spring.elasticsearch.rest.uris", "http://localhost:9200");
-    }
+@Persistent
+@Inherited
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface CompletionField {
 }

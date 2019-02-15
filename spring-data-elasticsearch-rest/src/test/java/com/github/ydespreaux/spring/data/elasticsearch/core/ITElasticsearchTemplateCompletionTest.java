@@ -18,21 +18,20 @@
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
  */
 
-package com.github.ydespreaux.spring.data.elasticsearch;
+package com.github.ydespreaux.spring.data.elasticsearch.core;
 
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
 import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
-import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
-import com.github.ydespreaux.spring.data.elasticsearch.core.completion.Completion;
 import com.github.ydespreaux.spring.data.elasticsearch.core.completion.StringSuggestExtractor;
+import com.github.ydespreaux.spring.data.elasticsearch.core.query.SuggestQuery;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.Music;
+import com.github.ydespreaux.spring.data.elasticsearch.entities.MusicInfo;
+import com.github.ydespreaux.spring.data.elasticsearch.repositories.completion.MusicRepository;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.search.suggest.SuggestBuilder;
 import org.elasticsearch.search.suggest.SuggestBuilders;
 import org.elasticsearch.search.suggest.SuggestionBuilder;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +44,8 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -57,52 +56,19 @@ import static org.hamcrest.Matchers.is;
         RestClientAutoConfiguration.class,
         ITElasticsearchTemplateCompletionTest.ElasticsearchConfiguration.class})
 @Profile("test-no-template")
-public class ITElasticsearchTemplateCompletionTest extends AbstractElasticsearchTest<Music> {
-
-    public ITElasticsearchTemplateCompletionTest() {
-        super(Music.class);
-    }
+public class ITElasticsearchTemplateCompletionTest {
 
     @Autowired
     private ElasticsearchOperations template;
 
-    @Override
-    protected List<Music> generateData() {
-        return Arrays.asList(
-                Music.builder()
-                        .id("1")
-                        .title("Nevermind")
-                        .suggest(Completion.builder()
-                                .input(new String[]{"Nevermind", "Nirvana"})
-                                .build())
-                        .build(),
-                Music.builder()
-                        .id("2")
-                        .title("Thriller")
-                        .suggest(Completion.builder()
-                                .input(new String[]{"Thriller", "Mickael Jackson"})
-                                .build())
-                        .build(),
-                Music.builder()
-                        .id("3")
-                        .title("Revolution")
-                        .suggest(Completion.builder()
-                                .input(new String[]{"Revolution", "Muse"})
-                                .build())
-                        .build()
-        );
-    }
-
-    @Before
-    public void onSetup() {
-        this.cleanData();
-    }
+    @Autowired
+    private MusicRepository repository;
 
     @Test
     public void shouldFindSuggestionsUsingCompletion() {
-        insertData();
         SuggestionBuilder completionSuggestionFuzzyBuilder = SuggestBuilders.completionSuggestion("suggest").prefix("m", Fuzziness.AUTO);
-        final List<String> suggestions = template.suggest(new SuggestBuilder().addSuggestion("test-suggest", completionSuggestionFuzzyBuilder), Music.class, new StringSuggestExtractor());
+        SuggestQuery query = new SuggestQuery(new SuggestBuilder().addSuggestion("test-suggest", completionSuggestionFuzzyBuilder));
+        final List<String> suggestions = template.suggest(query, Music.class, new StringSuggestExtractor());
         assertThat(suggestions.size(), is(2));
         assertThat(suggestions.get(0), is(equalTo("Mickael Jackson")));
         assertThat(suggestions.get(1), is(equalTo("Muse")));
@@ -110,13 +76,32 @@ public class ITElasticsearchTemplateCompletionTest extends AbstractElasticsearch
 
     @Test
     public void shouldFindSuggestionsUsingSearch() {
-        insertData();
         SuggestionBuilder completionSuggestionFuzzyBuilder = SuggestBuilders.completionSuggestion("suggest").prefix("m", Fuzziness.AUTO);
-        SearchResponse response = template.suggest(new SuggestBuilder().addSuggestion("test-suggest", completionSuggestionFuzzyBuilder), "musics");
-        final List<String> suggestions = new StringSuggestExtractor().extract(response);
+        SuggestQuery query = new SuggestQuery(new SuggestBuilder().addSuggestion("test-suggest", completionSuggestionFuzzyBuilder));
+        query.addIndices("musics");
+        query.addTypes("music");
+        List<String> suggestions = template.suggest(query, new StringSuggestExtractor());
         assertThat(suggestions.size(), is(2));
         assertThat(suggestions.get(0), is(equalTo("Mickael Jackson")));
         assertThat(suggestions.get(1), is(equalTo("Muse")));
+    }
+
+    @Test
+    public void shouldFindSuggestionsWithRepository() {
+        List<Music> suggestions = this.repository.suggest("m");
+        assertThat(suggestions.size(), is(2));
+        List<String> titles = suggestions.stream().map(Music::getTitle).collect(Collectors.toList());
+        assertThat(titles.contains("Revolution"), is(true));
+        assertThat(titles.contains("Thriller"), is(true));
+    }
+
+    @Test
+    public void shouldFindSuggestionsWithProjection() {
+        List<MusicInfo> suggestions = this.repository.suggest("m", MusicInfo.class);
+        assertThat(suggestions.size(), is(2));
+        List<String> titles = suggestions.stream().map(MusicInfo::getTitle).collect(Collectors.toList());
+        assertThat(titles.contains("Revolution"), is(true));
+        assertThat(titles.contains("Thriller"), is(true));
     }
 
     @Configuration

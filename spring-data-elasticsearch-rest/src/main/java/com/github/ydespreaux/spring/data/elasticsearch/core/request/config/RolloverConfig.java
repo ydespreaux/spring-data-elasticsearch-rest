@@ -42,7 +42,7 @@ public class RolloverConfig {
     // Trigger
     private final TriggerConfig trigger;
 
-    private volatile Alias defaultAlias;
+    private Alias defaultAlias;
 
     public boolean hasConditions() {
         return this.conditions.hasConditions();

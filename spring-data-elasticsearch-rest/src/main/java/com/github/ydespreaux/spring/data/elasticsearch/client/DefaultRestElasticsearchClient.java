@@ -110,7 +110,7 @@ public class DefaultRestElasticsearchClient implements RestElasticsearchClient {
         return this.client.cluster().putSettings(request, options);
     }
 
-    public ClusterGetSettingsResponse clusterPutSettings(ClusterGetSettingsRequest request, RequestOptions options) throws IOException {
+    public ClusterGetSettingsResponse clusterGetSettings(ClusterGetSettingsRequest request, RequestOptions options) throws IOException {
         return this.client.cluster().getSettings(request, options);
     }
 

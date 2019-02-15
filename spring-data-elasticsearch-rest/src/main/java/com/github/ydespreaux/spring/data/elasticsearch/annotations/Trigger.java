@@ -32,7 +32,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Trigger {
 
-    boolean enabled() default false;
+    boolean value() default false;
+
+    String enabled() default "";
 
     String cronExpression() default "";
 

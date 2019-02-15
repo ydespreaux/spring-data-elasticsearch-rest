@@ -1,0 +1,42 @@
+# index article settings
+PUT:_template/article:@resource(templates/article.template)
+# index articles
+PUT:article-e1-2018/article/1:{ "name" : "Article1", "description": "Description de l'article 1 - City", "entrepot": "E1" }
+PUT:article-e2-2018/article/2:{ "name" : "Article2", "description": "Description de l'article 2 - Product", "entrepot": "E2" }
+PUT:article-e3-2018/article/3:{ "name" : "Article3", "description": "Description de l'article 3 - Company", "entrepot": "E3" }
+PUT:article-e1-2018/article/4:{ "name" : "Article4", "description": "Description de l'article 4 - Step", "entrepot": "E1" }
+PUT:article-e1-2018/article/5:{ "name" : "Article5", "description": "Description de l'article 5 - World", "entrepot": "E1" }
+
+# index books settings
+PUT:books:@resource(indices/book.index)
+# index books
+PUT:books/book/1:{"title": "Black City Parade", "description": "Exceptionnel : pour la 1ère fois ! Indochine records et Sony Music sont fiers de proposer les rééditions des 12 albums studio d’Indochine...", "price": 15, "publication": "2015-10-25"}
+PUT:books/book/2:{"title": "Blake et Mortimer - Tome 25 : La vallée des immortels", "description": "À Lhassa, le palais impérial du dictateur Basam-Damdu est anéanti par une escadrille d’Espadons, et le monde, soulagé, fête la fin de la troisième guerre mondiale...", "price": 25, "publication": "2016-05-01"}
+PUT:books/book/3:{"title": "Et puis Colette", "description": "Anouk, trentenaire parisienne enfermée dans la routine, vient d’apprendre le décès de sa soeur...", "price": 9.99, "publication": "2017-02-01"}
+PUT:books/book/4:{"title": "Live Is love Double Vinyle", "description": "Thomas s’est pour ce disque mis à nu, sans concession aucune...", "price": 12.20, "publication": "2018-07-10"}
+PUT:books/book/5:{"title": "Zorro - Cicatrices Tome 01 : Zorro", "description": "Zorro est toujours Don Diego de la Vega sous le masque, et il défend toujours la veuve et l’orphelin grâce à son fouet et son épée. Mais il est cette fois aux prises avec l’amour !", "price": 5}
+
+# index cities settings
+PUT:_template/city:@resource(templates/city.template)
+# index cities
+PUT:metropole-se/city/1:{ "name" : "Montpellier", "population": 275318, "region": "SE", "location": { "lat": 43.613712, "lon": 3.872191 } }
+PUT:ville-se/city/2:{ "name" : "Mauguio", "population": 16795, "region": "SE", "location": { "lat": 43.615463, "lon": 4.009743 } }
+PUT:ville-se/city/3:{ "name" : "Castries", "population": 6075, "region": "SE", "location": { "lat": 43.677644, "lon": 3.985277 } }
+PUT:ville-se/city/4:{ "name" : "Vendargues", "population": 6186, "region": "SE", "location": { "lat": 43.656904, "lon": 3.969566 } }
+PUT:ville-se/city/5:{ "name" : "Sommières", "population": 4644, "region": "SE", "location": { "lat": 43.782759, "lon": 4.089557 } }
+
+# index products settings
+PUT:products:@resource(indices/product.index)
+# index products
+PUT:products/product/1:{ "name" : "Sugar", "text": "Cane sugar", "available": false, "price": 1.0, "popularity":2, "categories": ["C1", "C2"] }
+PUT:products/product/2:{ "name" : "Sugar", "text": "Cane sugar", "available": true, "price": 1.2, "popularity":1, "categories": ["C1"] }
+PUT:products/product/3:{ "name" : "Sugar", "text": "Beet sugar", "available": true, "price": 1.1, "popularity":4, "categories": ["C2"] }
+PUT:products/product/4:{ "name" : "Salt", "text": "Rock salt", "available": true, "price": 1.9, "popularity":2, "categories": ["C3", "C4"] }
+PUT:products/product/5:{ "name" : "Salt", "text": "Sea salt", "available": false, "price": 2.1, "popularity":4, "categories": ["C1", "C3"] }
+
+# index music settings
+PUT:music:@resource(indices/music.index)
+# index musics
+PUT:music/album/1:{ "title" : "Nevermind", "suggest": {"input": [ "Nevermind", "Nirvana" ]}}
+PUT:music/album/2:{ "title" : "Thriller", "suggest": {"input": [ "Thriller", "Mickael Jackson" ]}}
+PUT:music/album/3:{ "title" : "Revolution", "suggest": {"input": [ "Revolution", "Muse" ]}}

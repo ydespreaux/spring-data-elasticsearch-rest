@@ -18,26 +18,28 @@
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
  */
 
-package com.github.ydespreaux.spring.data.autoconfigure.elasticsearch;
+package com.github.ydespreaux.spring.data.elasticsearch.core.query;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import org.elasticsearch.search.suggest.SuggestBuilder;
 
 /**
+ * SuggestQuery
+ *
  * @author Yoann Despréaux
  * @since 1.0.0
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-        ITElasticsearchDataAutoConfigurationTest.class,
-        ITReactiveElasticsearchDataAutoConfigurationTest.class
-})
-public class ITSuiteTest {
+public class SuggestQuery extends AbstractQuery {
 
-//    @ClassRule
-//    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
+    private final SuggestBuilder suggestion;
 
-    static {
-        System.setProperty("spring.elasticsearch.rest.uris", "http://localhost:9200");
+    public SuggestQuery(SuggestBuilder suggestion) {
+        this.suggestion = suggestion;
+    }
+
+    /**
+     * @return
+     */
+    public SuggestBuilder getSuggestion() {
+        return this.suggestion;
     }
 }

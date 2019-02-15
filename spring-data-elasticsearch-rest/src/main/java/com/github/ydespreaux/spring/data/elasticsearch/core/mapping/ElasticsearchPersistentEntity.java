@@ -183,6 +183,17 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
     /**
      * @return
      */
+    boolean hasCompletionProperty();
+
+    /**
+     * @return
+     */
+    @Nullable
+    ElasticsearchPersistentProperty getCompletionProperty();
+
+    /**
+     * @return
+     */
     SourceFilter getSourceFilter();
 
     /**

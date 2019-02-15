@@ -45,12 +45,6 @@ public interface CityRepository extends ElasticsearchRepository<City, String> {
 
     Boolean existsByLocationWithin(String origin, String distance);
 
-    Long deleteByLocationWithin(GeoPoint origin, String distance);
-
-    Long deleteByLocationWithin(Point origin, Distance distance);
-
-    Long deleteByLocationWithin(String origin, String distance);
-
     List<City> findCityByLocationWithinOrderByNameAsc(GeoPoint origin, String distance);
 
     List<City> findCityByLocationWithinOrderByNameAsc(Point origin, Distance distance);
@@ -79,14 +73,6 @@ public interface CityRepository extends ElasticsearchRepository<City, String> {
 
     Boolean existsByLocationNear(String topLeftPoint, String bottomRightPoint);
 
-    Long deleteByLocationNear(Box box);
-
-    Long deleteByLocationNear(GeoPoint topLeftPoint, GeoPoint bottomRightPoint);
-
-    Long deleteByLocationNear(Point topLeftPoint, Point bottomRightPoint);
-
-    Long deleteByLocationNear(String topLeftPoint, String bottomRightPoint);
-
     List<City> findCityByLocationNearOrderByNameAsc(Box box);
 
     List<City> findCityByLocationNearOrderByNameAsc(GeoPoint topLeftPoint, GeoPoint bottomRightPoint);
@@ -102,18 +88,6 @@ public interface CityRepository extends ElasticsearchRepository<City, String> {
     ScrolledPage<City> findCityByLocationNear(Point topLeftPoint, Point bottomRightPoint, Pageable pageable);
 
     ScrolledPage<City> findCityByLocationNear(String topLeftPoint, String bottomRightPoint, Pageable pageable);
-
-    Long deleteByRegion(String region);
-
-    Long deleteByPopulationBetween(long min, long max);
-
-    Long deleteByPopulationGreaterThanEqual(long min);
-
-    Long deleteByPopulationGreaterThan(long min);
-
-    Long deleteByPopulationLessThanEqual(long max);
-
-    Long deleteByPopulationLessThan(long max);
 
     Long countByRegion(String region);
 

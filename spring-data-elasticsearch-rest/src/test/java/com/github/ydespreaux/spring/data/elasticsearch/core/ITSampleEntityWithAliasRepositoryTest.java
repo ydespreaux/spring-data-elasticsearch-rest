@@ -18,17 +18,19 @@
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
  */
 
-package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
+package com.github.ydespreaux.spring.data.elasticsearch.core;
 
 import com.github.ydespreaux.spring.data.elasticsearch.AbstractElasticsearchTest;
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
 import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.core.scroll.ScrolledPage;
-import com.github.ydespreaux.spring.data.elasticsearch.entities.SampleEntity;
-import com.github.ydespreaux.spring.data.elasticsearch.repositories.sampleindex.SampleEntityRepository;
+import com.github.ydespreaux.spring.data.elasticsearch.entities.SampleEntityWithAlias;
+import com.github.ydespreaux.spring.data.elasticsearch.repositories.sampleindex.SampleEntityWithAliasRepository;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,25 +58,28 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
         RestClientAutoConfiguration.class,
-        ITSampleEntityRepositoryTest.ElasticsearchConfiguration.class})
+        ITSampleEntityWithAliasRepositoryTest.ElasticsearchConfiguration.class})
 @Profile("test-no-template")
-public class ITSampleEntityRepositoryTest extends AbstractElasticsearchTest<SampleEntity> {
+public class ITSampleEntityWithAliasRepositoryTest extends AbstractElasticsearchTest<SampleEntityWithAlias> {
 
-    private static final String INDEX_NAME = "sample-entity-index";
+    @ClassRule
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
+
+    private static final String INDEX_NAME = "sample-entity-alias-index";
     @Autowired
-    private SampleEntityRepository repository;
+    private SampleEntityWithAliasRepository repository;
 
-    public ITSampleEntityRepositoryTest() {
-        super(SampleEntity.class);
+    public ITSampleEntityWithAliasRepositoryTest() {
+        super(SampleEntityWithAlias.class);
     }
 
     @Override
-    protected List<SampleEntity> generateData() {
+    protected List<SampleEntityWithAlias> generateData() {
         return Arrays.asList(
-                createSampleEntity(null, "Entity 1"),
-                createSampleEntity(null, "Entity 2"),
-                createSampleEntity(null, "Entity 3"),
-                createSampleEntity(null, "Entity 4")
+                createSampleEntityWithAlias(null, "Entity 1"),
+                createSampleEntityWithAlias(null, "Entity 2"),
+                createSampleEntityWithAlias(null, "Entity 3"),
+                createSampleEntityWithAlias(null, "Entity 4")
         );
     }
 
@@ -85,16 +90,16 @@ public class ITSampleEntityRepositoryTest extends AbstractElasticsearchTest<Samp
 
     @Test
     public void findById() {
-        List<SampleEntity> data = insertData();
-        SampleEntity myEntity = data.get(0);
-        Optional<SampleEntity> entity = this.repository.findById(myEntity.getId());
+        List<SampleEntityWithAlias> data = insertData();
+        SampleEntityWithAlias myEntity = data.get(0);
+        Optional<SampleEntityWithAlias> entity = this.repository.findById(myEntity.getId());
         assertThat(entity.isPresent(), is(true));
     }
 
     @Test
     public void findByIdNotFound() {
         insertData();
-        Optional<SampleEntity> entity = this.repository.findById("-1");
+        Optional<SampleEntityWithAlias> entity = this.repository.findById("-1");
         assertThat(entity.isPresent(), is(false));
     }
 
@@ -106,7 +111,7 @@ public class ITSampleEntityRepositoryTest extends AbstractElasticsearchTest<Samp
 
     @Test
     public void existsById() {
-        List<SampleEntity> data = insertData();
+        List<SampleEntityWithAlias> data = insertData();
         assertThat(this.repository.existsById(data.get(0).getId()), is(equalTo(true)));
     }
 
@@ -119,7 +124,7 @@ public class ITSampleEntityRepositoryTest extends AbstractElasticsearchTest<Samp
     @Test
     public void findAll() {
         insertData();
-        List<SampleEntity> entities = this.repository.findAll();
+        List<SampleEntityWithAlias> entities = this.repository.findAll();
         assertThat(entities.size(), is(equalTo(4)));
         for (int i = 0; i < 4; i++) {
             assertThat(entities.get(i).getScore(), is(equalTo(1.0f)));
@@ -131,7 +136,7 @@ public class ITSampleEntityRepositoryTest extends AbstractElasticsearchTest<Samp
     @Test
     public void findAllWithPageable() {
         insertData();
-        ScrolledPage<SampleEntity> entities = this.repository.findAll(PageRequest.of(0, 3));
+        ScrolledPage<SampleEntityWithAlias> entities = this.repository.findAll(PageRequest.of(0, 3));
         assertThat(entities.getTotalElements(), is(equalTo(4L)));
         assertThat(entities.hasContent(), is(true));
         assertThat(entities.getContent().size(), is(equalTo(3)));
@@ -145,7 +150,7 @@ public class ITSampleEntityRepositoryTest extends AbstractElasticsearchTest<Samp
     @Test
     public void findByQuery() {
         insertData();
-        List<SampleEntity> entities = this.repository.findByQuery(QueryBuilders.matchAllQuery(), Sort.by(Sort.Direction.ASC, "name.keyword"));
+        List<SampleEntityWithAlias> entities = this.repository.findByQuery(QueryBuilders.matchAllQuery(), Sort.by(Sort.Direction.ASC, "name.keyword"));
         assertThat(entities.size(), is(equalTo(4)));
         assertThat(entities.get(0).getName(), is(equalTo("Entity 1")));
         assertThat(Float.isNaN(entities.get(0).getScore()), is(true));
@@ -171,8 +176,8 @@ public class ITSampleEntityRepositoryTest extends AbstractElasticsearchTest<Samp
     @Test
     public void save() {
         insertData();
-        SampleEntity newEntity = SampleEntity.builder().name("My new entity").build();
-        SampleEntity entityIndexed = this.repository.save(newEntity);
+        SampleEntityWithAlias newEntity = SampleEntityWithAlias.builder().name("My new entity").build();
+        SampleEntityWithAlias entityIndexed = this.repository.save(newEntity);
         this.repository.refresh();
         assertThat(entityIndexed.getId(), is(notNullValue()));
         assertThat(entityIndexed.getName(), is(equalTo(newEntity.getName())));
@@ -184,8 +189,8 @@ public class ITSampleEntityRepositoryTest extends AbstractElasticsearchTest<Samp
 
     @Test
     public void deleteById() {
-        List<SampleEntity> data = insertData();
-        SampleEntity myEntity = data.get(0);
+        List<SampleEntityWithAlias> data = insertData();
+        SampleEntityWithAlias myEntity = data.get(0);
         this.repository.deleteById(myEntity.getId());
         this.repository.refresh();
         assertThat(this.repository.findById(myEntity.getId()).isPresent(), is(false));
@@ -193,8 +198,8 @@ public class ITSampleEntityRepositoryTest extends AbstractElasticsearchTest<Samp
 
     @Test
     public void delete() {
-        List<SampleEntity> data = insertData();
-        SampleEntity myEntity = data.get(0);
+        List<SampleEntityWithAlias> data = insertData();
+        SampleEntityWithAlias myEntity = data.get(0);
         this.repository.delete(myEntity);
         this.repository.refresh();
         assertThat(this.repository.findById(myEntity.getId()).isPresent(), is(false));
@@ -202,8 +207,8 @@ public class ITSampleEntityRepositoryTest extends AbstractElasticsearchTest<Samp
 
     @Test
     public void deleteAllWithCollection() {
-        List<SampleEntity> data = insertData();
-        List<SampleEntity> entities = Arrays.asList(data.get(0), data.get(1));
+        List<SampleEntityWithAlias> data = insertData();
+        List<SampleEntityWithAlias> entities = Arrays.asList(data.get(0), data.get(1));
         this.repository.deleteAll(entities);
         this.repository.refresh();
         assertThat(this.repository.count(), is(equalTo(2L)));
@@ -217,8 +222,8 @@ public class ITSampleEntityRepositoryTest extends AbstractElasticsearchTest<Samp
         assertThat(this.repository.count(), is(equalTo(0L)));
     }
 
-    private SampleEntity createSampleEntity(String id, String name) {
-        return SampleEntity.builder()
+    private SampleEntityWithAlias createSampleEntityWithAlias(String id, String name) {
+        return SampleEntityWithAlias.builder()
                 .id(id)
                 .name(name)
                 .build();
