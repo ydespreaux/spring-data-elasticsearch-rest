@@ -483,7 +483,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
 //    }
 
     /**
-     * Customization hook on the actual execution result {@link Publisher}. <br />
+     * Customization hook on the actual execution result {@link Publisher}.
      * You know what you're doing here? Well fair enough, go ahead on your own risk.
      *
      * @param request the already prepared {@link IndexRequest} ready to be executed.
@@ -498,7 +498,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
     }
 
     /**
-     * Customization hook on the actual execution result {@link Publisher}. <br />
+     * Customization hook on the actual execution result {@link Publisher}.
      *
      * @param request the already prepared {@link GetRequest} ready to be executed.
      * @return a {@link Mono} emitting the result of the operation.

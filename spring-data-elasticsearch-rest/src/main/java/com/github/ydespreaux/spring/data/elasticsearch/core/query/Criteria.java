@@ -424,8 +424,8 @@ public class Criteria {
      *
      * @param geoLocation {@link String} center point
      *                    supported formats:
-     *                    lat on = > "41.2,45.1",
-     *                    geohash = > "asd9as0d"
+     *                    lat on : "41.2,45.1",
+     *                    geohash : "asd9as0d"
      * @param distance    {@link String} radius as a string (e.g. : '100km').
      *                    Distance unit :
      *                    either mi/miles or km can be set

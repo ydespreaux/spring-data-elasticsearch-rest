@@ -26,7 +26,6 @@ import lombok.Setter;
 import org.springframework.scheduling.TaskScheduler;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -85,7 +84,6 @@ public class TriggerManager implements Closeable {
      * <em>mark</em> the {@code Closeable} as closed, prior to throwing
      * the {@code IOException}.
      *
-     * @throws IOException if an I/O error occurs
      */
     @Override
     public void close() {
