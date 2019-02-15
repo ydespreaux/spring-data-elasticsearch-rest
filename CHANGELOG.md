@@ -2,7 +2,8 @@
 
 ## [Unreleased]
 ### Added
-- Reactive repository
+- Dependency elasticsearch version from 6.4.2 to 6.4.3 (o)
+- Reactive repository (o)
 
 ### Changed
 
