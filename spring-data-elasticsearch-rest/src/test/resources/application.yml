@@ -2,14 +2,7 @@
 # Configuration Elasticsearch
 #
 spring:
-  main:
-    banner-mode: "off"
   elasticsearch:
-    jest:
-      connection-timeout: 5000ms
-      read-timeout: 6000ms
-      username: elastic
-      password: changeme
     template:
       action: CREATE_OR_UPDATE
       scripts: classpath:templates/article.template,classpath:templates/city.template
@@ -32,3 +25,12 @@ spring:
   elasticsearch:
     template:
       action: none
+
+---
+
+spring:
+  profiles: test-trigger-rollover
+index:
+  vehicles:
+    trigger:
+      enabled: true

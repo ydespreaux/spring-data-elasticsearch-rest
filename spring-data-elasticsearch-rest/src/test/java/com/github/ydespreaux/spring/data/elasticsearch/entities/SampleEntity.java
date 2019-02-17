@@ -20,13 +20,31 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.entities;
 
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Document;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.Index;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.IndexName;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.IndexedDocument;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.Score;
+import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 
-@Document(indexName = "sample-index", type = "sample-type")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@ToString
+@IndexedDocument(index = @Index(name = "sample-entity-index", type = "sample-type"))
 public class SampleEntity {
 
     @Id
     private String id;
     private String name;
+
+    @IndexName
+    private String indexName;
+    @Version
+    private Long version;
+    @Score
+    private Float score;
 }

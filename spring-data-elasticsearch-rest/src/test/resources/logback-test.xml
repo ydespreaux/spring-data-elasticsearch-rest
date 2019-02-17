@@ -7,6 +7,7 @@
     </appender>
     <logger name="org.testcontainers" level="INFO"/>
     <logger name="com.github.dockerjava" level="INFO"/>
+    <logger name="com.github.ydespreaux.testcontainers.elasticsearch" level="INFO"/>
     <logger name="com.github.ydespreaux.spring.data" level="WARN"/>
     <root level="ERROR">
         <appender-ref ref="CONSOLE"/>

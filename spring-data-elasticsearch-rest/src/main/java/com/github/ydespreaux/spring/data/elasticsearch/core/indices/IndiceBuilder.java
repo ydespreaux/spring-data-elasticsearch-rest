@@ -40,7 +40,7 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
  * @param <T> generic type
  * @param <S> generic type
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public abstract class IndiceBuilder<T extends IndicesRequest, S extends IndiceBuilder> {
 

@@ -30,6 +30,10 @@ import org.elasticsearch.search.suggest.Suggest;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * @author Yoann Despréaux
+ * @since 1.0.0
+ */
 public class StringSuggestExtractor implements ResultsExtractor<List<String>> {
 
     @Override

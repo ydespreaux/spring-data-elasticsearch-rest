@@ -30,7 +30,7 @@ import java.time.LocalDateTime;
 
 /**
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Getter
 @Setter
@@ -38,8 +38,19 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@Document(aliasName = "search-vehicles-alias", indexName = "vehicles-event", type = "position", indexPath = "classpath:indices/vehicles-event.index")
-@Rollover(alias = @Alias(name = "write-vehicles-alias"), maxDoc = 1, trigger = @Trigger(enabled = true, cronExpression = "*/2 * * * * *"))
+@RolloverDocument(
+        alias = @Alias(name = "search-vehicles-alias"),
+        index = @Index(
+                name = "vehicles-event",
+                type = "position",
+                settingsAndMappingPath = "classpath:indices/vehicles-event.index"
+        ),
+        rollover = @Rollover(
+                alias = @Alias(name = "write-vehicles-alias"),
+                maxDoc = 2,
+                trigger = @Trigger(enabled = "${index.vehicles.trigger.enabled}", cronExpression = "*/2 * * * * *")
+        )
+)
 public class VehicleEvent {
 
     @Id

@@ -30,7 +30,7 @@ import java.lang.annotation.Annotation;
  * of the {@link EnableElasticsearchRepositories} annotation.
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 class ElasticsearchRepositoriesRegistrar extends RepositoryBeanDefinitionRegistrarSupport {
 

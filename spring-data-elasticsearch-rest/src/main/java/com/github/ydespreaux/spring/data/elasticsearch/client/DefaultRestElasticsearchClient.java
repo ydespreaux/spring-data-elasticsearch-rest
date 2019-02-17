@@ -77,6 +77,10 @@ import org.elasticsearch.script.mustache.SearchTemplateResponse;
 
 import java.io.IOException;
 
+/**
+ * @author Yoann Despréaux
+ * @since 1.0.0
+ */
 @Slf4j
 public class DefaultRestElasticsearchClient implements RestElasticsearchClient {
 
@@ -106,7 +110,7 @@ public class DefaultRestElasticsearchClient implements RestElasticsearchClient {
         return this.client.cluster().putSettings(request, options);
     }
 
-    public ClusterGetSettingsResponse clusterPutSettings(ClusterGetSettingsRequest request, RequestOptions options) throws IOException {
+    public ClusterGetSettingsResponse clusterGetSettings(ClusterGetSettingsRequest request, RequestOptions options) throws IOException {
         return this.client.cluster().getSettings(request, options);
     }
 

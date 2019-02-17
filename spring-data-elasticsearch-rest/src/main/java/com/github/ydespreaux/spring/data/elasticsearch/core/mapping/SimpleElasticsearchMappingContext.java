@@ -31,7 +31,7 @@ import org.springframework.data.util.TypeInformation;
  * SimpleElasticsearchMappingContext
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public class SimpleElasticsearchMappingContext extends
         AbstractMappingContext<SimpleElasticsearchPersistentEntity<?>, ElasticsearchPersistentProperty> implements ApplicationContextAware {

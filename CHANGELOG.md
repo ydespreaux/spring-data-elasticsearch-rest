@@ -2,38 +2,23 @@
 
 ## [Unreleased]
 ### Added
-- Criteria query for elasticsearch
-- Query method name for elastricsearch repository
-- Query annotation for elastricsearch repository
-- Rollover index
-
-### Changed
-- Criteria query for jpa
-
-### Fixed
-
-## [0.0.3] - 2018-12-30
-### Added
-- JpaCriteriaRepository add generic methods for search with Criteria
-- Class BeanValidation for checking constraints bean (spring-data-validation library)
-- @Projection annotation
+- Dependency spring-boot version from 2.1.0 to 2.1.2
+- Dependency elasticsearch version from 6.4.2 to 6.4.3
+- Reactive repository (o)
 
 ### Changed
 
 ### Fixed
-- No more exception when start or continue an scroll that the index does not exist
 
-## [0.0.2] - 2018-12-29
+## [1.0.0]
 ### Added
-- spring-boot-starter-json dependency
-- CHANGELOG.md file
-
-### Changed
 - Elasticsearch v6.4.2
+- Time based index
+- Rollover index
+- Criteria query for elasticsearch
+- Query named method
+- Query annotation
+
+### Changed
 
 ### Fixed
-- No more exception when refreshing an index that does not exist
-- No more exception when clear an scroll that does not exist
-
-## [0.0.1] - 2018-12-27
-### Added

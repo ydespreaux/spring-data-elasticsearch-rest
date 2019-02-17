@@ -20,14 +20,14 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core.triggers;
 
-import com.github.ydespreaux.spring.data.elasticsearch.repository.support.ElasticsearchEntityInformation;
+import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
 import org.springframework.scheduling.support.CronTrigger;
 
-public interface Trigger {
+public interface Trigger<T> {
 
     CronTrigger getCronTrigger();
 
-    ElasticsearchEntityInformation<?, ?> getEntityInformation();
+    ElasticsearchPersistentEntity<T> getPersistentEntity();
 
     Runnable processor();
 

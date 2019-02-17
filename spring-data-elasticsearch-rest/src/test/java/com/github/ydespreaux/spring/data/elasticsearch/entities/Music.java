@@ -20,7 +20,10 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.entities;
 
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Document;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.Alias;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.CompletionField;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.Index;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.IndexedDocument;
 import com.github.ydespreaux.spring.data.elasticsearch.core.completion.Completion;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,11 +33,20 @@ import org.springframework.data.annotation.Id;
 @Builder
 @Getter
 @Setter
-@Document(indexName = "musics", type = "music", indexPath = "classpath:indices/music.index")
+@IndexedDocument(
+        alias = @Alias(name = "musics"),
+        index = @Index(
+                name = "music",
+                type = "album",
+                settingsAndMappingPath = "classpath:indices/music.index"
+        )
+)
 public class Music {
 
     @Id
     private String id;
     private String title;
+
+    @CompletionField
     private Completion suggest;
 }

@@ -37,7 +37,7 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
  * CriteriaQueryProcessor generate query-related queries for a {@link Criteria} object
  *
  * @author Yoann Despréaux
- * @since 0.1.0
+ * @since 1.0.0
  */
 @Slf4j
 class CriteriaQueryProcessor {

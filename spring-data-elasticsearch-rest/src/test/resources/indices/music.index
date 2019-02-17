@@ -5,8 +5,11 @@
         "number_of_replicas" : 1,
         "store.type": "fs"
     },
+    "aliases" : {
+        "musics" : {}
+    },
     "mappings": {
-      "music": {
+      "album": {
         "properties": {
           "suggest": {
             "type": "completion"

@@ -20,15 +20,12 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core.mapping;
 
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Document;
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Projection;
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Rollover;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.*;
 import com.github.ydespreaux.spring.data.elasticsearch.core.IndexTimeBasedParameter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.IndexTimeBasedSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.FetchSourceFilter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.SourceFilter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.request.config.RolloverConfig;
-import com.github.ydespreaux.spring.data.elasticsearch.core.triggers.TriggerManager;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
@@ -38,6 +35,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.data.mapping.MappingException;
 import org.springframework.data.mapping.model.BasicPersistentEntity;
 import org.springframework.data.util.TypeInformation;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.time.Clock;
@@ -49,7 +47,7 @@ import java.util.regex.Pattern;
 /**
  * @param <T> generic type
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Slf4j
 @Getter
@@ -59,7 +57,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
 
     private ApplicationContext context;
     private Class<T> entityClass;
-    private String aliasName;
+    private org.elasticsearch.action.admin.indices.alias.Alias alias;
     private String indexName;
     private String indexPattern;
     private String typeName;
@@ -70,6 +68,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     private ElasticsearchPersistentProperty parentIdProperty;
     private ElasticsearchPersistentProperty scoreProperty;
     private ElasticsearchPersistentProperty indexNameProperty;
+    private ElasticsearchPersistentProperty completionProperty;
     private SourceFilter sourceFilter;
     private Duration scrollTime;
     private RolloverConfig rollover;
@@ -86,37 +85,109 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
      */
     private void afterPropertiesSet() {
         this.entityClass = this.getTypeInformation().getType();
-        boolean isProjection = this.entityClass.isAnnotationPresent(Projection.class);
-        Projection projection = isProjection ? this.entityClass.getAnnotation(Projection.class) : null;
+        if (this.entityClass.isAnnotationPresent(ProjectionDocument.class)) {
+            afterProjectionDocumentPropertySet(this.entityClass.getAnnotation(ProjectionDocument.class));
+        } else if (this.entityClass.isAnnotationPresent(IndexedDocument.class)) {
+            afterIndexedDocumentPropertySet(this.entityClass.getAnnotation(IndexedDocument.class));
+        } else if (this.entityClass.isAnnotationPresent(RolloverDocument.class)) {
+            afterRolloverDocumentPropertySet(this.entityClass.getAnnotation(RolloverDocument.class));
+        }
+    }
 
-        Class<?> targetClass = isProjection ? projection.target() : this.entityClass;
-        Document document = targetClass.getAnnotation(Document.class);
-        if (document != null) {
-            this.typeName = document.type();
-            this.createIndex = isProjection ? false : document.createIndex();
-            this.indexPath = isProjection ? null : document.indexPath();
-            this.sourceFilter = isProjection ? new FetchSourceFilter.FetchSourceFilterBuilder().withIncludes(projection.fields()).build() : null;
+    private void afterProjectionDocumentPropertySet(ProjectionDocument document) {
+        this.sourceFilter = new FetchSourceFilter.FetchSourceFilterBuilder().withIncludes(document.fields()).build();
+        Class<?> targetClass = document.target();
+        Assert.isTrue(targetClass.isAnnotationPresent(IndexedDocument.class) || targetClass.isAnnotationPresent(RolloverDocument.class),
+                "Invalid document projection. " + targetClass.getSimpleName()
+                        + "TargetClass is not a elasticsearch document. Make sure the target document class is annotated with @Document or @DocumentRollover");
+        if (targetClass.isAnnotationPresent(IndexedDocument.class)) {
+            afterIndexedDocumentPropertySet(targetClass.getAnnotation(IndexedDocument.class));
+        } else if (targetClass.isAnnotationPresent(RolloverDocument.class)) {
+            afterRolloverDocumentPropertySet(targetClass.getAnnotation(RolloverDocument.class));
+        }
+    }
 
-            Environment env = context.getEnvironment();
-            this.aliasName = getEnvironmentValue(env, document.aliasName());
-            this.indexName = getEnvironmentValue(env, document.indexName());
-            this.indexPattern = getEnvironmentValue(env, document.indexPattern());
-            this.indexTimeBased = StringUtils.hasText(this.indexPattern);
+    private void afterIndexedDocumentPropertySet(IndexedDocument document) {
+        afterPropertySet(document.index());
+        afterPropertySet(document.alias());
+        this.scrollTime = Duration.ofSeconds(document.scrollTimeSeconds());
+    }
+
+    private void afterRolloverDocumentPropertySet(RolloverDocument document) {
+        afterPropertySet(document.index());
+        afterPropertySet(document.alias());
+        afterPropertySet(document.rollover());
+        this.scrollTime = Duration.ofSeconds(document.scrollTimeSeconds());
+    }
+
+    private void afterPropertySet(Alias aliasAnnotation) {
+        if (StringUtils.isEmpty(aliasAnnotation.name())) {
+            return;
+        }
+        this.alias = new org.elasticsearch.action.admin.indices.alias.Alias(getEnvironmentValue(aliasAnnotation.name()));
+        if (StringUtils.hasText(aliasAnnotation.searchRouting())) {
+            this.alias.searchRouting(getEnvironmentValue(aliasAnnotation.searchRouting()));
+        }
+        if (StringUtils.hasText(aliasAnnotation.indexRouting())) {
+            this.alias.searchRouting(getEnvironmentValue(aliasAnnotation.indexRouting()));
+        }
+        if (StringUtils.hasText(aliasAnnotation.filter())) {
+            this.alias.searchRouting(getEnvironmentValue(aliasAnnotation.filter()));
+        }
+    }
+
+    private void afterPropertySet(Index indexAnnotation) {
+        if (StringUtils.isEmpty(indexAnnotation.name()) && StringUtils.isEmpty(indexAnnotation.indexPattern())) {
+            throw new IllegalArgumentException("Index name or index pattern no defined");
+        }
+        this.createIndex = indexAnnotation.createIndex();
+        this.typeName = getEnvironmentValue(indexAnnotation.type());
+        this.indexName = getEnvironmentValue(indexAnnotation.name());
+        this.indexPattern = getEnvironmentValue(indexAnnotation.indexPattern());
+        this.indexPath = getEnvironmentValue(indexAnnotation.settingsAndMappingPath());
+        this.indexTimeBased = StringUtils.hasText(this.indexPattern);
+        if (this.indexTimeBased) {
             try {
-                this.indexSupport = document.indexTimeBasedSupport().newInstance();
+                this.indexSupport = indexAnnotation.indexTimeBasedSupport().newInstance();
             } catch (Exception e) {
                 throw new ElasticsearchException(e);
             }
-            this.scrollTime = Duration.ofSeconds(document.scrollTimeSeconds());
-
-            Rollover rolloverAnnotation = targetClass.getAnnotation(Rollover.class);
-            if (rolloverAnnotation != null) {
-                this.rollover = new RolloverConfig(rolloverAnnotation);
-                if (!this.rollover.hasConditions()) {
-                    throw new IllegalArgumentException("No condition defined");
-                }
-            }
         }
+    }
+
+    private void afterPropertySet(Rollover rolloverAnnotation) {
+        Alias aliasAnnotation = rolloverAnnotation.alias();
+        Trigger triggerAnnotation = rolloverAnnotation.trigger();
+        this.rollover = RolloverConfig.builder()
+                .alias(RolloverConfig.RolloverAlias.builder()
+                        .name(getEnvironmentValue(aliasAnnotation.name()))
+                        .indexRouting(getEnvironmentValue(aliasAnnotation.indexRouting()))
+                        .filter(getEnvironmentValue(aliasAnnotation.filter()))
+                        .searchRouting(getEnvironmentValue(aliasAnnotation.searchRouting()))
+                        .build())
+                .conditions(RolloverConfig.RolloverConditions.builder()
+                        .maxAge(rolloverAnnotation.maxAge())
+                        .maxDocs(rolloverAnnotation.maxDoc())
+                        .maxSize(rolloverAnnotation.maxSize())
+                        .build())
+                .trigger(RolloverConfig.TriggerConfig.builder()
+                        .enabled(isTriggerEnabled(triggerAnnotation))
+                        .cronExpression(getEnvironmentValue(triggerAnnotation.cronExpression()))
+                        .build())
+                .build();
+        if (!this.rollover.hasConditions()) {
+            throw new IllegalArgumentException("No condition defined");
+        }
+    }
+
+    private boolean isTriggerEnabled(Trigger triggerAnnotation) {
+        if (triggerAnnotation.value()) {
+            return true;
+        }
+        if (StringUtils.hasText(triggerAnnotation.enabled())) {
+            return Boolean.valueOf(getEnvironmentValue(triggerAnnotation.enabled()));
+        }
+        return false;
     }
 
     @Override
@@ -144,41 +215,39 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
                                 + "as index name property. Check your mapping configuration!", property.getField(), indexNameProperty.getField()));
             }
             this.indexNameProperty = property;
+        } else if (property.isCompletionProperty()) {
+            if (this.completionProperty != null) {
+                throw new MappingException(
+                        String.format("Attempt to add completion property %s but already have property %s registered "
+                                + "as completion property. Check your mapping configuration!", property.getField(), completionProperty.getField()));
+            }
+            this.completionProperty = property;
         }
     }
 
-    /**
-     * Retourne le nom de l'alias ou l'ndex de l'entité courante.
-     *
-     * @return the index or alias name
-     */
     @Override
-    public String getAliasOrIndexName() {
-        return StringUtils.isEmpty(this.aliasName) ? this.indexName : this.aliasName;
-    }
-
-    /**
-     * @param source the source
-     * @return the index name
-     */
-    @Override
-    public String getIndexName(T source) {
-        if (isRolloverIndex()) {
-            return this.rollover.getAlias().getName();
-        } else if (isIndexTimeBased()) {
-            return this.indexSupport.buildIndex(IndexTimeBasedParameter.of(indexPattern, LocalDate.now(Clock.systemUTC()), source));
+    public String getIndexName() {
+        if (isIndexTimeBased()) {
+            return this.indexSupport.buildIndex(IndexTimeBasedParameter.of(indexPattern, LocalDate.now(Clock.systemUTC()), null));
         } else {
             return this.indexName;
         }
     }
 
     @Override
-    public String getNewIndexName(T source) {
+    public String getAliasOrIndexReader() {
+        return this.alias != null ? this.alias.name() : this.indexName;
+    }
+
+    @Override
+    public String getAliasOrIndexWriter(T source) {
+        if (this.isRolloverIndex()) {
+            return this.rollover.getAlias().getName();
+        }
         if (isIndexTimeBased()) {
             return this.indexSupport.buildIndex(IndexTimeBasedParameter.of(indexPattern, LocalDate.now(Clock.systemUTC()), source));
-        } else {
-            return this.indexName;
         }
+        return this.indexName;
     }
 
     @Override
@@ -211,9 +280,9 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
      */
     @Override
     public void setPersistentEntityIndexName(T entity, String indexName) {
-        ElasticsearchPersistentProperty indexNameProperty = getIndexNameProperty();
-        if (indexNameProperty != null) {
-            getPropertyAccessor(entity).setProperty(indexNameProperty, indexName);
+        ElasticsearchPersistentProperty property = getIndexNameProperty();
+        if (property != null) {
+            getPropertyAccessor(entity).setProperty(property, indexName);
         }
     }
 
@@ -299,6 +368,14 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
      * @return
      */
     @Override
+    public boolean hasCompletionProperty() {
+        return this.completionProperty != null;
+    }
+
+    /**
+     * @return
+     */
+    @Override
     public SourceFilter getSourceFilter() {
         return sourceFilter;
     }
@@ -327,6 +404,11 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
         return this.createIndex;
     }
 
+    @Override
+    public org.elasticsearch.action.admin.indices.alias.Alias getAlias() {
+        return this.alias;
+    }
+
     /**
      * @return true if the current index is a time based index
      */
@@ -339,7 +421,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
      * @return the index path
      */
     @Override
-    public String getIndexPath() {
+    public String getIndexSettingAndMappingPath() {
         return this.indexPath;
     }
 
@@ -351,11 +433,6 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     @Override
     public RolloverConfig getRolloverConfig() {
         return this.rollover;
-    }
-
-    @Override
-    public TriggerManager getTriggerManagement() {
-        return this.context.getBean(TriggerManager.class);
     }
 
     /**
@@ -387,11 +464,11 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     }
 
     /**
-     * @param environment the environment
      * @param expression  the SPel expression
      * @return evaluate the expression
      */
-    private String getEnvironmentValue(Environment environment, String expression) {
+    private String getEnvironmentValue(String expression) {
+        Environment environment = context.getEnvironment();
         String value = null;
         // Create the matcher
         Matcher matcher = pattern.matcher(expression);

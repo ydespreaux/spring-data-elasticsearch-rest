@@ -28,7 +28,7 @@ import java.lang.annotation.*;
  * Parent
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Persistent
 @Inherited

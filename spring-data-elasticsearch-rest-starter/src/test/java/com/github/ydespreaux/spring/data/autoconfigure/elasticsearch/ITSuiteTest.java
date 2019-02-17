@@ -27,15 +27,16 @@ import org.junit.runners.Suite;
 
 /**
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        ITElasticsearchDataAutoConfigurationTest.class,
-        ITReactiveElasticsearchDataAutoConfigurationTest.class
+        ITElasticsearchConfigurationTest.class,
+        ITReactiveElasticsearchConfigurationTest.class
 })
 public class ITSuiteTest {
 
     @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.3");
+
 }

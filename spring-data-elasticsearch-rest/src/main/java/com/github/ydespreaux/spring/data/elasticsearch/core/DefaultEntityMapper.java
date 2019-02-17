@@ -36,7 +36,7 @@ import org.springframework.data.annotation.Version;
  * EntityMapper based on a Jackson {@link ObjectMapper}.
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public class DefaultEntityMapper implements EntityMapper {
 
@@ -57,8 +57,8 @@ public class DefaultEntityMapper implements EntityMapper {
         builder.addSerializationExclusionStrategy(new ExclusionStrategy() {
             @Override
             public boolean shouldSkipField(FieldAttributes fieldAttributes) {
-                return fieldAttributes.getAnnotation(Id.class) != null
-                        || fieldAttributes.getAnnotation(Version.class) != null
+                return fieldAttributes.getAnnotation(Version.class) != null
+                        || fieldAttributes.getAnnotation(Id.class) != null
                         || fieldAttributes.getAnnotation(IndexName.class) != null
                         || fieldAttributes.getAnnotation(Score.class) != null;
             }

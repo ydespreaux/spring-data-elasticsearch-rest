@@ -20,31 +20,13 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
 
-import com.github.ydespreaux.spring.data.elasticsearch.core.request.config.RolloverConfig;
-import com.github.ydespreaux.spring.data.elasticsearch.core.triggers.TriggerManager;
 import org.springframework.data.repository.core.EntityInformation;
 
 /**
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public interface ElasticsearchEntityInformation<T, K> extends EntityInformation<T, K> {
 
-    String getIndexName(T source);
 
-    Boolean createIndex();
-
-    Boolean isIndexTimeBased();
-
-    String getIndexPath();
-
-    boolean isRolloverIndex();
-
-    String getAliasOrIndexName();
-
-    String getNewIndexName(T source);
-
-    RolloverConfig getRolloverConfig();
-
-    TriggerManager getTriggerManagement();
 }

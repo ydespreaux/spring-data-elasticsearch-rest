@@ -20,22 +20,24 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
 
-import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchQueryConfiguration;
-import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
-import com.github.ydespreaux.spring.data.elasticsearch.entities.Product;
+import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
+import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.repositories.query.ProductRepository;
-import org.junit.Before;
+import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.elasticsearch.rest.RestClientAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -46,34 +48,24 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
         RestClientAutoConfiguration.class,
-        ElasticsearchQueryConfiguration.class})
+        ITProductRepositoryTest.ElasticsearchConfiguration.class})
 @Profile("test-no-template")
 public class ITProductRepositoryTest {
-
-    private static final String PRODUCT_INDEX_NAME = "products";
 
     @Autowired
     private ProductRepository repository;
 
-    @Autowired
-    private ElasticsearchOperations elasticsearchOperations;
+    @Configuration
+    @EnableAspectJAutoProxy
+    @EnableAutoConfiguration
+    @EnableElasticsearchRepositories(
+            basePackages = "com.github.ydespreaux.spring.data.elasticsearch.repositories.query")
+    static class ElasticsearchConfiguration extends ElasticsearchConfigurationSupport {
 
-    @Before
-    public void setUp() {
-        prepareData();
-    }
-
-    private void prepareData() {
-        elasticsearchOperations.deleteIndexByName(PRODUCT_INDEX_NAME);
-        elasticsearchOperations.createIndexWithSettingsAndMapping(PRODUCT_INDEX_NAME, "classpath:indices/product.index");
-        repository.save(Arrays.asList(
-                createProduct("1", "Sugar", "Cane sugar", false, 1.0f, 2, Arrays.asList("C1", "C2")),
-                createProduct("2", "Sugar", "Cane sugar", true, 1.2f, 1, Arrays.asList("C1")),
-                createProduct("3", "Sugar", "Beet sugar", true, 1.1f, 4, Arrays.asList("C2")),
-                createProduct("4", "Salt", "Rock salt", true, 1.9f, 2, Arrays.asList("C3", "C4")),
-                createProduct("5", "Salt", "Sea salt", false, 2.1f, 4, Arrays.asList("C1", "C3"))));
-        elasticsearchOperations.refresh(Product.class);
-
+        @Bean
+        ClientLoggerAspect clientLoggerAspect() {
+            return new ClientLoggerAspect();
+        }
     }
 
     @Test
@@ -160,38 +152,5 @@ public class ITProductRepositoryTest {
     public void findByPriceGreaterThanEqual() {
         assertThat(this.repository.findByPriceGreaterThanEqual(1.2f).size(), is(equalTo(3)));
     }
-
-    @Test
-    public void findByIdNotIn() {
-        assertThat(this.repository.findByIdNotIn(Arrays.asList("1", "2", "3")).size(), is(equalTo(2)));
-    }
-
-
-    private void assertProduct(Product actual, Product expected) {
-        assertThat(actual.getName(), is(equalTo(expected.getName())));
-        assertThat(actual.getDescription(), is(equalTo(expected.getDescription())));
-        assertThat(actual.getPopularity(), is(equalTo(expected.getPopularity())));
-        assertThat(actual.getPrice(), is(equalTo(expected.getPrice())));
-        assertThat(actual.getCategories(), is(equalTo(expected.getCategories())));
-        assertThat(actual.isAvailable(), is(equalTo(expected.isAvailable())));
-        assertThat(actual.getId(), is(equalTo(expected.getId())));
-    }
-
-    private Product createProduct(String id, String name, String text, Boolean available, Float price, Integer popularity, List<String> categories) {
-        return Product.builder()
-                .id(id)
-                .name(name)
-                .text(text)
-                .available(available)
-                .price(price)
-                .popularity(popularity)
-                .categories(categories)
-                .build();
-    }
-
-    private Product indexProduct(String id, String name, String text, Boolean available, Float price, Integer popularity, List<String> categories) {
-        return this.elasticsearchOperations.index(createProduct(id, name, text, available, price, popularity, categories), Product.class);
-    }
-
 
 }

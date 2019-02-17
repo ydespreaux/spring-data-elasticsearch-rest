@@ -24,7 +24,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.core;
  * DocumentMapper interface, it will allow to customize how we mapping object to json
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public interface EntityMapper {
 

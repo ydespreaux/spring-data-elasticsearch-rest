@@ -20,7 +20,9 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.entities;
 
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Document;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.Alias;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.Index;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.IndexedDocument;
 import lombok.*;
 import org.elasticsearch.common.geo.GeoPoint;
 import org.springframework.data.annotation.Id;
@@ -30,10 +32,14 @@ import org.springframework.data.annotation.Id;
 @Builder
 @Getter
 @Setter
-@Document(aliasName = "${spring.elasticsearch.aliases.city}",
-        type = "city",
-        indexPattern = "%s-%s",
-        indexTimeBasedSupport = CityTimeBasedSupport.class)
+@IndexedDocument(
+        alias = @Alias(name = "${spring.elasticsearch.aliases.city}"),
+        index = @Index(
+                type = "city",
+                indexPattern = "%s-%s",
+                indexTimeBasedSupport = CityTimeBasedSupport.class
+        )
+)
 public class City {
 
     @Id

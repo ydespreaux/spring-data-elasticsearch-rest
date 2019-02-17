@@ -31,7 +31,7 @@ import java.util.List;
  * SearchQuery
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public interface SearchQuery extends Query {
 

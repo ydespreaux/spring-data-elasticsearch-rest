@@ -23,6 +23,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.core;
 import com.github.ydespreaux.spring.data.elasticsearch.client.reactive.ReactiveRestElasticsearchClient;
 import com.github.ydespreaux.spring.data.elasticsearch.core.converter.ElasticsearchConverter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
+import com.github.ydespreaux.spring.data.elasticsearch.core.triggers.TriggerManager;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
@@ -44,6 +45,11 @@ public interface ReactiveElasticsearchOperations {
      * @return the elasticsearch converter
      */
     ElasticsearchConverter getElasticsearchConverter();
+
+    /**
+     * @return
+     */
+    TriggerManager getTriggerManager();
 
     /**
      * @param callback
@@ -68,10 +74,10 @@ public interface ReactiveElasticsearchOperations {
 //
 //    /**
 //     * @param indexName the index name
-//     * @param indexPath the path of the json index file
+//     * @param settingsAndMappingPath the path of the json index file
 //     * @return true if the index was created
 //     */
-//    Mono<Boolean> createIndexWithSettingsAndMapping(String indexName, String indexPath);
+//    Mono<Boolean> createIndexWithSettingsAndMapping(String indexName, String settingsAndMappingPath);
 //
 //    /**
 //     * Delete index
@@ -298,7 +304,7 @@ public interface ReactiveElasticsearchOperations {
      *
      * @param <T>
      * @author Christoph Strobl
-     * @since 4.0
+     * @since 1.0.0
      */
     interface ClientCallback<T extends Publisher<?>> {
 

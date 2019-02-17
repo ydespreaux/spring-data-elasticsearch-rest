@@ -20,25 +20,29 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
 
-import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchTemplateConfiguration;
-import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
+import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
+import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.core.scroll.ScrolledPage;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.City;
 import com.github.ydespreaux.spring.data.elasticsearch.repositories.template.CityRepository;
+import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.elasticsearch.common.geo.GeoPoint;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.elasticsearch.rest.RestClientAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.geo.Box;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
@@ -50,45 +54,26 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 
-@DirtiesContext
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
         RestClientAutoConfiguration.class,
-        ElasticsearchTemplateConfiguration.class})
+        ITCityRepositoryTest.ElasticsearchConfiguration.class})
+@Profile("test-no-template")
 public class ITCityRepositoryTest {
 
     @Autowired
     private CityRepository repository;
 
-    @Autowired
-    private ElasticsearchOperations elasticsearchOperations;
+    private static final String montpellier = "1";
+    private static final String mauguio = "2";
+    private static final String castries = "3";
+    private static final String vendargues = "4";
+    private static final String sommieres = "5";
 
-    private City castries = null;
-    private City mauguio = null;
-    private City montpellier = null;
-    private City sommieres = null;
-    private City vendargues = null;
+    private static final GeoPoint castriesLocation = new GeoPoint(43.677644, 3.985277);
 
     private GeoPoint topLeftBox = new GeoPoint(43.679112, 3.958448);
     private GeoPoint bottomRightBox = new GeoPoint(43.608526, 4.021915);
-
-    @Before
-    public void setUp() {
-        prepareData();
-    }
-
-    private void prepareData() {
-        this.repository.deleteAll();
-
-        montpellier = indexCity("Montpellier", new GeoPoint(43.613712, 3.872191), 275318L, "SE");
-        mauguio = indexCity("Mauguio", new GeoPoint(43.615463, 4.009743), 16795L, "SE");
-        castries = indexCity("Castries", new GeoPoint(43.677644, 3.985277), 6075L, "SE");
-        vendargues = indexCity("Vendargues", new GeoPoint(43.656904, 3.969566), 6186L, "SE");
-        sommieres = indexCity("Sommières", new GeoPoint(43.782759, 4.089557), 4644L, "SE");
-
-        this.repository.refresh();
-
-    }
 
     @Test
     public void countByLocationNear() {
@@ -141,83 +126,48 @@ public class ITCityRepositoryTest {
     }
 
     @Test
-    public void deleteByLocationNear() {
-        assertThat(this.repository.deleteByLocationNear(transformLocation(topLeftBox), transformLocation(bottomRightBox)), is(equalTo(3L)));
-        this.repository.refresh();
-        assertThat(this.repository.count(), is(equalTo(2L)));
-    }
-
-    @Test
-    public void deleteByLocationNearWithBox() {
-        assertThat(this.repository.deleteByLocationNear(transformBox(topLeftBox, bottomRightBox)), is(equalTo(3L)));
-        this.repository.refresh();
-        assertThat(this.repository.count(), is(equalTo(2L)));
-    }
-
-    @Test
-    public void deleteByLocationNearWithPoint() {
-        assertThat(this.repository.deleteByLocationNear(transformLocationToPoint(topLeftBox), transformLocationToPoint(bottomRightBox)), is(equalTo(3L)));
-        this.repository.refresh();
-        assertThat(this.repository.count(), is(equalTo(2L)));
-    }
-
-    @Test
-    public void deleteByLocationNearWithGeoHash() {
-        assertThat(this.repository.deleteByLocationNear(transformLocationToGeoHash(topLeftBox), transformLocationToGeoHash(bottomRightBox)), is(equalTo(3L)));
-        this.repository.refresh();
-        assertThat(this.repository.count(), is(equalTo(2L)));
-    }
-
-    @Test
-    public void deleteByLocationNearWithGeoPoint() {
-        assertThat(this.repository.deleteByLocationNear(topLeftBox, bottomRightBox), is(equalTo(3L)));
-        this.repository.refresh();
-        assertThat(this.repository.count(), is(equalTo(2L)));
-    }
-
-    @Test
     public void findByLocationNear() {
         List<City> cities = this.repository.findCityByLocationNearOrderByNameAsc(transformLocation(topLeftBox), transformLocation(bottomRightBox));
         assertThat(cities.size(), is(equalTo(3)));
-        assertCity(cities.get(0), castries);
-        assertCity(cities.get(1), mauguio);
-        assertCity(cities.get(2), vendargues);
+        assertThat(cities.get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
     public void findByLocationNearWithBox() {
         List<City> cities = this.repository.findCityByLocationNearOrderByNameAsc(transformBox(topLeftBox, bottomRightBox));
         assertThat(cities.size(), is(equalTo(3)));
-        assertCity(cities.get(0), castries);
-        assertCity(cities.get(1), mauguio);
-        assertCity(cities.get(2), vendargues);
+        assertThat(cities.get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
     public void findByLocationNearWithPoint() {
         List<City> cities = this.repository.findCityByLocationNearOrderByNameAsc(transformLocationToPoint(topLeftBox), transformLocationToPoint(bottomRightBox));
         assertThat(cities.size(), is(equalTo(3)));
-        assertCity(cities.get(0), castries);
-        assertCity(cities.get(1), mauguio);
-        assertCity(cities.get(2), vendargues);
+        assertThat(cities.get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
     public void findByLocationNearWithGeoHash() {
         List<City> cities = this.repository.findCityByLocationNearOrderByNameAsc(transformLocationToGeoHash(topLeftBox), transformLocationToGeoHash(bottomRightBox));
         assertThat(cities.size(), is(equalTo(3)));
-        assertCity(cities.get(0), castries);
-        assertCity(cities.get(1), mauguio);
-        assertCity(cities.get(2), vendargues);
+        assertThat(cities.get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
     public void findByLocationNearWithGeoPoint() {
         List<City> cities = this.repository.findCityByLocationNearOrderByNameAsc(topLeftBox, bottomRightBox);
         assertThat(cities.size(), is(equalTo(3)));
-        assertCity(cities.get(0), castries);
-        assertCity(cities.get(1), mauguio);
-        assertCity(cities.get(2), vendargues);
+        assertThat(cities.get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
@@ -225,9 +175,9 @@ public class ITCityRepositoryTest {
         ScrolledPage<City> cities = this.repository.findCityByLocationNear(transformLocation(topLeftBox), transformLocation(bottomRightBox),
                 PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(3L)));
-        assertCity(cities.getContent().get(0), castries);
-        assertCity(cities.getContent().get(1), mauguio);
-        assertCity(cities.getContent().get(2), vendargues);
+        assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.getContent().get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.getContent().get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
@@ -235,9 +185,9 @@ public class ITCityRepositoryTest {
         ScrolledPage<City> cities = this.repository.findCityByLocationNear(transformBox(topLeftBox, bottomRightBox),
                 PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(3L)));
-        assertCity(cities.getContent().get(0), castries);
-        assertCity(cities.getContent().get(1), mauguio);
-        assertCity(cities.getContent().get(2), vendargues);
+        assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.getContent().get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.getContent().get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
@@ -245,9 +195,9 @@ public class ITCityRepositoryTest {
         ScrolledPage<City> cities = this.repository.findCityByLocationNear(transformLocationToPoint(topLeftBox), transformLocationToPoint(bottomRightBox),
                 PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(3L)));
-        assertCity(cities.getContent().get(0), castries);
-        assertCity(cities.getContent().get(1), mauguio);
-        assertCity(cities.getContent().get(2), vendargues);
+        assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.getContent().get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.getContent().get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
@@ -255,9 +205,9 @@ public class ITCityRepositoryTest {
         ScrolledPage<City> cities = this.repository.findCityByLocationNear(transformLocationToGeoHash(topLeftBox), transformLocationToGeoHash(bottomRightBox),
                 PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(3L)));
-        assertCity(cities.getContent().get(0), castries);
-        assertCity(cities.getContent().get(1), mauguio);
-        assertCity(cities.getContent().get(2), vendargues);
+        assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.getContent().get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.getContent().get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
@@ -265,185 +215,141 @@ public class ITCityRepositoryTest {
         ScrolledPage<City> cities = this.repository.findCityByLocationNear(topLeftBox, bottomRightBox,
                 PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(3L)));
-        assertCity(cities.getContent().get(0), castries);
-        assertCity(cities.getContent().get(1), mauguio);
-        assertCity(cities.getContent().get(2), vendargues);
+        assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.getContent().get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.getContent().get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
     public void countByLocationWithinWithPoint() {
-        GeoPoint point = castries.getLocation();
-        assertThat(this.repository.countByLocationWithin(transformLocationToPoint(point), new Distance(10, Metrics.KILOMETERS)), is(equalTo(3L)));
+        assertThat(this.repository.countByLocationWithin(transformLocationToPoint(castriesLocation), new Distance(10, Metrics.KILOMETERS)), is(equalTo(3L)));
     }
 
     @Test
     public void countByLocationWithinWithPointAndMiles() {
-        GeoPoint point = castries.getLocation();
-        assertThat(this.repository.countByLocationWithin(transformLocationToPoint(point), new Distance(6.21371, Metrics.MILES)), is(equalTo(3L)));
+        assertThat(this.repository.countByLocationWithin(transformLocationToPoint(castriesLocation), new Distance(6.21371, Metrics.MILES)), is(equalTo(3L)));
     }
 
     @Test
     public void countByLocationWithinWithGeoHash() {
-        GeoPoint point = castries.getLocation();
-        assertThat(this.repository.countByLocationWithin(transformLocationToGeoHash(point), "10km"), is(equalTo(3L)));
+        assertThat(this.repository.countByLocationWithin(transformLocationToGeoHash(castriesLocation), "10km"), is(equalTo(3L)));
     }
 
     @Test
     public void countByLocationWithin() {
-        GeoPoint point = castries.getLocation();
-        assertThat(this.repository.countByLocationWithin(transformLocation(point), "10km"), is(equalTo(3L)));
+        assertThat(this.repository.countByLocationWithin(transformLocation(castriesLocation), "10km"), is(equalTo(3L)));
     }
 
     @Test
     public void countByLocationWithinWithGeoPoint() {
-        assertThat(this.repository.countByLocationWithin(castries.getLocation(), "10km"), is(equalTo(3L)));
+        assertThat(this.repository.countByLocationWithin(castriesLocation, "10km"), is(equalTo(3L)));
     }
 
     @Test
     public void existsByLocationWithin() {
-        GeoPoint point = castries.getLocation();
-        assertThat(this.repository.existsByLocationWithin(transformLocation(point), "10km"), is(true));
+        assertThat(this.repository.existsByLocationWithin(transformLocation(castriesLocation), "10km"), is(true));
     }
 
     @Test
     public void existsByLocationWithinGeoHash() {
-        GeoPoint point = castries.getLocation();
-        assertThat(this.repository.existsByLocationWithin(transformLocationToGeoHash(point), "10km"), is(true));
+        assertThat(this.repository.existsByLocationWithin(transformLocationToGeoHash(castriesLocation), "10km"), is(true));
     }
 
     @Test
     public void existsByLocationWithinWithPoint() {
-        GeoPoint point = castries.getLocation();
-        assertThat(this.repository.existsByLocationWithin(transformLocationToPoint(point), new Distance(10, Metrics.KILOMETERS)), is(true));
+        assertThat(this.repository.existsByLocationWithin(transformLocationToPoint(castriesLocation), new Distance(10, Metrics.KILOMETERS)), is(true));
     }
 
     @Test
     public void existsByLocationWithinWithGeoPoint() {
-        assertThat(this.repository.existsByLocationWithin(castries.getLocation(), "10km"), is(true));
-    }
-
-    @Test
-    public void deleteByLocationWithin() {
-        GeoPoint point = castries.getLocation();
-        assertThat(this.repository.deleteByLocationWithin(transformLocation(point), "10km"), is(equalTo(3L)));
-        this.repository.refresh();
-        assertThat(this.repository.count(), is(equalTo(2L)));
-    }
-
-    @Test
-    public void deleteByLocationWithinWithGeoHash() {
-        GeoPoint point = castries.getLocation();
-        assertThat(this.repository.deleteByLocationWithin(transformLocationToGeoHash(point), "10km"), is(equalTo(3L)));
-        this.repository.refresh();
-        assertThat(this.repository.count(), is(equalTo(2L)));
-    }
-
-    @Test
-    public void deleteByLocationWithinWithPoint() {
-        GeoPoint point = castries.getLocation();
-        assertThat(this.repository.deleteByLocationWithin(transformLocationToPoint(point), new Distance(10, Metrics.KILOMETERS)), is(equalTo(3L)));
-        this.repository.refresh();
-        assertThat(this.repository.count(), is(equalTo(2L)));
-    }
-
-    @Test
-    public void deleteByLocationWithinWithGeoPoint() {
-        assertThat(this.repository.deleteByLocationWithin(castries.getLocation(), "10km"), is(equalTo(3L)));
-        this.repository.refresh();
-        assertThat(this.repository.count(), is(equalTo(2L)));
+        assertThat(this.repository.existsByLocationWithin(castriesLocation, "10km"), is(true));
     }
 
     @Test
     public void findByLocationWithin() {
-        GeoPoint point = castries.getLocation();
-        List<City> cities = this.repository.findCityByLocationWithinOrderByNameAsc(transformLocation(point), "10km");
+        List<City> cities = this.repository.findCityByLocationWithinOrderByNameAsc(transformLocation(castriesLocation), "10km");
         assertThat(cities.size(), is(equalTo(3)));
-        assertCity(cities.get(0), castries);
-        assertCity(cities.get(1), mauguio);
-        assertCity(cities.get(2), vendargues);
+        assertThat(cities.get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
     public void findByLocationWithinWithGeoHash() {
-        GeoPoint point = castries.getLocation();
-        List<City> cities = this.repository.findCityByLocationWithinOrderByNameAsc(transformLocationToGeoHash(point), "10km");
+        List<City> cities = this.repository.findCityByLocationWithinOrderByNameAsc(transformLocationToGeoHash(castriesLocation), "10km");
         assertThat(cities.size(), is(equalTo(3)));
-        assertCity(cities.get(0), castries);
-        assertCity(cities.get(1), mauguio);
-        assertCity(cities.get(2), vendargues);
+        assertThat(cities.get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
     public void findByLocationWithinWithPoint() {
-        GeoPoint point = castries.getLocation();
-        List<City> cities = this.repository.findCityByLocationWithinOrderByNameAsc(transformLocationToPoint(point), new Distance(10, Metrics.KILOMETERS));
+        List<City> cities = this.repository.findCityByLocationWithinOrderByNameAsc(transformLocationToPoint(castriesLocation), new Distance(10, Metrics.KILOMETERS));
         assertThat(cities.size(), is(equalTo(3)));
-        assertCity(cities.get(0), castries);
-        assertCity(cities.get(1), mauguio);
-        assertCity(cities.get(2), vendargues);
+        assertThat(cities.get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
     public void findByLocationWithinWithGeoPoint() {
-        List<City> cities = this.repository.findCityByLocationWithinOrderByNameAsc(castries.getLocation(), "10km");
+        List<City> cities = this.repository.findCityByLocationWithinOrderByNameAsc(castriesLocation, "10km");
         assertThat(cities.size(), is(equalTo(3)));
-        assertCity(cities.get(0), castries);
-        assertCity(cities.get(1), mauguio);
-        assertCity(cities.get(2), vendargues);
+        assertThat(cities.get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
     public void findByLocationWithinPageable() {
-        GeoPoint point = castries.getLocation();
-        ScrolledPage<City> cities = this.repository.findCityByLocationWithin(transformLocation(point), "10km",
+        ScrolledPage<City> cities = this.repository.findCityByLocationWithin(transformLocation(castriesLocation), "10km",
                 PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(3L)));
-        assertCity(cities.getContent().get(0), castries);
-        assertCity(cities.getContent().get(1), mauguio);
-        assertCity(cities.getContent().get(2), vendargues);
+        assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.getContent().get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.getContent().get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
     public void findByLocationWithinPageableWithGeoHash() {
-        GeoPoint point = castries.getLocation();
-        ScrolledPage<City> cities = this.repository.findCityByLocationWithin(transformLocationToGeoHash(point), "10km",
+        ScrolledPage<City> cities = this.repository.findCityByLocationWithin(transformLocationToGeoHash(castriesLocation), "10km",
                 PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(3L)));
-        assertCity(cities.getContent().get(0), castries);
-        assertCity(cities.getContent().get(1), mauguio);
-        assertCity(cities.getContent().get(2), vendargues);
+        assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.getContent().get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.getContent().get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
     public void findByLocationWithinPageableWithPoint() {
-        GeoPoint point = castries.getLocation();
         ScrolledPage<City> cities = this.repository.findCityByLocationWithin(
-                transformLocationToPoint(point),
+                transformLocationToPoint(castriesLocation),
                 new Distance(10, Metrics.KILOMETERS),
                 PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(3L)));
-        assertCity(cities.getContent().get(0), castries);
-        assertCity(cities.getContent().get(1), mauguio);
-        assertCity(cities.getContent().get(2), vendargues);
+        assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.getContent().get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.getContent().get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
     public void findByLocationWithinPageableWithGeoPoint() {
         ScrolledPage<City> cities = this.repository.findCityByLocationWithin(
-                castries.getLocation(),
+                castriesLocation,
                 "10km",
                 PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(3L)));
-        assertCity(cities.getContent().get(0), castries);
-        assertCity(cities.getContent().get(1), mauguio);
-        assertCity(cities.getContent().get(2), vendargues);
+        assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.getContent().get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.getContent().get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
     public void findById() {
-        Optional<City> optional = this.repository.findById(montpellier.getId());
+        Optional<City> optional = this.repository.findById(montpellier);
         assertTrue(optional.isPresent());
-        assertCity(optional.get(), montpellier);
+        assertThat(optional.get().getId(), is(equalTo(montpellier)));
     }
 
     @Test
@@ -457,13 +363,6 @@ public class ITCityRepositoryTest {
     }
 
     @Test
-    public void deleteByRegion() {
-        assertThat(this.repository.deleteByRegion("SE"), is(equalTo(5L)));
-        this.repository.refresh();
-        assertThat(this.repository.count(), is(equalTo(0L)));
-    }
-
-    @Test
     public void existsByRegionNotFound() {
         assertThat(this.repository.existsByRegion("ES"), is(false));
     }
@@ -472,22 +371,22 @@ public class ITCityRepositoryTest {
     public void findCityByRegion() {
         List<City> cities = this.repository.findCityByRegionOrderByNameAsc("SE");
         assertThat(cities.size(), is(equalTo(5)));
-        assertCity(cities.get(0), castries);
-        assertCity(cities.get(1), mauguio);
-        assertCity(cities.get(2), montpellier);
-        assertCity(cities.get(3), sommieres);
-        assertCity(cities.get(4), vendargues);
+        assertThat(cities.get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.get(2).getId(), is(equalTo(montpellier)));
+        assertThat(cities.get(3).getId(), is(equalTo(sommieres)));
+        assertThat(cities.get(4).getId(), is(equalTo(vendargues)));
     }
 
     @Test
     public void findCityByRegionWithPageable() {
         ScrolledPage<City> cities = this.repository.findCityByRegion("SE", PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(5L)));
-        assertCity(cities.getContent().get(0), castries);
-        assertCity(cities.getContent().get(1), mauguio);
-        assertCity(cities.getContent().get(2), montpellier);
-        assertCity(cities.getContent().get(3), sommieres);
-        assertCity(cities.getContent().get(4), vendargues);
+        assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.getContent().get(1).getId(), is(equalTo(mauguio)));
+        assertThat(cities.getContent().get(2).getId(), is(equalTo(montpellier)));
+        assertThat(cities.getContent().get(3).getId(), is(equalTo(sommieres)));
+        assertThat(cities.getContent().get(4).getId(), is(equalTo(vendargues)));
     }
 
     @Test
@@ -501,26 +400,19 @@ public class ITCityRepositoryTest {
     }
 
     @Test
-    public void deleteByPopulationBetween() {
-        assertThat(this.repository.deleteByPopulationBetween(5000L, 10000L), is(equalTo(2L)));
-        this.repository.refresh();
-        assertThat(this.repository.count(), is(equalTo(3L)));
-    }
-
-    @Test
     public void findCityByPopulationBetweenOrderByNameAsc() {
         List<City> cities = this.repository.findCityByPopulationBetweenOrderByNameAsc(5000L, 10000L);
         assertThat(cities.size(), is(equalTo(2)));
-        assertCity(cities.get(0), castries);
-        assertCity(cities.get(1), vendargues);
+        assertThat(cities.get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.get(1).getId(), is(equalTo(vendargues)));
     }
 
     @Test
     public void findCityByPopulationBetween() {
         ScrolledPage<City> cities = this.repository.findCityByPopulationBetween(5000L, 10000L, PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(2L)));
-        assertCity(cities.getContent().get(0), castries);
-        assertCity(cities.getContent().get(1), vendargues);
+        assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
+        assertThat(cities.getContent().get(1).getId(), is(equalTo(vendargues)));
     }
 
     @Test
@@ -534,28 +426,21 @@ public class ITCityRepositoryTest {
     }
 
     @Test
-    public void deleteByPopulationGreaterThanEqual() {
-        assertThat(this.repository.deleteByPopulationGreaterThanEqual(6186L), is(equalTo(3L)));
-        this.repository.refresh();
-        assertThat(this.repository.count(), is(equalTo(2L)));
-    }
-
-    @Test
     public void findCityByPopulationGreaterThanEqualOrderByNameAsc() {
         List<City> cities = this.repository.findCityByPopulationGreaterThanEqualOrderByNameAsc(6186L);
         assertThat(cities.size(), is(equalTo(3)));
-        assertCity(cities.get(0), mauguio);
-        assertCity(cities.get(1), montpellier);
-        assertCity(cities.get(2), vendargues);
+        assertThat(cities.get(0).getId(), is(equalTo(mauguio)));
+        assertThat(cities.get(1).getId(), is(equalTo(montpellier)));
+        assertThat(cities.get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
     public void findCityByPopulationGreaterThanEqual() {
         ScrolledPage<City> cities = this.repository.findCityByPopulationGreaterThanEqual(6186L, PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(3L)));
-        assertCity(cities.getContent().get(0), mauguio);
-        assertCity(cities.getContent().get(1), montpellier);
-        assertCity(cities.getContent().get(2), vendargues);
+        assertThat(cities.getContent().get(0).getId(), is(equalTo(mauguio)));
+        assertThat(cities.getContent().get(1).getId(), is(equalTo(montpellier)));
+        assertThat(cities.getContent().get(2).getId(), is(equalTo(vendargues)));
     }
 
     @Test
@@ -569,26 +454,19 @@ public class ITCityRepositoryTest {
     }
 
     @Test
-    public void deleteByPopulationGreaterThan() {
-        assertThat(this.repository.deleteByPopulationGreaterThan(6186L), is(equalTo(2L)));
-        this.repository.refresh();
-        assertThat(this.repository.count(), is(equalTo(3L)));
-    }
-
-    @Test
     public void findCityByPopulationGreaterThanOrderByNameAsc() {
         List<City> cities = this.repository.findCityByPopulationGreaterThanOrderByNameAsc(6186L);
         assertThat(cities.size(), is(equalTo(2)));
-        assertCity(cities.get(0), mauguio);
-        assertCity(cities.get(1), montpellier);
+        assertThat(cities.get(0).getId(), is(equalTo(mauguio)));
+        assertThat(cities.get(1).getId(), is(equalTo(montpellier)));
     }
 
     @Test
     public void findCityByPopulationGreaterThan() {
         ScrolledPage<City> cities = this.repository.findCityByPopulationGreaterThan(6186L, PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(2L)));
-        assertCity(cities.getContent().get(0), mauguio);
-        assertCity(cities.getContent().get(1), montpellier);
+        assertThat(cities.getContent().get(0).getId(), is(equalTo(mauguio)));
+        assertThat(cities.getContent().get(1).getId(), is(equalTo(montpellier)));
     }
 
     @Test
@@ -602,24 +480,17 @@ public class ITCityRepositoryTest {
     }
 
     @Test
-    public void deleteByPopulationLessThanEqual() {
-        assertThat(this.repository.deleteByPopulationLessThanEqual(4644L), is(equalTo(1L)));
-        this.repository.refresh();
-        assertThat(this.repository.count(), is(equalTo(4L)));
-    }
-
-    @Test
     public void findCityByPopulationLessThanEqualOrderByNameAsc() {
         List<City> cities = this.repository.findCityByPopulationLessThanEqualOrderByNameAsc(4644L);
         assertThat(cities.size(), is(equalTo(1)));
-        assertCity(cities.get(0), sommieres);
+        assertThat(cities.get(0).getId(), is(equalTo(sommieres)));
     }
 
     @Test
     public void findCityByPopulationLessThanEqual() {
         ScrolledPage<City> cities = this.repository.findCityByPopulationLessThanEqual(4644L, PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(1L)));
-        assertCity(cities.getContent().get(0), sommieres);
+        assertThat(cities.getContent().get(0).getId(), is(equalTo(sommieres)));
     }
 
     @Test
@@ -633,13 +504,6 @@ public class ITCityRepositoryTest {
     }
 
     @Test
-    public void deleteByPopulationLessThan() {
-        assertThat(this.repository.deleteByPopulationLessThan(4644L), is(equalTo(0L)));
-        this.repository.refresh();
-        assertThat(this.repository.count(), is(equalTo(5L)));
-    }
-
-    @Test
     public void findCityByPopulationLessThanOrderByNameAsc() {
         List<City> cities = this.repository.findCityByPopulationLessThanOrderByNameAsc(4644L);
         assertThat(cities.isEmpty(), is(true));
@@ -649,28 +513,6 @@ public class ITCityRepositoryTest {
     public void findCityByPopulationLessThan() {
         ScrolledPage<City> cities = this.repository.findCityByPopulationLessThan(4644L, PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.hasContent(), is(false));
-    }
-
-
-    private void assertCity(City actual, City expected) {
-        assertThat(actual.getName(), is(equalTo(expected.getName())));
-        assertThat(actual.getLocation(), is(equalTo(expected.getLocation())));
-        assertThat(actual.getRegion(), is(equalTo(expected.getRegion())));
-        assertThat(actual.getPopulation(), is(equalTo(expected.getPopulation())));
-        assertThat(actual.getId(), is(equalTo(expected.getId())));
-    }
-
-    private City createCity(String name, GeoPoint location, Long population, String region) {
-        return City.builder()
-                .name(name)
-                .location(location)
-                .population(population)
-                .region(region)
-                .build();
-    }
-
-    private City indexCity(String name, GeoPoint location, Long population, String region) {
-        return this.elasticsearchOperations.index(createCity(name, location, population, region), City.class);
     }
 
     private String transformLocation(GeoPoint point) {
@@ -687,6 +529,20 @@ public class ITCityRepositoryTest {
 
     private Box transformBox(GeoPoint topLeft, GeoPoint bottomRight) {
         return new Box(transformLocationToPoint(topLeft), transformLocationToPoint(bottomRight));
+    }
+
+    @Configuration
+    @EnableAspectJAutoProxy
+    @EnableAutoConfiguration
+    @EnableElasticsearchRepositories(
+            basePackages = "com.github.ydespreaux.spring.data.elasticsearch.repositories.template",
+            namedQueriesLocation = "classpath:named-queries/*-named-queries.properties")
+    static class ElasticsearchConfiguration extends ElasticsearchConfigurationSupport {
+
+        @Bean
+        ClientLoggerAspect clientLoggerAspect() {
+            return new ClientLoggerAspect();
+        }
     }
 
 }

@@ -24,8 +24,6 @@ import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperati
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
@@ -39,8 +37,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * @author Yoann Despréaux
+ * @since 1.0.0
+ */
 @Slf4j
-public class IngestTemplate implements ApplicationContextAware, InitializingBean {
+public class IngestTemplate implements ApplicationContextAware {
 
     private final TemplateProperties properties;
     private final ElasticsearchOperations operations;
@@ -52,19 +54,14 @@ public class IngestTemplate implements ApplicationContextAware, InitializingBean
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        ingest();
     }
 
     /**
      *
      */
-    private void ingest() {
+    public void ingest() {
         final TemplateAction templateAction = this.properties.getAction();
         if (templateAction == TemplateAction.NONE) {
             return;
@@ -156,7 +153,7 @@ public class IngestTemplate implements ApplicationContextAware, InitializingBean
 
     /**
      * @author yoann.despreaux
-     * @since 0.0.1
+     * @since 1.0.0
      */
     @Getter
     @Setter

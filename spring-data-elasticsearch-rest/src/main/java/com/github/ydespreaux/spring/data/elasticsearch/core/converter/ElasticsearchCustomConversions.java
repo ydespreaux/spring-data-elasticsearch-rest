@@ -26,7 +26,7 @@ import java.util.Collection;
 
 /**
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public class ElasticsearchCustomConversions extends CustomConversions {
 

@@ -21,7 +21,9 @@
 package com.github.ydespreaux.spring.data.elasticsearch.core.mapping;
 
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.SourceFilter;
+import com.github.ydespreaux.spring.data.elasticsearch.core.request.config.RolloverConfig;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.support.ElasticsearchEntityInformation;
+import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
@@ -34,16 +36,9 @@ import java.time.Duration;
 /**
  * @param <T> generic type
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, ElasticsearchPersistentProperty>, ElasticsearchEntityInformation<T, String> {
-
-    /**
-     * Retourne le nom de l'alias ou l'ndex de l'entité courante.
-     *
-     * @return the index or alias name
-     */
-    String getAliasOrIndexName();
 
     /**
      * Retourne le type de document de l'entité courante.
@@ -53,12 +48,44 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
     String getTypeName();
 
     /**
-     * Retourne le nom de l'index de l'entité courante à indexer.
-     *
-     * @param source the document
-     * @return the index name
+     * @return
      */
-    String getIndexName(T source);
+    Alias getAlias();
+
+    /**
+     * @return
+     */
+    String getAliasOrIndexReader();
+
+    /**
+     * @return
+     */
+    default String getAliasOrIndexWriter() {
+        return getAliasOrIndexWriter(null);
+    }
+
+    /**
+     * @param source
+     * @return
+     */
+    String getAliasOrIndexWriter(T source);
+
+    /**
+     * Get the current index name for writing operations.
+     *
+     * @return
+     */
+    String getIndexName();
+
+    /**
+     * @return
+     */
+    boolean isRolloverIndex();
+
+    /**
+     * @return
+     */
+    RolloverConfig getRolloverConfig();
 
     /**
      * @param entity the source of docuement
@@ -109,7 +136,7 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
     /**
      * @return the index path
      */
-    String getIndexPath();
+    String getIndexSettingAndMappingPath();
 
     /**
      * @return the parent id property
@@ -152,6 +179,17 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
      * @param score  the score
      */
     void setPersistentEntityScore(T result, float score);
+
+    /**
+     * @return
+     */
+    boolean hasCompletionProperty();
+
+    /**
+     * @return
+     */
+    @Nullable
+    ElasticsearchPersistentProperty getCompletionProperty();
 
     /**
      * @return

@@ -22,7 +22,6 @@ package com.github.ydespreaux.spring.data.elasticsearch.core.query;
 
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.support.IndicesOptions;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
@@ -33,12 +32,9 @@ import java.util.List;
  * Query
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public interface Query {
-
-    int DEFAULT_PAGE_SIZE = 10;
-    Pageable DEFAULT_PAGE = PageRequest.of(0, DEFAULT_PAGE_SIZE);
 
     /**
      * Get page settings if defined

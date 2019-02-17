@@ -39,13 +39,13 @@ import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public class DefaultResultsMapper implements ResultsMapper {
 
@@ -184,8 +184,7 @@ public class DefaultResultsMapper implements ResultsMapper {
             }
             generator.writeEndObject();
             generator.flush();
-            generator.close();
-            return new String(stream.toByteArray(), Charset.forName("UTF-8"));
+            return new String(stream.toByteArray(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             return null;
         }

@@ -22,6 +22,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.core.query;
 
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.support.IndicesOptions;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.Assert;
@@ -36,9 +37,11 @@ import static java.util.Collections.addAll;
  * AbstractQuery
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 abstract class AbstractQuery implements Query {
+
+    private static final Pageable DEFAULT_PAGE = PageRequest.of(0, 50);
 
     protected Pageable pageable = DEFAULT_PAGE;
     protected Sort sort;

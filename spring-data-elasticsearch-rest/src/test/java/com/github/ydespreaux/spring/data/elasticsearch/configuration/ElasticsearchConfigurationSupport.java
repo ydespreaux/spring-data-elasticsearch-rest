@@ -30,6 +30,7 @@ import com.github.ydespreaux.spring.data.elasticsearch.core.converter.MappingEla
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.SimpleElasticsearchMappingContext;
 import com.github.ydespreaux.spring.data.elasticsearch.core.triggers.TriggerManager;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -43,6 +44,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @EnableConfigurationProperties({JacksonProperties.class, TemplateProperties.class})
 public class ElasticsearchConfigurationSupport {
 
+    @Autowired
+    private TemplateProperties templateProperties;
+
     @Bean
     RestElasticsearchClient restElasticsearchClient(@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") final RestHighLevelClient client) {
         return new DefaultRestElasticsearchClient(client);
@@ -52,13 +56,11 @@ public class ElasticsearchConfigurationSupport {
     ElasticsearchOperations restElasticsearchTemplate(
             final RestElasticsearchClient client,
             final ElasticsearchConverter converter,
-            final ResultsMapper resultsMapper) {
-        return new ElasticsearchTemplate(client, converter, resultsMapper);
-    }
-
-    @Bean
-    IngestTemplate ingestTemplate(final TemplateProperties templateProperties, final ElasticsearchOperations operations) {
-        return new IngestTemplate(templateProperties, operations);
+            final ResultsMapper resultsMapper,
+            final TriggerManager triggerManager) {
+        ElasticsearchTemplate template = new ElasticsearchTemplate(client, converter, resultsMapper, triggerManager);
+        template.setIngestTemplate(new IngestTemplate(templateProperties, template));
+        return template;
     }
 
     @Bean

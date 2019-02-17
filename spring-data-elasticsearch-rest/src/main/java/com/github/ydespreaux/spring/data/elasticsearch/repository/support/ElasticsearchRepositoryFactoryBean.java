@@ -33,7 +33,7 @@ import java.io.Serializable;
  * XML namespace and JavaConfig.
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public class ElasticsearchRepositoryFactoryBean<T extends Repository<S, K>, S, K extends Serializable> extends
         RepositoryFactoryBeanSupport<T, S, K> {

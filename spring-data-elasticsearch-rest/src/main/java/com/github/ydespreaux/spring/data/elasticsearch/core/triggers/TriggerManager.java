@@ -26,7 +26,6 @@ import lombok.Setter;
 import org.springframework.scheduling.TaskScheduler;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +33,7 @@ import java.util.concurrent.ScheduledFuture;
 
 /**
  * @author Yoann Despréaux
- * @since 0.1.0
+ * @since 1.0.0
  */
 public class TriggerManager implements Closeable {
 
@@ -43,6 +42,10 @@ public class TriggerManager implements Closeable {
 
     public TriggerManager(TaskScheduler taskScheduler) {
         this.taskScheduler = taskScheduler;
+    }
+
+    public void stopAll() {
+        this.schedulers.keySet().forEach(this::cancelScheduler);
     }
 
     public void startTrigger(Trigger trigger) {
@@ -63,9 +66,9 @@ public class TriggerManager implements Closeable {
         }
     }
 
-    private KeyTrigger generateKey(Trigger trigger) {
+    public KeyTrigger generateKey(Trigger trigger) {
         return KeyTrigger.builder()
-                .javaType(trigger.getEntityInformation().getJavaType())
+                .javaType(trigger.getPersistentEntity().getJavaType())
                 .triggerType(trigger.getClass())
                 .build();
     }
@@ -81,11 +84,10 @@ public class TriggerManager implements Closeable {
      * <em>mark</em> the {@code Closeable} as closed, prior to throwing
      * the {@code IOException}.
      *
-     * @throws IOException if an I/O error occurs
      */
     @Override
-    public void close() throws IOException {
-
+    public void close() {
+        this.schedulers.keySet().forEach(this::cancelScheduler);
     }
 
     @Getter

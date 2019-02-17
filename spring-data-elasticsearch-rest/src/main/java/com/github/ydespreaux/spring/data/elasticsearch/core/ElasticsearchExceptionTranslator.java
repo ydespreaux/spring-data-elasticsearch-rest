@@ -29,7 +29,7 @@ import java.net.ConnectException;
 
 /**
  * @author Yoann Despréaux
- * @since 4.0
+ * @since 1.0.0
  */
 public class ElasticsearchExceptionTranslator {
 
@@ -39,12 +39,10 @@ public class ElasticsearchExceptionTranslator {
         }
         if (ex instanceof ElasticsearchStatusException) {
             RestStatus status = ((ElasticsearchStatusException) ex).status();
-            switch (status) {
-                case NOT_FOUND:
-                    return new IndexNotFoundException(ex.getMessage(), ex);
-                default:
-                    return ex.getCause();
+            if (status == RestStatus.NOT_FOUND) {
+                return new IndexNotFoundException(ex.getMessage(), ex);
             }
+            return ex.getCause();
         }
         return null;
     }

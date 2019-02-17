@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  * CriteriaFilterProcessor generate filter-related queries for a {@link Criteria} object
  *
  * @author Yoann Despréaux
- * @since 0.1.0
+ * @since 1.0.0
  */
 @Slf4j
 final class CriteriaFilterProcessor {

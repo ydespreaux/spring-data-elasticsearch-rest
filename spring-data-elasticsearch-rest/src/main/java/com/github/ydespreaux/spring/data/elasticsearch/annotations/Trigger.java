@@ -24,11 +24,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * @author Yoann Despréaux
+ * @since 1.0.0
+ */
 @Target({})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Trigger {
 
-    boolean enabled() default false;
+    boolean value() default false;
+
+    String enabled() default "";
 
     String cronExpression() default "";
 

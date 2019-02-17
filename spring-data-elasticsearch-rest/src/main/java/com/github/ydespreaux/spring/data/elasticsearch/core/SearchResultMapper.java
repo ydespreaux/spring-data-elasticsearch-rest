@@ -25,7 +25,7 @@ import org.elasticsearch.action.search.SearchResponse;
 
 /**
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public interface SearchResultMapper {
 

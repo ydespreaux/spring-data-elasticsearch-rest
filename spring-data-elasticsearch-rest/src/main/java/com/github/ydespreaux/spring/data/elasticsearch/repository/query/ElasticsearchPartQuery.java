@@ -34,7 +34,7 @@ import org.springframework.util.ClassUtils;
  * ElasticsearchPartQuery
  *
  * @author Yoann Despréaux
- * @since 0.1.0
+ * @since 1.0.0
  */
 public class ElasticsearchPartQuery extends AbstractElasticsearchRepositoryQuery {
 
@@ -61,7 +61,7 @@ public class ElasticsearchPartQuery extends AbstractElasticsearchRepositoryQuery
         } else if (queryMethod.isStreamQuery()) {
             throw new ElasticsearchException("Stream query method not supported");
         } else if (queryMethod.isCollectionQuery()) {
-            if (accessor.getPageable() == null) {
+            if (!accessor.getPageable().isPaged()) {
                 int itemCount = (int) elasticsearchOperations.count(query, queryMethod.getEntityInformation().getJavaType());
                 query.setPageable(PageRequest.of(0, Math.max(1, itemCount)));
             } else {
@@ -71,9 +71,7 @@ public class ElasticsearchPartQuery extends AbstractElasticsearchRepositoryQuery
         } else if (tree.isCountProjection()) {
             return elasticsearchOperations.count(query, queryMethod.getEntityInformation().getJavaType());
         } else if (tree.isExistsProjection()) {
-            if (accessor.getPageable() == null) {
-                query.setPageable(PageRequest.of(0, 1));
-            }
+            query.setPageable(PageRequest.of(0, 1));
             return elasticsearchOperations.existsByQuery(query, queryMethod.getEntityInformation().getJavaType());
         }
         return elasticsearchOperations.findOne(query, queryMethod.getEntityInformation().getJavaType());

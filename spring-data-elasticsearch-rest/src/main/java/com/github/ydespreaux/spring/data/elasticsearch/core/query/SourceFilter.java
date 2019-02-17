@@ -24,7 +24,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.core.query;
  * SourceFilter for providing includes and excludes.
  *
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 public interface SourceFilter {
 

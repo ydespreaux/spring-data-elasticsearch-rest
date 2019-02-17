@@ -30,7 +30,7 @@ import java.util.Objects;
 /**
  * @param <T> generic type
  * @author Yoann Despréaux
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Getter
 @Setter
