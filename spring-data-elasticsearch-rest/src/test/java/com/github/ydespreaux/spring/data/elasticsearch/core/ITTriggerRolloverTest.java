@@ -55,7 +55,7 @@ import java.util.concurrent.TimeUnit;
 public class ITTriggerRolloverTest {
 
     @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.3");
 
     @Autowired
     private VehicleEventRepository repository;

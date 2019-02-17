@@ -18,7 +18,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <elasticsearch.version>6.4.2</elasticsearch.version>
         <commons-io.version>2.6</commons-io.version>
     </properties>
     <dependencies>
