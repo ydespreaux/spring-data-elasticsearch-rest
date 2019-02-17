@@ -16,7 +16,7 @@ import org.junit.runners.Suite;
 public class ITSuiteTest {
 
 //    @ClassRule
-//    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2")
+//    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.3")
 //            .withConfigDirectory("elastic-config");
 
 //    static {
