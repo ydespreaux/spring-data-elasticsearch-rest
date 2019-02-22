@@ -2,9 +2,6 @@
 
 ## [Unreleased]
 ### Added
-- Dependency spring-boot version from 2.1.0 to 2.1.2
-- Dependency elasticsearch version from 6.4.2 to 6.4.3
-- Reactive repository (o)
 
 ### Changed
 
