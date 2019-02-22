@@ -10,8 +10,8 @@ services:
     ports:
     - "9000:9000"
     - "9095:9092"
-    volumes:
-    - ./sonarqube/data:/opt/sonarqube/data
+  #    volumes:
+  #    - ./sonarqube/data:/opt/sonarqube/data
 
   data-elasticsearch:
     container_name: data-elasticsearch

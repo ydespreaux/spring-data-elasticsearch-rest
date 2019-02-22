@@ -214,10 +214,7 @@ public class RequestsBuilder {
             indexRequest.versionType(EXTERNAL);
         }
         if (persistentEntity.hasParent()) {
-            Object parentId = persistentEntity.getParentId(source);
-            if (parentId != null) {
-                indexRequest.parent(parentId.toString());
-            }
+            indexRequest.routing(persistentEntity.getParentDescriptor().getRouting());
         }
         return indexRequest;
     }

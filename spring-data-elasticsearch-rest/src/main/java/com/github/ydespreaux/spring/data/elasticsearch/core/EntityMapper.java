@@ -20,6 +20,8 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core;
 
+import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
+
 /**
  * DocumentMapper interface, it will allow to customize how we mapping object to json
  *
@@ -32,7 +34,7 @@ public interface EntityMapper {
      * @param object the object to map
      * @return the string representation
      */
-    String mapToString(Object object);
+    <T> String mapToString(T object);
 
     /**
      * @param source the json source
@@ -41,4 +43,10 @@ public interface EntityMapper {
      * @return the object corresponding to json source
      */
     <T> T mapToObject(String source, Class<T> clazz);
+
+    /**
+     * @param persistentEntity
+     * @param <T>
+     */
+    <T> void register(ElasticsearchPersistentEntity<T> persistentEntity);
 }

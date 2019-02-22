@@ -64,8 +64,8 @@ public class ElasticsearchConfigurationSupport {
     }
 
     @Bean
-    ElasticsearchConverter elasticsearchConverter() {
-        return new MappingElasticsearchConverter(elasticsearchMappingContext());
+    ElasticsearchConverter elasticsearchConverter(EntityMapper mapper) {
+        return new MappingElasticsearchConverter(elasticsearchMappingContext(), mapper);
     }
 
     @Bean

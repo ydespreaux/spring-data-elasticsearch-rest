@@ -25,7 +25,7 @@ import org.springframework.data.annotation.Persistent;
 import java.lang.annotation.*;
 
 /**
- * Parent
+ * CompletionField
  *
  * @author Yoann Despréaux
  * @since 1.0.0

@@ -18,30 +18,32 @@
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
  */
 
-package com.github.ydespreaux.spring.data.elasticsearch.core.converter.adapter;
+package com.github.ydespreaux.spring.data.elasticsearch.core.converter.serializer;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import org.elasticsearch.common.geo.GeoPoint;
 
-import com.google.gson.*;
-
-import java.lang.reflect.Type;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.io.IOException;
 
 /**
+ * GeoPointSerializer
+ *
  * @author Yoann Despréaux
- * @since 1.0.0
+ * @since 1.0.1
  */
-public class LocalDateTimeTypeAdapter implements JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
-
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+public class GeoPointSerializer extends JsonSerializer<GeoPoint> {
 
     @Override
-    public JsonElement serialize(LocalDateTime localDateTime, Type type, JsonSerializationContext jsonSerializationContext) {
-        return new JsonPrimitive(FORMATTER.format(localDateTime));
+    public void serialize(GeoPoint value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+        if (value == null) {
+            return;
+        }
+        jsonGenerator.writeStartObject();
+        jsonGenerator.writeNumberField("lat", value.getLat());
+        jsonGenerator.writeNumberField("lon", value.getLat());
+        jsonGenerator.writeEndObject();
     }
 
-    @Override
-    public LocalDateTime deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) {
-        return FORMATTER.parse(jsonElement.getAsString(), LocalDateTime::from);
-    }
 }
