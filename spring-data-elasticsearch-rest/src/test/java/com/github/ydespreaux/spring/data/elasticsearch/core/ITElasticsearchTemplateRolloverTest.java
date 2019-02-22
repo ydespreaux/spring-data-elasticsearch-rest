@@ -63,7 +63,7 @@ import static org.junit.Assert.assertThat;
 public class ITElasticsearchTemplateRolloverTest extends AbstractElasticsearchTest<VehicleEvent> {
 
     @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.3");
 
     public ITElasticsearchTemplateRolloverTest() {
         super(VehicleEvent.class);

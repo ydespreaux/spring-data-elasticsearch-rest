@@ -66,7 +66,7 @@ import static org.hamcrest.Matchers.*;
 public class ITElasticsearchTemplateMappingTest {
 
     @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2")
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.3")
             .withConfigDirectory("elastic-config");
 
     private static final String INDEX_BOOK_NAME = "books";
