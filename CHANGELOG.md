@@ -2,8 +2,10 @@
 
 ## [Unreleased]
 ### Added
+- Parent relationship with @Parent annotation
 
 ### Changed
+- Migrate Gson to Jackson
 
 ### Fixed
 

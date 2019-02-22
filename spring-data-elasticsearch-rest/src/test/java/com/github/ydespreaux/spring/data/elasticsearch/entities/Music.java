@@ -25,14 +25,14 @@ import com.github.ydespreaux.spring.data.elasticsearch.annotations.CompletionFie
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.Index;
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.IndexedDocument;
 import com.github.ydespreaux.spring.data.elasticsearch.core.completion.Completion;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 
-@Builder
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @IndexedDocument(
         alias = @Alias(name = "musics"),
         index = @Index(

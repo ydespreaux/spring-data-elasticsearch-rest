@@ -21,14 +21,14 @@
 package com.github.ydespreaux.spring.data.elasticsearch.entities;
 
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.ProjectionDocument;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 
 @Builder
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @ProjectionDocument(target = Music.class, fields = {"title"})
 public class MusicInfo {
 

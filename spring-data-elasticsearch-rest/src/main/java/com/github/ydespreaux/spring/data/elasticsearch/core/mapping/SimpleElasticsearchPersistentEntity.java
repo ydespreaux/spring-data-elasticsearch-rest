@@ -23,6 +23,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.core.mapping;
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.*;
 import com.github.ydespreaux.spring.data.elasticsearch.core.IndexTimeBasedParameter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.IndexTimeBasedSupport;
+import com.github.ydespreaux.spring.data.elasticsearch.core.ParentDescriptor;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.FetchSourceFilter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.SourceFilter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.request.config.RolloverConfig;
@@ -73,24 +74,36 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     private Duration scrollTime;
     private RolloverConfig rollover;
 
+    private boolean parent = false;
+    private ParentDescriptor parentDescriptor;
+
     /**
      * @param typeInformation a {@link TypeInformation} parameter
      */
     public SimpleElasticsearchPersistentEntity(TypeInformation<T> typeInformation) {
         super(typeInformation);
+        this.entityClass = this.getTypeInformation().getType();
     }
 
     /**
      *
      */
     private void afterPropertiesSet() {
-        this.entityClass = this.getTypeInformation().getType();
         if (this.entityClass.isAnnotationPresent(ProjectionDocument.class)) {
             afterProjectionDocumentPropertySet(this.entityClass.getAnnotation(ProjectionDocument.class));
         } else if (this.entityClass.isAnnotationPresent(IndexedDocument.class)) {
             afterIndexedDocumentPropertySet(this.entityClass.getAnnotation(IndexedDocument.class));
         } else if (this.entityClass.isAnnotationPresent(RolloverDocument.class)) {
             afterRolloverDocumentPropertySet(this.entityClass.getAnnotation(RolloverDocument.class));
+        }
+
+        if (this.entityClass.isAnnotationPresent(Parent.class)) {
+            Parent parentAnnotation = this.entityClass.getAnnotation(Parent.class);
+            this.parentDescriptor = ParentDescriptor.builder()
+                    .name(parentAnnotation.name())
+                    .type(parentAnnotation.type())
+                    .build();
+            this.parent = true;
         }
     }
 
@@ -194,34 +207,13 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     public void addPersistentProperty(ElasticsearchPersistentProperty property) {
         super.addPersistentProperty(property);
         if (property.isParentProperty()) {
-            if (this.parentIdProperty != null) {
-                throw new MappingException(
-                        String.format("Attempt to add parent property %s but already have property %s registered "
-                                + "as parent property. Check your mapping configuration!", property.getField(), parentIdProperty.getField()));
-            }
-            this.parentIdProperty = property;
+            addPersistentParentProperty(property);
         } else if (property.isScoreProperty()) {
-            if (this.scoreProperty != null) {
-                throw new MappingException(
-                        String.format("Attempt to add score property %s but already have property %s registered "
-                                + "as score property. Check your mapping configuration!", property.getField(), scoreProperty.getField()));
-            }
-
-            this.scoreProperty = property;
+            addPersistentScoreProperty(property);
         } else if (property.isIndexNameProperty()) {
-            if (this.indexNameProperty != null) {
-                throw new MappingException(
-                        String.format("Attempt to add indexName property %s but already have property %s registered "
-                                + "as index name property. Check your mapping configuration!", property.getField(), indexNameProperty.getField()));
-            }
-            this.indexNameProperty = property;
+            addPersistentIndexNameProperty(property);
         } else if (property.isCompletionProperty()) {
-            if (this.completionProperty != null) {
-                throw new MappingException(
-                        String.format("Attempt to add completion property %s but already have property %s registered "
-                                + "as completion property. Check your mapping configuration!", property.getField(), completionProperty.getField()));
-            }
-            this.completionProperty = property;
+            addPersistentCompletionProperty(property);
         }
     }
 
@@ -456,6 +448,18 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     }
 
     /**
+     * @param entity
+     * @param id
+     */
+    @Override
+    public void setParentId(T entity, Object id) {
+        if (!this.hasParent()) {
+            return;
+        }
+        getPropertyAccessor(entity).setProperty(getParentIdProperty(), id);
+    }
+
+    /**
      * @return true if the current document have a parent
      */
     @Override
@@ -468,6 +472,9 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
      * @return evaluate the expression
      */
     private String getEnvironmentValue(String expression) {
+        if (this.context == null) {
+            return expression;
+        }
         Environment environment = context.getEnvironment();
         String value = null;
         // Create the matcher
@@ -500,4 +507,53 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
         return this.entityClass;
     }
 
+    private void addPersistentParentProperty(ElasticsearchPersistentProperty property) {
+        if (this.parentIdProperty != null) {
+            throw new MappingException(
+                    String.format("Attempt to add parent property %s but already have property %s registered "
+                            + "as parent property. Check your mapping configuration!", property.getField(), parentIdProperty.getField()));
+        }
+        if (this.parentDescriptor != null) {
+            throw new MappingException(
+                    String.format("Attempt to add parent property %s but the bean %s is already defined as parent. Check your mapping configuration!", property.getField(), this.getJavaType().getSimpleName()));
+        }
+        Parent parentAnnotation = property.findAnnotation(Parent.class);
+        if (StringUtils.isEmpty(parentAnnotation.routing())) {
+            throw new MappingException(
+                    String.format("Attempt to add parent property %s but the routing attribute of annotation Parent is mandatory. Check your mapping configuration!", property.getField()));
+        }
+        this.parentIdProperty = property;
+        this.parentDescriptor = ParentDescriptor.builder()
+                .name(parentAnnotation.name())
+                .type(parentAnnotation.type())
+                .routing(parentAnnotation.routing())
+                .build();
+    }
+
+    private void addPersistentScoreProperty(ElasticsearchPersistentProperty property) {
+        if (this.scoreProperty != null) {
+            throw new MappingException(
+                    String.format("Attempt to add score property %s but already have property %s registered "
+                            + "as score property. Check your mapping configuration!", property.getField(), scoreProperty.getField()));
+        }
+        this.scoreProperty = property;
+    }
+
+    private void addPersistentIndexNameProperty(ElasticsearchPersistentProperty property) {
+        if (this.indexNameProperty != null) {
+            throw new MappingException(
+                    String.format("Attempt to add indexName property %s but already have property %s registered "
+                            + "as index name property. Check your mapping configuration!", property.getField(), indexNameProperty.getField()));
+        }
+        this.indexNameProperty = property;
+    }
+
+    private void addPersistentCompletionProperty(ElasticsearchPersistentProperty property) {
+        if (this.completionProperty != null) {
+            throw new MappingException(
+                    String.format("Attempt to add completion property %s but already have property %s registered "
+                            + "as completion property. Check your mapping configuration!", property.getField(), completionProperty.getField()));
+        }
+        this.completionProperty = property;
+    }
 }

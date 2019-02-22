@@ -20,8 +20,10 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core.converter;
 
+import com.github.ydespreaux.spring.data.elasticsearch.core.DefaultEntityMapper;
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.SimpleElasticsearchMappingContext;
 import org.junit.Test;
+import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.data.mapping.context.MappingContext;
 
 import static org.hamcrest.Matchers.*;
@@ -36,14 +38,14 @@ public class MappingElasticsearchConverterTest {
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailToInitializeGivenMappingContextIsNull() {
         // given
-        new MappingElasticsearchConverter(null);
+        new MappingElasticsearchConverter(null, new DefaultEntityMapper(new JacksonProperties()));
     }
 
     @Test
     public void shouldReturnMappingContextWithWhichItWasInitialized() {
         // given
         MappingContext mappingContext = new SimpleElasticsearchMappingContext();
-        MappingElasticsearchConverter converter = new MappingElasticsearchConverter(mappingContext);
+        MappingElasticsearchConverter converter = new MappingElasticsearchConverter(mappingContext, new DefaultEntityMapper(new JacksonProperties()));
         // then
         assertThat(converter.getMappingContext(), is(notNullValue()));
         assertThat(converter.getMappingContext(), is(sameInstance(mappingContext)));

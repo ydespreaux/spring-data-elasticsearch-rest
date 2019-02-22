@@ -20,17 +20,30 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.IndexName;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.Parent;
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.Score;
-import com.github.ydespreaux.spring.data.elasticsearch.core.converter.adapter.TimeTypeAdapterRegistry;
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.github.ydespreaux.spring.data.elasticsearch.core.converter.ElasticsearchTypeModule;
+import com.github.ydespreaux.spring.data.elasticsearch.core.converter.serializer.PersistentEntityDeserializer;
+import com.github.ydespreaux.spring.data.elasticsearch.core.converter.serializer.PersistentEntitySerializer;
+import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
+import org.elasticsearch.ElasticsearchException;
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * EntityMapper based on a Jackson {@link ObjectMapper}.
@@ -40,35 +53,52 @@ import org.springframework.data.annotation.Version;
  */
 public class DefaultEntityMapper implements EntityMapper {
 
-    private final Gson mapper;
+    private final ObjectMapper mapper;
+
+    private final SimpleModule deserializersCustomModule = new SimpleModule("deserializersCustomModule");
+
+    private Map<Class<?>, ElasticsearchPersistentEntity<?>> deserializersCustom = new ConcurrentHashMap<>();
 
     /**
      * @param jacksonProperties the jackson properties
      */
     public DefaultEntityMapper(final JacksonProperties jacksonProperties) {
-        GsonBuilder builder = new GsonBuilder();
-        TimeTypeAdapterRegistry.registerAll(builder);
+        mapper = new ObjectMapper();
+        configure(jacksonProperties);
+    }
+
+    protected void configure(final JacksonProperties jacksonProperties) {
         if (jacksonProperties.getDateFormat() != null) {
-            builder.setDateFormat(jacksonProperties.getDateFormat());
+            mapper.setDateFormat(new SimpleDateFormat(jacksonProperties.getDateFormat()));
         } else {
-            builder.setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+            mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"));
         }
-        TimeTypeAdapterRegistry.registerAll(builder);
-        builder.addSerializationExclusionStrategy(new ExclusionStrategy() {
-            @Override
-            public boolean shouldSkipField(FieldAttributes fieldAttributes) {
-                return fieldAttributes.getAnnotation(Version.class) != null
-                        || fieldAttributes.getAnnotation(Id.class) != null
-                        || fieldAttributes.getAnnotation(IndexName.class) != null
-                        || fieldAttributes.getAnnotation(Score.class) != null;
-            }
+        mapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
 
             @Override
-            public boolean shouldSkipClass(Class<?> aClass) {
-                return false;
+            public boolean hasIgnoreMarker(AnnotatedMember m) {
+                return m.hasAnnotation(Id.class)
+                        || m.hasAnnotation(Version.class)
+                        || m.hasAnnotation(IndexName.class)
+                        || m.hasAnnotation(Score.class)
+                        || m.hasAnnotation(Parent.class)
+                        || super.hasIgnoreMarker(m);
             }
         });
-        mapper = builder.create();
+        mapper.registerModules(new JavaTimeModule(), new ElasticsearchTypeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        deserializersCustomModule.setDeserializerModifier(new BeanDeserializerModifier() {
+            @Override
+            public JsonDeserializer<?> modifyDeserializer(DeserializationConfig config, BeanDescription beanDesc, JsonDeserializer<?> deserializer) {
+                if (deserializersCustom.containsKey(beanDesc.getBeanClass())) {
+                    return new PersistentEntityDeserializer(deserializer, deserializersCustom.get(beanDesc.getBeanClass()));
+                }
+                return deserializer;
+            }
+        });
+        mapper.registerModule(deserializersCustomModule);
     }
 
     /*
@@ -76,8 +106,12 @@ public class DefaultEntityMapper implements EntityMapper {
      * @see org.springframework.data.elasticsearch.core.EntityMapper#mapToString(java.lang.Object)
      */
     @Override
-    public String mapToString(Object object) {
-        return mapper.toJson(object);
+    public <T> String mapToString(T object) {
+        try {
+            return mapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new ElasticsearchException("Json processing failed : ", e);
+        }
     }
 
     /*
@@ -86,7 +120,26 @@ public class DefaultEntityMapper implements EntityMapper {
      */
     @Override
     public <T> T mapToObject(String source, Class<T> clazz) {
-        return mapper.fromJson(source, clazz);
+        try {
+            return mapper.readValue(source, clazz);
+        } catch (IOException e) {
+            throw new ElasticsearchException("Json processing failed : ", e);
+        }
+    }
+
+    /**
+     * @param persistentEntity
+     */
+    @Override
+    public <T> void register(ElasticsearchPersistentEntity<T> persistentEntity) {
+        if (persistentEntity.isParent() || persistentEntity.hasParent()) {
+            deserializersCustomModule.addSerializer(persistentEntity.getJavaType(), new PersistentEntitySerializer<>(persistentEntity));
+            if (persistentEntity.hasParent()) {
+                deserializersCustom.put(persistentEntity.getJavaType(), persistentEntity);
+            }
+            // Update registry module
+            mapper.registerModule(deserializersCustomModule);
+        }
     }
 
 }

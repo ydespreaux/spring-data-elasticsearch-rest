@@ -20,6 +20,7 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core.mapping;
 
+import com.github.ydespreaux.spring.data.elasticsearch.core.ParentDescriptor;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.SourceFilter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.request.config.RolloverConfig;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.support.ElasticsearchEntityInformation;
@@ -153,6 +154,11 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
     Object getParentId(T source);
 
     /**
+     * @param id
+     */
+    void setParentId(T entity, Object id);
+
+    /**
      * @return true if the current entity has a parent
      */
     boolean hasParent();
@@ -247,4 +253,14 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
         setPersistentEntityIndexName(result, hit.getIndex());
     }
 
+    /**
+     *
+     * @return
+     */
+    boolean isParent();
+
+    /**
+     * @return
+     */
+    ParentDescriptor getParentDescriptor();
 }

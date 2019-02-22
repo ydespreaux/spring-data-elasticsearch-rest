@@ -20,12 +20,15 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core.indices;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRequest;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -48,28 +51,33 @@ public class TemplateBuilder extends IndiceBuilder<PutIndexTemplateRequest, Temp
 
     @Override
     public PutIndexTemplateRequest build(PutIndexTemplateRequest request) {
-        Map<String, JsonElement> settings = this.buildJsonElement(this.source());
-        // Index patterns
-        List<String> indexPatterns = new ArrayList<>();
-        JsonElement patternsElement = settings.get(INDEX_PATTERNS_CONFIG);
-        if (patternsElement.isJsonArray()) {
-            patternsElement.getAsJsonArray().forEach(pattern -> indexPatterns.add(pattern.getAsString()));
-        } else {
-            indexPatterns.add(patternsElement.getAsString());
+        try {
+            Map<String, TreeNode> settings = this.buildJsonElement(this.source());
+            // Index patterns
+            List<String> indexPatterns = new ArrayList<>();
+            TreeNode patternsElement = settings.get(INDEX_PATTERNS_CONFIG);
+            if (patternsElement.isArray()) {
+                ArrayNode arrayNode = (ArrayNode) patternsElement;
+                arrayNode.elements().forEachRemaining(node -> indexPatterns.add(node.textValue()));
+            } else {
+                indexPatterns.add(((JsonNode) patternsElement).asText());
+            }
+            request.patterns(indexPatterns);
+            // Aliases
+            request.aliases(xContentBuilder(settings.get(ALIASES_CONFIG)));
+            // Settings
+            request.settings(settings.get(SETTINGS_CONFIG).toString(), XContentType.JSON);
+            // Mappings
+            TreeNode mappingsElement = settings.get(MAPPINGS_CONFIG);
+            mappingsElement.fieldNames().forEachRemaining(field -> request.mapping(field, xContentBuilder(mappingsElement.get(field))));
+            // Order
+            if (settings.containsKey(ORDER_CONFIG)) {
+                request.order(((JsonNode) settings.get(ORDER_CONFIG)).asInt());
+            }
+            return request;
+        } catch (IOException e) {
+            throw new InvalidDataAccessApiUsageException("Invalid json", e);
         }
-        request.patterns(indexPatterns);
-        // Aliases
-        request.aliases(xContentBuilder(settings.get(ALIASES_CONFIG)));
-        // Settings
-        request.settings(settings.get(SETTINGS_CONFIG).toString(), XContentType.JSON);
-        // Mappings
-        JsonObject mappingsElement = settings.get(MAPPINGS_CONFIG).getAsJsonObject();
-        mappingsElement.entrySet().forEach(entry -> request.mapping(entry.getKey(), xContentBuilder(entry.getValue())));
-        // Order
-        if (settings.containsKey(ORDER_CONFIG)) {
-            request.order(settings.get(ORDER_CONFIG).getAsInt());
-        }
-        return request;
     }
 
     /**
