@@ -18,30 +18,21 @@
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
  */
 
-package com.github.ydespreaux.spring.data.elasticsearch.core.converter.adapter;
+package com.github.ydespreaux.spring.data.elasticsearch.core.converter;
 
-
-import com.google.gson.*;
-
-import java.lang.reflect.Type;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.github.ydespreaux.spring.data.elasticsearch.core.converter.serializer.GeoPointSerializer;
+import org.elasticsearch.common.geo.GeoPoint;
 
 /**
+ * ElasticsearchTypeModule
+ *
  * @author Yoann Despréaux
- * @since 1.0.0
+ * @since 1.0.1
  */
-public class LocalDateTypeAdapter implements JsonSerializer<LocalDate>, JsonDeserializer<LocalDate> {
+public class ElasticsearchTypeModule extends SimpleModule {
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
-
-    @Override
-    public JsonElement serialize(LocalDate localDateTime, Type type, JsonSerializationContext jsonSerializationContext) {
-        return new JsonPrimitive(FORMATTER.format(localDateTime));
-    }
-
-    @Override
-    public LocalDate deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) {
-        return FORMATTER.parse(jsonElement.getAsString(), LocalDate::from);
+    public ElasticsearchTypeModule() {
+        this.addSerializer(GeoPoint.class, new GeoPointSerializer());
     }
 }

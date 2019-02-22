@@ -91,7 +91,7 @@ public class SimpleElasticsearchPersistentProperty extends
 
     /*
      * (non-Javadoc)
-     * @see org.springframework.data.elasticsearch.core.mapping.ElasticsearchPersistentProperty#getFieldName()
+     * @see org.springframework.data.elasticsearch.core.mapping.ElasticsearchPersistentProperty#getName()
      */
     @Override
     public String getFieldName() {

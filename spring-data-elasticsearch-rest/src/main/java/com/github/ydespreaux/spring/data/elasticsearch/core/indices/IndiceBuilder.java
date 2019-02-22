@@ -20,9 +20,9 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core.indices;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.IndicesRequest;
 import org.elasticsearch.common.xcontent.*;
@@ -105,7 +105,7 @@ public abstract class IndiceBuilder<T extends IndicesRequest, S extends IndiceBu
      * @param element the json element
      * @return a new {@link XContentBuilder}
      */
-    protected XContentBuilder xContentBuilder(JsonElement element) {
+    protected XContentBuilder xContentBuilder(TreeNode element) {
         try (XContentParser parser = XContentFactory.xContent(XContentType.JSON).createParser(NamedXContentRegistry.EMPTY, LoggingDeprecationHandler.INSTANCE, element.toString())) {
             return jsonBuilder().copyCurrentStructure(parser);
         } catch (IOException e) {
@@ -117,11 +117,11 @@ public abstract class IndiceBuilder<T extends IndicesRequest, S extends IndiceBu
      * @param scripts the list of scripts
      * @return the map of jeson elements
      */
-    public Map<String, JsonElement> buildJsonElement(List<Resource> scripts) {
+    public Map<String, TreeNode> buildJsonElement(List<Resource> scripts) throws IOException {
         if (scripts.isEmpty()) {
             return null;
         }
-        final Map<String, JsonElement> settings = new LinkedHashMap<>();
+        final Map<String, TreeNode> settings = new LinkedHashMap<>();
         for (Resource script : scripts) {
             settings.putAll(buildJsonElement(script));
         }
@@ -132,8 +132,8 @@ public abstract class IndiceBuilder<T extends IndicesRequest, S extends IndiceBu
      * @param rootObject the root json element
      * @return the map of json elements
      */
-    protected Map<String, JsonElement> buildJsonElement(JsonObject rootObject) {
-        Map<String, JsonElement> elements = new HashMap<>();
+    protected Map<String, TreeNode> buildJsonElement(JsonNode rootObject) {
+        Map<String, TreeNode> elements = new HashMap<>();
         this.getAttributeNames().forEach(attribute -> {
             if (rootObject.has(attribute)) {
                 elements.put(attribute, rootObject.get(attribute));
@@ -147,9 +147,9 @@ public abstract class IndiceBuilder<T extends IndicesRequest, S extends IndiceBu
      * @param script the script
      * @return the map of json elements
      */
-    protected Map<String, JsonElement> buildJsonElement(Resource script) {
+    protected Map<String, TreeNode> buildJsonElement(Resource script) throws IOException {
         String data = readInputStream(script);
-        return buildJsonElement(new JsonParser().parse(data).getAsJsonObject());
+        return buildJsonElement(new ObjectMapper().readTree(data));
     }
 
     /**

@@ -18,35 +18,22 @@
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
  */
 
-package com.github.ydespreaux.spring.data.elasticsearch.annotations;
+package com.github.ydespreaux.spring.data.elasticsearch.core;
 
-import java.lang.annotation.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * Parent
- *
- * @author Yoann Despréaux
+ * @author yoann Despréaux
  * @since 1.0.1
  */
+@Getter
+@Setter
+@Builder
+public class ParentDescriptor {
 
-@Documented
-@Inherited
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
-public @interface Parent {
-
-    /**
-     * @return
-     */
-    String name();
-
-    /**
-     * @return
-     */
-    String type();
-
-    /**
-     * @return
-     */
-    String routing() default "";
+    private String name;
+    private String type;
+    private String routing;
 }

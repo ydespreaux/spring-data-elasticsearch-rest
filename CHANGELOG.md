@@ -19,6 +19,15 @@
 
 ### Fixed
 
+## [1.0.1]
+### Added
+- Parent relationship with @Parent annotation
+
+### Changed
+- Migrate Gson to Jackson
+
+### Fixed
+
 ## [1.0.0]
 ### Added
 - Elasticsearch v6.4.2
