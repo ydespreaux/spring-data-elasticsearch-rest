@@ -107,6 +107,37 @@ Le mapping de l'entité doit être déclaré avec le type completion d'elasticse
   }
 }
 ```
+#### Annotation @Parent
+
+L'annotation Parent permet de déclarer une relation père fils. 
+Description des attributs:
+
+Les documents parent et fils doivent être contenu dans le même index et doivent avoir le même type.
+Afin de définir une relation père-fils, le document doit posséder un attribut de type Join.
+Le mapping défini les relations entre le père et le fils.
+Example de mapping:
+
+Déclaration du parent:
+```java
+@IndexedDocument(index=@Index(name="my_index", type="my_type"))
+@Parent(name="join_field", type="question")
+public class Question {
+private String name;
+}
+```
+
+Déclaration du fils:
+```java
+public class Answer{
+private String name;
+@Parent(name="join_field", type="answer", routing="1")
+private String parentId;
+}
+```
+
+name : nom de l'attribut du mapping de type Join
+type : le type de a relation
+routine : la route du document. Cet attribut est obligatoire pour l'indexation du fils.
 
 ### Documents
 
