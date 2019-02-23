@@ -19,6 +19,7 @@ The library supports the following types of indexes:
 
 |   spring-data-elasticsearch-rest   |   spring-boot    |   elasticsearch  |
 |:----------------------------------:|:----------------:|:----------------:|
+|   1.0.1                            |       2.1.0      |       6.4.2      |
 |   1.0.0                            |       2.1.0      |       6.4.2      |
 
 ## Maven dependency
@@ -27,7 +28,7 @@ The library supports the following types of indexes:
 <dependency>
     <groupId>com.github.ydespreaux.spring.data</groupId>
     <artifactId>spring-data-elasticsearch-rest-starter</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
@@ -82,7 +83,6 @@ public class MyBean {
  
 ##### Annotation @CompletionField
 
-
 The CompletionField annotation allows the use of elasticsearch completion. The completion offers a feature of autocomplete / search on demand.
 It is a navigation feature that guides users to relevant results during typing, improving the accuracy of the search.
 The type of the attribute must be of type Completion or Collection<Completion>.
@@ -94,53 +94,81 @@ public class MyBean {
 }
 ```
 
-Le mapping de l'entité doit être déclaré avec le type completion d'elasticsearch.
+The mapping of the entity must be declared with the completion type.
 
 ```json
-"mappings": {
-  "myType": {
-    "properties": {
-      "suggest": {
-        "type": "completion"
+{
+  "mappings": {
+    "myType": {
+      "properties": {
+        "suggest": {
+          "type": "completion"
+        }
       }
     }
   }
 }
 ```
-#### Annotation @Parent
 
-L'annotation Parent permet de déclarer une relation père fils. 
-Description des attributs:
+##### Annotation @Parent (version 1.0.1)
 
-Les documents parent et fils doivent être contenu dans le même index et doivent avoir le même type.
-Afin de définir une relation père-fils, le document doit posséder un attribut de type Join.
-Le mapping défini les relations entre le père et le fils.
-Example de mapping:
+The Parent annotation defines a parent-child relationship of a document. 
 
-Déclaration du parent:
+The parent's document and the child's document must be contained in the same index and must have the same type.
+In order to define a parent-child relationship, the document must have an attribute of type Join.
+
+Attributes description:
+
+|   Attribut   |   Type     |   Mandatory  |     Description     |
+|:------------:|:----------:|:------------:|:-------------------:|
+|   name       |   String   |       Yes    | Name of the attribute defining the join    |
+|   type       |   String   |       Yes    | Name of the relationship    |
+|   routing    |   String   |       No     | Route of the index (obligatory for the child document)    |
+
+The mapping defines the relations between parent and child as below:
+
+```json
+{
+  "mappings": {
+    "myType": {
+      "properties": {
+        "description" : {
+          "type": "text"
+        },
+        "join_field": {
+          "type": "join",
+          "relations": {
+            "question": "answer"
+          }
+        }
+      }
+     }
+  }
+}
+```
+
+Here is an example describing a parent document:
+
 ```java
-@IndexedDocument(index=@Index(name="my_index", type="my_type"))
+@IndexedDocument(index=@Index(name="my_index", type="my_type", settingsAndMappingPath = "classpath:scripts/my_index.index"))
 @Parent(name="join_field", type="question")
 public class Question {
-private String name;
+    private String description;
 }
 ```
 
-Déclaration du fils:
+Here is an example describing a child document:
+
 ```java
+@IndexedDocument(index=@Index(name="my_index", type="my_type", createIndex = false))
 public class Answer{
-private String name;
-@Parent(name="join_field", type="answer", routing="1")
-private String parentId;
+    private String description;
+    @Parent(name="join_field", type="answer", routing="1")
+    private String parentId;
 }
 ```
 
-name : nom de l'attribut du mapping de type Join
-type : le type de a relation
-routine : la route du document. Cet attribut est obligatoire pour l'indexation du fils.
-
-### Documents
-
+### Description of documents
 
 #### Annotation @IndexedDocument
 
