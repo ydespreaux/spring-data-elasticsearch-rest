@@ -19,6 +19,9 @@
  */
 package com.github.ydespreaux.spring.data.elasticsearch.core.query;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.index.query.Operator;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -539,7 +542,21 @@ public class Criteria {
      *
      */
     public enum OperationKey {
-        EQUALS, CONTAINS, STARTS_WITH, ENDS_WITH, EXPRESSION, BETWEEN, FUZZY, IN, NOT_IN, WITHIN, BOX, LESS, LESS_EQUAL, GREATER, GREATER_EQUAL;
+        EQUALS,
+        CONTAINS,
+        STARTS_WITH,
+        ENDS_WITH,
+        EXPRESSION,
+        BETWEEN,
+        FUZZY,
+        IN,
+        NOT_IN,
+        WITHIN,
+        BOX,
+        LESS,
+        LESS_EQUAL,
+        GREATER,
+        GREATER_EQUAL
     }
 
     /**
@@ -585,5 +602,15 @@ public class Criteria {
                     ", value=" + value +
                     '}';
         }
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class ParentEntry {
+        private String type;
+        private Criteria criteria;
+        private String parentId;
+
     }
 }

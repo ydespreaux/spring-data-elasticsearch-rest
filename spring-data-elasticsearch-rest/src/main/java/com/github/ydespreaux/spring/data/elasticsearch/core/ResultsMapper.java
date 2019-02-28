@@ -20,7 +20,6 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core;
 
-import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -49,7 +48,7 @@ public interface ResultsMapper extends SearchResultMapper, GetResultMapper, Mult
      * @param <T>    generic method
      * @return the entity
      */
-    <T> T mapEntity(Collection<DocumentField> values, Class<T> clazz);
+    <S extends T, T> S mapEntity(Collection<DocumentField> values, Class<T> clazz);
 
     /**
      * @param source the json source
@@ -58,7 +57,7 @@ public interface ResultsMapper extends SearchResultMapper, GetResultMapper, Mult
      * @return the entity
      */
     @Nullable
-    default <T> T mapEntity(String source, Class<T> clazz) {
+    default <S extends T, T> S mapEntity(String source, Class<T> clazz) {
 
         if (StringUtils.isEmpty(source)) {
             return null;
@@ -74,7 +73,7 @@ public interface ResultsMapper extends SearchResultMapper, GetResultMapper, Mult
      * @param <T>       generic method
      * @return can be {@literal null} if the {@link SearchHit} does not have {@link SearchHit#hasSource() a source}.
      */
-    <T> T mapEntity(SearchHit searchHit, Class<T> type);
+    <S extends T, T> S mapEntity(SearchHit searchHit, Class<T> type);
 
     /**
      * @param searchHits the hits
@@ -82,13 +81,6 @@ public interface ResultsMapper extends SearchResultMapper, GetResultMapper, Mult
      * @param <T>        method generic
      * @return the list of entities
      */
-    <T> List<T> mapEntity(SearchHits searchHits, Class<T> type);
+    <S extends T, T> List<S> mapEntity(SearchHits searchHits, Class<T> type);
 
-    /**
-     * @param response the response
-     * @param clazz    the entity class
-     * @param <T>      method generic
-     * @return the entity
-     */
-    <T> T mapResult(GetResponse response, Class<T> clazz);
 }

@@ -213,8 +213,8 @@ public class RequestsBuilder {
             indexRequest.version(version);
             indexRequest.versionType(EXTERNAL);
         }
-        if (persistentEntity.hasParent()) {
-            indexRequest.routing(persistentEntity.getParentDescriptor().getRouting());
+        if (persistentEntity.isChildDocument()) {
+            indexRequest.routing(persistentEntity.getChildDescriptor().getRouting());
         }
         return indexRequest;
     }

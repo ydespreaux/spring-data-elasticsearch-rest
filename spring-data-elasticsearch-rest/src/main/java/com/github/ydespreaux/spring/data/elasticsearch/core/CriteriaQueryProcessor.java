@@ -40,7 +40,7 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
  * @since 1.0.0
  */
 @Slf4j
-class CriteriaQueryProcessor {
+public class CriteriaQueryProcessor {
 
 
     /**
@@ -49,7 +49,7 @@ class CriteriaQueryProcessor {
      * @param criteria
      * @return
      */
-    QueryBuilder createQueryFromCriteria(Criteria criteria) {
+    public QueryBuilder createQueryFromCriteria(Criteria criteria) {
         if (criteria == null)
             return null;
         ListQueryBuilder builder = new ListQueryBuilder();

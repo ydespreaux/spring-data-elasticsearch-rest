@@ -191,7 +191,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
     @Override
     public <T> Mono<T> index(T entity, Class<T> clazz) {
         ElasticsearchPersistentEntity<T> persistentEntity = getPersistentEntityFor(clazz);
-        IndexRequest request = createIndexRequest(entity, clazz);
+        IndexRequest request = this.requestsBuilder().indexRequest(entity, persistentEntity, getResultsMapper());
         return doIndex(request)
                 .map(response -> {
                     persistentEntity.setPersistentEntity(entity, response);
@@ -284,7 +284,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
         ElasticsearchPersistentEntity<T> persistentEntity = getPersistentEntityFor(entityType);
         return doFindById(id, persistentEntity.getAliasOrIndexReader(), persistentEntity.getTypeName())
                 .filter(GetResponse::isExists)
-                .map(it -> this.getResultsMapper().mapResult(it, entityType))
+                .map(it -> (T) this.getResultsMapper().mapResult(it, entityType))
                 .onErrorResume(IndexNotFoundException.class, ex -> Mono.empty());
     }
 

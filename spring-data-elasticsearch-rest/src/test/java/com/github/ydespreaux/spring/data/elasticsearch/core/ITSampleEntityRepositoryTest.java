@@ -63,7 +63,7 @@ import static org.junit.Assert.assertThat;
 public class ITSampleEntityRepositoryTest extends AbstractElasticsearchTest<SampleEntity> {
 
     @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.3");
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
 
     private static final String INDEX_NAME = "sample-entity-index";
     @Autowired

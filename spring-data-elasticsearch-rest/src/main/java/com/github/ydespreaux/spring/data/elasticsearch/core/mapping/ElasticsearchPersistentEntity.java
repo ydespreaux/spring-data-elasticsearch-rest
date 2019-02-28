@@ -20,7 +20,6 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core.mapping;
 
-import com.github.ydespreaux.spring.data.elasticsearch.core.ParentDescriptor;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.SourceFilter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.request.config.RolloverConfig;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.support.ElasticsearchEntityInformation;
@@ -145,25 +144,6 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
     ElasticsearchPersistentProperty getParentIdProperty();
 
     /**
-     * Returns the parent Id. Can be {@literal null}.
-     *
-     * @param source the document source
-     * @return can be {@literal null}.
-     */
-    @Nullable
-    Object getParentId(T source);
-
-    /**
-     * @param id
-     */
-    void setParentId(T entity, Object id);
-
-    /**
-     * @return true if the current entity has a parent
-     */
-    boolean hasParent();
-
-    /**
      * @return true if the score property is defined
      */
     boolean hasScoreProperty();
@@ -254,13 +234,18 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
     }
 
     /**
+     * Returns the parent Id. Can be {@literal null}.
      *
-     * @return
+     * @param source the document source
+     * @return can be {@literal null}.
      */
-    boolean isParent();
+    @Nullable
+    Object getParentId(T source);
 
     /**
-     * @return
+     * @param id
      */
-    ParentDescriptor getParentDescriptor();
+    void setParentId(T entity, Object id);
+
+
 }

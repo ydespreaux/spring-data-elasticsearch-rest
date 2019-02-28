@@ -24,7 +24,7 @@ import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.ResolvableDeserializer;
-import com.github.ydespreaux.spring.data.elasticsearch.core.ParentDescriptor;
+import com.github.ydespreaux.spring.data.elasticsearch.core.ChildDescriptor;
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
 
 import java.io.IOException;
@@ -49,10 +49,10 @@ public class PersistentEntityDeserializer<T> extends JsonDeserializer<T> impleme
     public T deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         JsonLocation startLocation = jsonParser.getCurrentLocation();
         T bean = this.defaultDeserializer.deserialize(jsonParser, deserializationContext);
-        if (persistentEntity.hasParent()) {
+        if (persistentEntity.isChildDocument()) {
             JsonNode node = new ObjectMapper().readTree(startLocation.getSourceRef().toString());
-            ParentDescriptor parentDescriptor = persistentEntity.getParentDescriptor();
-            String fieldName = parentDescriptor.getName();
+            ChildDescriptor childDescriptor = persistentEntity.getChildDescriptor();
+            String fieldName = childDescriptor.getName();
             if (node.has(fieldName)) {
                 JsonNode joinNode = node.get(fieldName);
                 if (joinNode.has("parent")) {
@@ -67,4 +67,5 @@ public class PersistentEntityDeserializer<T> extends JsonDeserializer<T> impleme
     public void resolve(DeserializationContext deserializationContext) throws JsonMappingException {
         ((ResolvableDeserializer) defaultDeserializer).resolve(deserializationContext);
     }
+
 }

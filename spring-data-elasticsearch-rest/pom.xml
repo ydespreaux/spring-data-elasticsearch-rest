@@ -19,6 +19,7 @@
         <java.version>1.8</java.version>
         <elasticsearch.version>6.4.2</elasticsearch.version>
         <commons-io.version>2.6</commons-io.version>
+        <findbugs.version>3.0.2</findbugs.version>
         <sonar.exclusions>**/Reactive*.java</sonar.exclusions>
     </properties>
     <dependencies>
@@ -65,6 +66,11 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>${findbugs.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

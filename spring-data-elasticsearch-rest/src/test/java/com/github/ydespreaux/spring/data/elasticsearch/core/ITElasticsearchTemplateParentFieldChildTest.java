@@ -21,14 +21,14 @@ package com.github.ydespreaux.spring.data.elasticsearch.core;
 
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
 import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
-import com.github.ydespreaux.spring.data.elasticsearch.core.query.NativeSearchQuery;
-import com.github.ydespreaux.spring.data.elasticsearch.entities.ParentEntity;
+import com.github.ydespreaux.spring.data.elasticsearch.core.query.HasChildQuery;
+import com.github.ydespreaux.spring.data.elasticsearch.core.query.HasParentQuery;
+import com.github.ydespreaux.spring.data.elasticsearch.core.query.ParentIdQuery;
+import com.github.ydespreaux.spring.data.elasticsearch.entities.Question;
 import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,13 +42,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
-import static org.elasticsearch.join.query.JoinQueryBuilders.hasChildQuery;
-import static org.elasticsearch.join.query.JoinQueryBuilders.hasParentQuery;
+import static org.elasticsearch.index.query.Operator.AND;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 /**
- * @author Philipp Jardas
+ * @author Yoann Despréaux
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {
@@ -58,94 +57,133 @@ import static org.junit.Assert.assertThat;
 public class ITElasticsearchTemplateParentFieldChildTest {
 
     @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
-
-    @Autowired
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2")
+            .withFileInitScript("scripts/parent-child.script");
     private ElasticsearchTemplate elasticsearchTemplate;
 
-    @Before
-    public void before() {
-        clean();
-        elasticsearchTemplate.createIndex(ParentEntity.class);
+    @Autowired
+    public void setElasticsearchTemplate(ElasticsearchTemplate elasticsearchTemplate) {
+        this.elasticsearchTemplate = elasticsearchTemplate;
+        EntityMapper mapper = elasticsearchTemplate.getResultsMapper().getEntityMapper();
+        mapper.register(elasticsearchTemplate.getPersistentEntityFor(Question.class));
+        mapper.register(elasticsearchTemplate.getPersistentEntityFor(Question.Answer.class));
+        mapper.register(elasticsearchTemplate.getPersistentEntityFor(Question.Comment.class));
+
     }
 
     @Test
     public void parentSerialize() {
         EntityMapper mapper = elasticsearchTemplate.getResultsMapper().getEntityMapper();
-        ParentEntity entity = new ParentEntity("1", "Parent1");
+        Question entity = new Question("1", "Parent1");
         String json = mapper.mapToString(entity);
-        assertThat(json, is(equalTo("{\"name\":\"Parent1\",\"relation\":{\"name\":\"question\"}}")));
+        assertThat(json, is(equalTo("{\"description\":\"Parent1\",\"join_field\":{\"name\":\"question\"}}")));
     }
 
     @Test
     public void childSerialize() {
         EntityMapper mapper = elasticsearchTemplate.getResultsMapper().getEntityMapper();
-        ParentEntity.ChildEntity child = new ParentEntity.ChildEntity("1", "1", "Child1");
+        Question.Answer child = new Question.Answer("1", "1", "Child1");
         String json = mapper.mapToString(child);
-        assertThat(json, is(equalTo("{\"name\":\"Child1\",\"relation\":{\"name\":\"answer\",\"parent\":\"1\"}}")));
+        assertThat(json, is(equalTo("{\"description\":\"Child1\",\"join_field\":{\"name\":\"answer\",\"parent\":\"1\"}}")));
 
     }
 
     @Test
     public void parentDeserialize() {
         EntityMapper mapper = elasticsearchTemplate.getResultsMapper().getEntityMapper();
-        String json = "{\"name\":\"Parent1\",\"relation\":{\"name\":\"question\"}}";
-        ParentEntity parent = mapper.mapToObject(json, ParentEntity.class);
-        assertThat(parent.getName(), is(equalTo("Parent1")));
+        String json = "{\"description\":\"Parent1\",\"join_field\":{\"name\":\"question\"}}";
+        Question parent = mapper.mapToObject(json, Question.class);
+        assertThat(parent.getDescription(), is(equalTo("Parent1")));
     }
 
     @Test
     public void childDeserialize() {
         // register ChildEntity
-        elasticsearchTemplate.getPersistentEntityFor(ParentEntity.ChildEntity.class);
+        elasticsearchTemplate.getPersistentEntityFor(Question.Answer.class);
         //
         EntityMapper mapper = elasticsearchTemplate.getResultsMapper().getEntityMapper();
-        String json = "{\"name\":\"Child1\",\"relation\":{\"name\":\"answer\",\"parent\":\"1\"}}";
-        ParentEntity.ChildEntity child = mapper.mapToObject(json, ParentEntity.ChildEntity.class);
-        assertThat(child.getName(), is(equalTo("Child1")));
+        String json = "{\"description\":\"Child1\",\"join_field\":{\"name\":\"answer\",\"parent\":\"1\"}}";
+        Question.Answer child = mapper.mapToObject(json, Question.Answer.class);
+        assertThat(child.getDescription(), is(equalTo("Child1")));
         assertThat(child.getParentId(), is(equalTo("1")));
 
     }
 
-    @After
-    public void clean() {
-        elasticsearchTemplate.deleteIndexByName("parent-child");
+    @Test
+    public void hasChildAnswer() {
+        QueryBuilder query = QueryBuilders.matchPhraseQuery("description", "question");
+        List<? super Question.Answer> questionsWithAnswer =
+                elasticsearchTemplate.hasChild(HasChildQuery.builder().type("answer").query(query).scoreMode(ScoreMode.None).build(), Question.Answer.class);
+        assertThat(questionsWithAnswer, contains(hasProperty("id", is("1")), hasProperty("id", is("2"))));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void hasChildAnswerWithNoQuery() {
+        elasticsearchTemplate.hasChild(null, Question.Answer.class);
     }
 
     @Test
-    public void shouldIndexParentChildEntity() {
-        // index two parents
-        ParentEntity question1 = index("1", "Question 1");
-        ParentEntity question2 = index("2", "Question 2");
-
-        // index a child for each parent
-        ParentEntity.ChildEntity answer1 = index("3", question1.getId(), "Answer 1 of question 1");
-        ParentEntity.ChildEntity answer2 = index("4", question2.getId(), "Answer  1 of question 2");
-        ParentEntity.ChildEntity answer3 = index("5", question2.getId(), "Answer  2 of question 2");
-
-        elasticsearchTemplate.refresh(ParentEntity.class);
-        // find all parents that have the first child
-        QueryBuilder query = hasChildQuery("answer", QueryBuilders.matchPhraseQuery("name", "question"), ScoreMode.None);
-        List<ParentEntity> parents = elasticsearchTemplate.search(new NativeSearchQuery(query), ParentEntity.class);
-        assertThat(parents, contains(hasProperty("id", is(question1.getId())), hasProperty("id", is(question2.getId()))));
-
-        // find all childs that have the first child
-        QueryBuilder childQuery = hasParentQuery("question", QueryBuilders.matchPhraseQuery("name", question2.getName()), true);
-        List<ParentEntity.ChildEntity> childs = elasticsearchTemplate.search(new NativeSearchQuery(childQuery), ParentEntity.ChildEntity.class);
-        assertThat(childs, contains(hasProperty("id", is(answer2.getId())), hasProperty("id", is(answer3.getId()))));
-        assertThat(childs, contains(hasProperty("parentId", is(question2.getId())), hasProperty("parentId", is(question2.getId()))));
-        assertThat(childs.get(0).getParentId(), is(equalTo(question2.getId())));
-        assertThat(childs.get(1).getParentId(), is(equalTo(question2.getId())));
+    public void hasChildComment() {
+        QueryBuilder query = QueryBuilders.matchPhraseQuery("description", "question");
+        List<? super Question.Comment> questionsWithComment =
+                elasticsearchTemplate.hasChild(HasChildQuery.builder().type("comment").query(query).scoreMode(ScoreMode.None).build(), Question.Comment.class);
+        assertThat(questionsWithComment, contains(hasProperty("id", is("1")), hasProperty("id", is("3"))));
     }
 
-    private ParentEntity index(String parentId, String name) {
-        ParentEntity parent = new ParentEntity(parentId, name);
-        return elasticsearchTemplate.index(parent, ParentEntity.class);
+    @Test
+    public void hasParent() {
+        // find all childs
+        List<? extends Question> childs = elasticsearchTemplate.hasParent(HasParentQuery.builder().type("question").query(QueryBuilders.matchAllQuery()).build(), Question.class);
+        assertThat(childs, contains(
+                hasProperty("id", is("4")),
+                hasProperty("id", is("5")),
+                hasProperty("id", is("6")),
+                hasProperty("id", is("7")),
+                hasProperty("id", is("8")),
+                hasProperty("id", is("9"))));
+        assertThat(childs, contains(
+                hasProperty("parentId", is("1")),
+                hasProperty("parentId", is("2")),
+                hasProperty("parentId", is("2")),
+                hasProperty("parentId", is("1")),
+                hasProperty("parentId", is("1")),
+                hasProperty("parentId", is("3"))));
     }
 
-    private ParentEntity.ChildEntity index(String childId, String parentId, String name) {
-        ParentEntity.ChildEntity child = new ParentEntity.ChildEntity(childId, parentId, name);
-        return elasticsearchTemplate.index(child, ParentEntity.ChildEntity.class);
+    @Test
+    public void hasParentBySearchQuery() {
+        // find all childs for Question 2
+        List<? extends Question> childs = elasticsearchTemplate.hasParent(HasParentQuery.builder().type("question").query(QueryBuilders.queryStringQuery("Question 2").field("description").defaultOperator(AND)).build(), Question.class);
+        assertThat(childs, contains(
+                hasProperty("id", is("5")),
+                hasProperty("id", is("6"))));
+        assertThat(childs, contains(
+                hasProperty("parentId", is("2")),
+                hasProperty("parentId", is("2"))));
+    }
+
+    @Test
+    public void hasParentIdAnswer() {
+        ParentIdQuery query = ParentIdQuery.builder().type("answer").parentId("1").build();
+        List<Question.Answer> answersWithParentId = elasticsearchTemplate.hasParentId(query, Question.Answer.class);
+        assertThat(answersWithParentId, contains(hasProperty("id", is("4"))));
+    }
+
+    @Test
+    public void hasParentIdAnswerWithQuery() {
+        ParentIdQuery query = ParentIdQuery.builder().type("answer").parentId("2")
+                .query(QueryBuilders.matchPhraseQuery("description", "java")).build();
+        List<Question.Answer> answersWithParentId = elasticsearchTemplate.hasParentId(query, Question.Answer.class);
+        assertThat(answersWithParentId, contains(hasProperty("id", is("5"))));
+    }
+
+    @Test
+    public void hasParentIdComment() {
+        ParentIdQuery query = ParentIdQuery.builder().type("comment").parentId("1").build();
+        List<Question.Comment> commentsWithParentId = elasticsearchTemplate.hasParentId(query, Question.Comment.class);
+        assertThat(commentsWithParentId, contains(
+                hasProperty("id", is("7")),
+                hasProperty("id", is("8"))));
     }
 
     @Configuration

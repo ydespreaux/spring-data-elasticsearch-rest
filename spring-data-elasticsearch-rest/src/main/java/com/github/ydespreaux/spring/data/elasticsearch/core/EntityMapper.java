@@ -42,7 +42,7 @@ public interface EntityMapper {
      * @param <T>    generic type
      * @return the object corresponding to json source
      */
-    <T> T mapToObject(String source, Class<T> clazz);
+    <S extends T, T> S mapToObject(String source, Class<T> clazz);
 
     /**
      * @param persistentEntity

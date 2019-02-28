@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.BeanSerializerFactory;
+import com.github.ydespreaux.spring.data.elasticsearch.core.ChildDescriptor;
 import com.github.ydespreaux.spring.data.elasticsearch.core.ParentDescriptor;
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
 import lombok.Builder;
@@ -60,11 +61,11 @@ public class PersistentEntitySerializer<T> extends JsonSerializer<T> {
         // this is basically your 'writeAllFields()'-method:
         serializer.unwrappingSerializer(null).serialize(value, jsonGenerator, serializerProvider);
 
-        if (this.persistentEntity.isParent()) {
+        if (this.persistentEntity.isParentDocument()) {
             ParentDescriptor descriptor = this.persistentEntity.getParentDescriptor();
             jsonGenerator.writeObjectField(descriptor.getName(), JoinType.builder().name(descriptor.getType()).build());
-        } else if (this.persistentEntity.hasParent()) {
-            ParentDescriptor descriptor = this.persistentEntity.getParentDescriptor();
+        } else if (this.persistentEntity.isChildDocument()) {
+            ChildDescriptor descriptor = this.persistentEntity.getChildDescriptor();
             jsonGenerator.writeObjectField(descriptor.getName(), JoinType.builder().name(descriptor.getType()).parent(this.persistentEntity.getParentId(value)).build());
         }
         jsonGenerator.writeEndObject();

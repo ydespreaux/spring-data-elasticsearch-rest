@@ -36,7 +36,7 @@ The library supports the following types of indexes:
 
 ### Field annotations
 
-##### Annotation @Id / @Version
+##### @Id / @Version
 
 The org.springframework.data.annotation.Id annotation is used to declare an attribute representing the identifier of the document. The type of the attribute must be of type String.
 An annotated @Id attribute is not stored in the document (stored in the _id metadata).
@@ -58,10 +58,11 @@ public class MyBean {
 }
 ```
 
-##### Annotation @IndexName
+##### @IndexName
 
 The IndexName annotation is used to declare an attribute representing the name of the index in which the document is indexed. The type of the attribute must be of type String.
-An annotated attribute @IndexName is not stored in the document, it is initialized when reading a document.
+An annotated attribute @IndexName is not stored in the document (stored in the metada _index), it's initialized when reading a document.
+An annotated attribute @IndexName is read-only mode.
 
 ```java
 public class MyBean {
@@ -70,9 +71,10 @@ public class MyBean {
 }
 ```
 
-##### Annotation @Score
+##### @Score
 
 The Score annotation is used to inject the _score value of a document during a search (without sorting). The type of the attribute must be Float type.
+An annotated attribute @Score is read-only mode.
 
 ```java
 public class MyBean {
@@ -81,7 +83,7 @@ public class MyBean {
 }
 ```
  
-##### Annotation @CompletionField
+##### @CompletionField
 
 The CompletionField annotation allows the use of elasticsearch completion. The completion offers a feature of autocomplete / search on demand.
 It is a navigation feature that guides users to relevant results during typing, improving the accuracy of the search.
@@ -110,7 +112,7 @@ The mapping of the entity must be declared with the completion type.
 }
 ```
 
-##### Annotation @Parent (version 1.0.1)
+##### @Parent (version 1.0.1)
 
 The Parent annotation defines a parent-child relationship of a document. 
 
@@ -157,6 +159,18 @@ public class Question {
 }
 ```
 
+When indexing a child document, the join attribute is automatically injected into the source of the document as follow:
+
+```text
+PUT my_index/my_type/1
+{
+  "description": "This is an question",
+  "join_field": {
+    "name": "question"
+  }
+}
+```
+
 Here is an example describing a child document:
 
 ```java
@@ -168,9 +182,27 @@ public class Answer{
 }
 ```
 
+The attribute parentId is not mapping. The type of the attribute must be of type String.
+When indexing a child document, the value of the attribute is automatically injected into the source of the document as follow:
+
+```text
+PUT my_index/my_type/2?routing=1 
+{
+  "description": "This is an answer",
+  "join_field": {
+    "name": "answer", 
+    "parent": "1" 
+  }
+}
+```
+
 ### Description of documents
 
-#### Annotation @IndexedDocument
+#### @IndexedDocument
+
+
+
+##### Attributes description
 
 @IndexedDocument
 
@@ -200,18 +232,13 @@ public class Answer{
 | searchRouting   | String  |    No        |   IndexTimeBasedSupport.class |
 
 
+#### @RolloverDocument
 
-### Timebased Index
+##### Attributes description
 
-@IndexedDocument
+#### @ProjectionDocument
 
-### Rollover index
-
-@RolloverDocument
-
-### Projection
-
-@ProjectionDocument
+##### Attributes description
 
 ## Repository
 ### CRUD operations

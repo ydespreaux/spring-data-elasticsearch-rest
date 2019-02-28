@@ -35,13 +35,15 @@ import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.join.query.HasChildQueryBuilder;
+import org.elasticsearch.join.query.HasParentQueryBuilder;
+import org.elasticsearch.join.query.JoinQueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
@@ -50,14 +52,18 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.text.MessageFormat;
 import java.time.Duration;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import static org.elasticsearch.index.VersionType.EXTERNAL;
 import static org.elasticsearch.index.query.QueryBuilders.wrapperQuery;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -157,32 +163,6 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
      */
     protected Resource getResource(String locationPath) {
         return this.applicationContext.getResource(locationPath);
-    }
-
-    /**
-     * @param source
-     * @return
-     */
-    protected <T> IndexRequest createIndexRequest(T source, Class<?> clazz) {
-        Objects.requireNonNull(source);
-        ElasticsearchPersistentEntity<T> persistentEntity = (ElasticsearchPersistentEntity<T>) getPersistentEntityFor(clazz);
-        String indexName = persistentEntity.getAliasOrIndexWriter(source);
-        String type = persistentEntity.getTypeName();
-        String id = persistentEntity.getPersistentEntityId(source);
-        IndexRequest indexRequest = id != null ? new IndexRequest(indexName, type, id) : new IndexRequest(indexName, type);
-        indexRequest.source(this.getResultsMapper().getEntityMapper().mapToString(source), Requests.INDEX_CONTENT_TYPE);
-        Long version = persistentEntity.getPersistentEntityVersion(source);
-        if (version != null) {
-            indexRequest.version(version);
-            indexRequest.versionType(EXTERNAL);
-        }
-        if (persistentEntity.hasParent()) {
-            Object parentId = persistentEntity.getParentId(source);
-            if (parentId != null) {
-                indexRequest.parent(parentId.toString());
-            }
-        }
-        return indexRequest;
     }
 
     /**
@@ -522,6 +502,88 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
     }
 
 
+    protected <T> SearchQuery prepareHasChildQuery(HasChildQuery query, Class<T> clazz) {
+        assertNotNull(query);
+        setPersistentEntityJoinType(query, clazz);
+        return prepareHasChildQuery(query);
+    }
+
+    protected SearchQuery prepareHasChildQuery(HasChildQuery query) {
+        assertNotNull(query);
+        HasChildQueryBuilder childQueryBuilder = JoinQueryBuilders.hasChildQuery(query.getType(), query.getQuery(), query.getScoreMode())
+                .ignoreUnmapped(query.isIgnoreUnmapped())
+                .minMaxChildren(query.getMinChildren(), query.getMaxChildren());
+        if (query.getInnerHitBuilder() != null) {
+            childQueryBuilder.innerHit(query.getInnerHitBuilder());
+        }
+        return new NativeSearchQuery(childQueryBuilder);
+    }
+
+    protected <T> SearchQuery prepareHasParentQuery(HasParentQuery query, Class<T> entityClass) {
+        assertNotNull(query);
+        setPersistentEntityJoinType(query, entityClass);
+        return prepareHasParentQuery(query);
+    }
+
+    protected SearchQuery prepareHasParentQuery(HasParentQuery query) {
+        assertNotNull(query);
+        HasParentQueryBuilder parentQueryBuilder = JoinQueryBuilders.hasParentQuery(query.getType(), query.getQuery(), false)
+                .ignoreUnmapped(query.isIgnoreUnmapped());
+        if (query.getInnerHitBuilder() != null) {
+            parentQueryBuilder.innerHit(query.getInnerHitBuilder());
+        }
+        return new NativeSearchQuery(parentQueryBuilder);
+    }
+
+    protected <T> SearchQuery prepareHasParentId(ParentIdQuery query, Class<T> entityClass) {
+        assertNotNull(query);
+        setPersistentEntityJoinType(query, entityClass);
+        return prepareHasParentId(query);
+    }
+
+    protected SearchQuery prepareHasParentId(ParentIdQuery query) {
+        assertNotNull(query);
+        QueryBuilder completedQuery = null;
+        QueryBuilder parentIdQueryBuilder = JoinQueryBuilders.parentId(query.getType(), query.getParentId()).ignoreUnmapped(query.isIgnoreUnmapped());
+        QueryBuilder originalQuery = query.getQuery();
+        if (originalQuery != null) {
+            if (originalQuery instanceof BoolQueryBuilder) {
+                completedQuery = ((BoolQueryBuilder) originalQuery).must(parentIdQueryBuilder);
+            } else {
+                completedQuery = QueryBuilders.boolQuery()
+                        .must(originalQuery)
+                        .must(parentIdQueryBuilder);
+            }
+        } else {
+            completedQuery = parentIdQueryBuilder;
+        }
+        return new NativeSearchQuery(completedQuery);
+    }
+
+    private <T> void setPersistentEntityJoinType(HasChildQuery query, Class<T> clazz) {
+        ElasticsearchPersistentEntity<T> persistentEntity = getPersistentEntityFor(clazz);
+        assertChildDocument(persistentEntity);
+        if (StringUtils.isEmpty(query.getType())) {
+            query.setType(persistentEntity.getChildDescriptor().getType());
+        }
+    }
+
+    private <T> void setPersistentEntityJoinType(HasParentQuery query, Class<T> entityClass) {
+        ElasticsearchPersistentEntity<T> persistentEntity = getPersistentEntityFor(entityClass);
+        assertParentDocument(persistentEntity);
+        if (StringUtils.isEmpty(query.getType())) {
+            query.setType(persistentEntity.getParentDescriptor().getType());
+        }
+    }
+
+    private <T> void setPersistentEntityJoinType(ParentIdQuery query, Class<T> clazz) {
+        ElasticsearchPersistentEntity<T> persistentEntity = getPersistentEntityFor(clazz);
+        assertChildDocument(persistentEntity);
+        if (StringUtils.isEmpty(query.getType())) {
+            query.setType(persistentEntity.getChildDescriptor().getType());
+        }
+    }
+
     /**
      * @param sort
      * @param searchSourceBuilder
@@ -540,6 +602,7 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
             }
         }
     }
+
 
     /**
      * @param query
@@ -580,6 +643,10 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
         Assert.notNull(query.getPageable(), "Query.pageable is required for scan & scroll");
     }
 
+    private void assertNotNull(Query query) {
+        Assert.notNull(query, "Query is required");
+    }
+
     /**
      * @param e
      * @param request
@@ -596,4 +663,17 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
     protected ElasticsearchException buildClearScrollException(Exception e, ClearScrollRequest request) {
         return new ElasticsearchException("Error for clear scroll request: " + request.toString(), e);
     }
+
+    protected <T> void assertChildDocument(ElasticsearchPersistentEntity<T> persistentEntity) {
+        if (!persistentEntity.isChildDocument()) {
+            throw new InvalidDataAccessApiUsageException("The document must be a child document !!!");
+        }
+    }
+
+    protected <T> void assertParentDocument(ElasticsearchPersistentEntity<T> persistentEntity) {
+        if (!persistentEntity.isParentDocument()) {
+            throw new InvalidDataAccessApiUsageException("The document must be a parent document !!!");
+        }
+    }
+
 }

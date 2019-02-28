@@ -25,15 +25,17 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
+ * ParentDescriptor
+ *
  * @author yoann Despréaux
  * @since 1.0.1
  */
 @Getter
 @Setter
 @Builder
-public class ParentDescriptor {
+public class ParentDescriptor<T> {
 
     private String name;
     private String type;
-    private String routing;
+    private Class<T> javaType;
 }

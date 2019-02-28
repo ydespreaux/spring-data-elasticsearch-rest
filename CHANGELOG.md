@@ -2,8 +2,11 @@
 
 ## [Unreleased]
 ### Added
+- Add mapping annotations for parent / child
+- ElasticsearchRepository : Add methods for search parent / child  
 
 ### Changed
+- Externalized @Parent attributes
 
 ### Fixed
 
