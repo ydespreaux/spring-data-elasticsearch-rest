@@ -94,6 +94,7 @@ public class RequestsBuilder {
      * @return
      */
     public CreateIndexRequest createIndexRequest(Alias alias, String indexName, String indexPath) {
+
         CreateIndexRequest indexRequest = new CreateIndexBuilder()
                 .name(indexName)
                 .sources(getResources(indexPath))

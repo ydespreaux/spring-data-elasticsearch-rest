@@ -112,7 +112,7 @@ public class ITElasticsearchTemplateParentFieldChildTest {
     @Test
     public void hasChildAnswer() {
         QueryBuilder query = QueryBuilders.matchPhraseQuery("description", "question");
-        List<? super Question.Answer> questionsWithAnswer =
+        List<Question> questionsWithAnswer =
                 elasticsearchTemplate.hasChild(HasChildQuery.builder().type("answer").query(query).scoreMode(ScoreMode.None).build(), Question.Answer.class);
         assertThat(questionsWithAnswer, contains(hasProperty("id", is("1")), hasProperty("id", is("2"))));
     }
@@ -125,7 +125,7 @@ public class ITElasticsearchTemplateParentFieldChildTest {
     @Test
     public void hasChildComment() {
         QueryBuilder query = QueryBuilders.matchPhraseQuery("description", "question");
-        List<? super Question.Comment> questionsWithComment =
+        List<Question> questionsWithComment =
                 elasticsearchTemplate.hasChild(HasChildQuery.builder().type("comment").query(query).scoreMode(ScoreMode.None).build(), Question.Comment.class);
         assertThat(questionsWithComment, contains(hasProperty("id", is("1")), hasProperty("id", is("3"))));
     }

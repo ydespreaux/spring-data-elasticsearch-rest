@@ -57,19 +57,19 @@ public class ITAnswerRepositoryTest {
 
     @Test
     public void hasChild() {
-        List<? super Question.Answer> questions = this.answerRepository.hasChild();
+        List<Question> questions = this.answerRepository.hasChild();
         assertThat(questions, contains(hasProperty("id", is("1")), hasProperty("id", is("2"))));
     }
 
     @Test
     public void hasChildWithCriteria() {
-        List<? super Question.Answer> questions = this.answerRepository.hasChildByQuery(new Criteria("description").contains("java"));
+        List<Question> questions = this.answerRepository.hasChildByQuery(new Criteria("description").contains("java"));
         assertThat(questions, contains(hasProperty("id", is("2"))));
     }
 
     @Test
     public void hasChildWithQuery() {
-        List<? super Question.Answer> questions = this.answerRepository.hasChildByQuery(QueryBuilders.matchPhraseQuery("description", "java"));
+        List<Question> questions = this.answerRepository.hasChildByQuery(QueryBuilders.matchPhraseQuery("description", "java"));
         assertThat(questions, contains(hasProperty("id", is("2"))));
     }
 

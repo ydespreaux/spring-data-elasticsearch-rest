@@ -57,19 +57,19 @@ public class ITCommentRepositoryTest {
 
     @Test
     public void hasChild() {
-        List<? super Question.Comment> questions = this.commentRepository.hasChild();
+        List<Question> questions = this.commentRepository.hasChild();
         assertThat(questions, contains(hasProperty("id", is("1")), hasProperty("id", is("3"))));
     }
 
     @Test
     public void hasChildWithCriteria() {
-        List<? super Question.Comment> questions = this.commentRepository.hasChildByQuery(new Criteria("description").contains("another"));
+        List<Question> questions = this.commentRepository.hasChildByQuery(new Criteria("description").contains("another"));
         assertThat(questions, contains(hasProperty("id", is("1"))));
     }
 
     @Test
     public void hasChildWithQuery() {
-        List<? super Question.Comment> questions = this.commentRepository.hasChildByQuery(QueryBuilders.matchPhraseQuery("description", "another"));
+        List<Question> questions = this.commentRepository.hasChildByQuery(QueryBuilders.matchPhraseQuery("description", "another"));
         assertThat(questions, contains(hasProperty("id", is("1"))));
     }
 
