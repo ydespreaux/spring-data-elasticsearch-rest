@@ -21,10 +21,7 @@
 package com.github.ydespreaux.spring.data.elasticsearch;
 
 import com.github.ydespreaux.spring.data.elasticsearch.core.ITElasticsearchTemplateCompletionTest;
-import com.github.ydespreaux.spring.data.elasticsearch.repository.support.ITArticleRepositoryTest;
-import com.github.ydespreaux.spring.data.elasticsearch.repository.support.ITBookRepositoryTest;
-import com.github.ydespreaux.spring.data.elasticsearch.repository.support.ITCityRepositoryTest;
-import com.github.ydespreaux.spring.data.elasticsearch.repository.support.ITProductRepositoryTest;
+import com.github.ydespreaux.spring.data.elasticsearch.repository.support.*;
 import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
@@ -36,12 +33,15 @@ import org.junit.runners.Suite;
         ITBookRepositoryTest.class,
         ITCityRepositoryTest.class,
         ITProductRepositoryTest.class,
-        ITElasticsearchTemplateCompletionTest.class
+        ITElasticsearchTemplateCompletionTest.class,
+        ITAnswerRepositoryTest.class,
+        ITCommentRepositoryTest.class,
+        ITQuestionRepositoryTest.class
 })
 public class ITQuerySuiteTest {
 
     @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.3")
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2")
             .withConfigDirectory("elastic-config")
             .withFileInitScript("scripts/queries.script");
 

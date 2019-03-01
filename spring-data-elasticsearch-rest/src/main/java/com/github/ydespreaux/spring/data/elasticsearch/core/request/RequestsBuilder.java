@@ -94,6 +94,7 @@ public class RequestsBuilder {
      * @return
      */
     public CreateIndexRequest createIndexRequest(Alias alias, String indexName, String indexPath) {
+
         CreateIndexRequest indexRequest = new CreateIndexBuilder()
                 .name(indexName)
                 .sources(getResources(indexPath))
@@ -213,8 +214,8 @@ public class RequestsBuilder {
             indexRequest.version(version);
             indexRequest.versionType(EXTERNAL);
         }
-        if (persistentEntity.hasParent()) {
-            indexRequest.routing(persistentEntity.getParentDescriptor().getRouting());
+        if (persistentEntity.isChildDocument()) {
+            indexRequest.routing(persistentEntity.getChildDescriptor().getRouting());
         }
         return indexRequest;
     }

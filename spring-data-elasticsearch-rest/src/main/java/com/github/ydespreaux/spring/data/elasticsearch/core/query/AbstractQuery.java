@@ -187,4 +187,15 @@ abstract class AbstractQuery implements Query {
     public void setTrackScores(boolean trackScores) {
         this.trackScores = trackScores;
     }
+
+    /*
+
+     */
+    protected static <T> T requireValue(T value, String message) {
+        if (value == null) {
+            throw new IllegalArgumentException(message);
+        } else {
+            return value;
+        }
+    }
 }

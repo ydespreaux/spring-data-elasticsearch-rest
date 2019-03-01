@@ -35,5 +35,5 @@ public interface SearchResultMapper {
      * @param <T>      the generic type
      * @return a new {@link ScrolledPage}
      */
-    <T> ScrolledPage<T> mapResults(SearchResponse response, Class<T> clazz);
+    <S extends T, T> ScrolledPage<S> mapResults(SearchResponse response, Class<T> clazz);
 }

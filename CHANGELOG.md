@@ -8,7 +8,6 @@
 
 ### Fixed
 
-
 ## [1.1.0-SNAPSHOT]
 ### Added
 - Dependency spring-boot version from 2.1.0 to 2.1.2
@@ -16,6 +15,16 @@
 - Reactive repository (o)
 
 ### Changed
+
+### Fixed
+
+## [1.0.2]
+### Added
+- Add mapping annotations for parent / child
+- ElasticsearchRepository : Add methods for search parent / child  
+
+### Changed
+- Externalized @Parent attributes
 
 ### Fixed
 

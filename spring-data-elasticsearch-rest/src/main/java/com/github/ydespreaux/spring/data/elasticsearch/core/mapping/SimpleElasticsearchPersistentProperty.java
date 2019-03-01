@@ -22,7 +22,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.core.mapping;
 
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.CompletionField;
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.IndexName;
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Parent;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.ParentId;
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.Score;
 import com.github.ydespreaux.spring.data.elasticsearch.core.completion.Completion;
 import org.springframework.data.mapping.Association;
@@ -62,7 +62,7 @@ public class SimpleElasticsearchPersistentProperty extends
 
         this.isId = super.isIdProperty() || SUPPORTED_ID_PROPERTY_NAMES.contains(getFieldName());
         this.isScore = isAnnotationPresent(Score.class);
-        this.isParent = isAnnotationPresent(Parent.class);
+        this.isParent = isAnnotationPresent(ParentId.class);
         this.isIndexName = isAnnotationPresent(IndexName.class);
         this.isCompletion = isAnnotationPresent(CompletionField.class);
 

@@ -21,6 +21,7 @@
 package com.github.ydespreaux.spring.data.elasticsearch.core.mapping;
 
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.*;
+import com.github.ydespreaux.spring.data.elasticsearch.core.ChildDescriptor;
 import com.github.ydespreaux.spring.data.elasticsearch.core.IndexTimeBasedParameter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.IndexTimeBasedSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.core.ParentDescriptor;
@@ -74,8 +75,9 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     private Duration scrollTime;
     private RolloverConfig rollover;
 
-    private boolean parent = false;
-    private ParentDescriptor parentDescriptor;
+    private boolean parentDocument = false;
+    private ParentDescriptor<T> parentDescriptor;
+    private ChildDescriptor<T> childDescriptor;
 
     /**
      * @param typeInformation a {@link TypeInformation} parameter
@@ -99,12 +101,43 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
 
         if (this.entityClass.isAnnotationPresent(Parent.class)) {
             Parent parentAnnotation = this.entityClass.getAnnotation(Parent.class);
-            this.parentDescriptor = ParentDescriptor.builder()
-                    .name(parentAnnotation.name())
-                    .type(parentAnnotation.type())
+            this.parentDescriptor = ParentDescriptor.<T>builder()
+                    .name(getEnvironmentValue(parentAnnotation.name()))
+                    .type(getEnvironmentValue(parentAnnotation.type()))
+                    .javaType(this.entityClass)
                     .build();
-            this.parent = true;
+            this.parentDocument = true;
+        } else if (this.entityClass.isAnnotationPresent(Child.class)) {
+            Class<? super T> parentClass = findParentClass();
+            if (parentClass == null) {
+                throw new MappingException("Child class no extends to a parentDocument class");
+            }
+            Child childAnnotation = this.entityClass.getAnnotation(Child.class);
+            if (StringUtils.isEmpty(childAnnotation.routing())) {
+                throw new MappingException("routing attribute is mandatory. Check your mapping configuration!");
+            }
+            if (StringUtils.isEmpty(childAnnotation.type())) {
+                throw new MappingException("type attribute is mandatory. Check your mapping configuration!");
+            }
+            this.childDescriptor = ChildDescriptor.<T>builder()
+                    .name(parentClass.getAnnotation(Parent.class).name())
+                    .type(getEnvironmentValue(childAnnotation.type()))
+                    .routing(getEnvironmentValue(childAnnotation.routing()))
+                    .javaType(this.entityClass)
+                    .parentJavaType(parentClass)
+                    .build();
         }
+    }
+
+    private Class<? super T> findParentClass() {
+        Class<? super T> parentClass = this.entityClass.getSuperclass();
+        while (parentClass != null) {
+            if (parentClass.isAnnotationPresent(Parent.class)) {
+                return parentClass;
+            }
+            parentClass = parentClass.getSuperclass();
+        }
+        return null;
     }
 
     private void afterProjectionDocumentPropertySet(ProjectionDocument document) {
@@ -428,7 +461,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     }
 
     /**
-     * Returns the parent Id. Can be {@literal null}.
+     * Returns the parentDocument Id. Can be {@literal null}.
      *
      * @return can be {@literal null}.
      */
@@ -453,17 +486,14 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
      */
     @Override
     public void setParentId(T entity, Object id) {
-        if (!this.hasParent()) {
+        if (!this.isChildDocument()) {
             return;
         }
         getPropertyAccessor(entity).setProperty(getParentIdProperty(), id);
     }
 
-    /**
-     * @return true if the current document have a parent
-     */
     @Override
-    public boolean hasParent() {
+    public boolean isChildDocument() {
         return this.parentIdProperty != null;
     }
 
@@ -510,24 +540,10 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     private void addPersistentParentProperty(ElasticsearchPersistentProperty property) {
         if (this.parentIdProperty != null) {
             throw new MappingException(
-                    String.format("Attempt to add parent property %s but already have property %s registered "
-                            + "as parent property. Check your mapping configuration!", property.getField(), parentIdProperty.getField()));
-        }
-        if (this.parentDescriptor != null) {
-            throw new MappingException(
-                    String.format("Attempt to add parent property %s but the bean %s is already defined as parent. Check your mapping configuration!", property.getField(), this.getJavaType().getSimpleName()));
-        }
-        Parent parentAnnotation = property.findAnnotation(Parent.class);
-        if (StringUtils.isEmpty(parentAnnotation.routing())) {
-            throw new MappingException(
-                    String.format("Attempt to add parent property %s but the routing attribute of annotation Parent is mandatory. Check your mapping configuration!", property.getField()));
+                    String.format("Attempt to add parentDocument property %s but already have property %s registered "
+                            + "as parentDocument property. Check your mapping configuration!", property.getField(), parentIdProperty.getField()));
         }
         this.parentIdProperty = property;
-        this.parentDescriptor = ParentDescriptor.builder()
-                .name(parentAnnotation.name())
-                .type(parentAnnotation.type())
-                .routing(parentAnnotation.routing())
-                .build();
     }
 
     private void addPersistentScoreProperty(ElasticsearchPersistentProperty property) {

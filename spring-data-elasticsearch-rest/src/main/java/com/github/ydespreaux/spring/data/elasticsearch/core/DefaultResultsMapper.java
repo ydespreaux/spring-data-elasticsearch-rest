@@ -73,7 +73,7 @@ public class DefaultResultsMapper implements ResultsMapper {
      * @return the entity
      */
     @Override
-    public <T> T mapEntity(Collection<DocumentField> values, Class<T> clazz) {
+    public <S extends T, T> S mapEntity(Collection<DocumentField> values, Class<T> clazz) {
         return mapEntity(buildJSONFromFields(values), clazz);
     }
 
@@ -85,8 +85,8 @@ public class DefaultResultsMapper implements ResultsMapper {
      * @return can be {@literal null} if the {@link GetResult#isSourceEmpty() is empty}.
      */
     @Override
-    public <T> T mapResult(GetResponse response, Class<T> clazz) {
-        T result = mapEntity(response.getSourceAsString(), clazz);
+    public <S extends T, T> S mapResult(GetResponse response, Class<T> clazz) {
+        S result = mapEntity(response.getSourceAsString(), clazz);
         if (result != null) {
             setPersistentEntity(result, response, clazz);
         }
@@ -101,12 +101,12 @@ public class DefaultResultsMapper implements ResultsMapper {
      * @return can be {@literal null} if the {@link SearchHit} does not have {@link SearchHit#hasSource() a source}.
      */
     @Override
-    public <T> T mapEntity(SearchHit searchHit, Class<T> type) {
+    public <S extends T, T> S mapEntity(SearchHit searchHit, Class<T> type) {
         if (!searchHit.hasSource()) {
             return null;
         }
         String sourceString = searchHit.getSourceAsString();
-        T entity = mapEntity(sourceString, type);
+        S entity = mapEntity(sourceString, type);
         if (entity != null) {
             setPersistentEntity(entity, searchHit, type);
         }
@@ -114,11 +114,12 @@ public class DefaultResultsMapper implements ResultsMapper {
     }
 
     @Override
-    public <T> List<T> mapEntity(SearchHits searchHits, Class<T> type) {
-        List<T> results = new ArrayList<>();
+    public <S extends T, T> List<S> mapEntity(SearchHits searchHits, Class<T> type) {
+        List<S> results = new ArrayList<>();
         searchHits.forEach(hit -> results.add(mapEntity(hit, type)));
         return results.stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
+
 
     /**
      * @param response the response
@@ -127,12 +128,12 @@ public class DefaultResultsMapper implements ResultsMapper {
      * @return the new {@link ScrolledPage}
      */
     @Override
-    public <T> ScrolledPage<T> mapResults(SearchResponse response, Class<T> clazz) {
+    public <S extends T, T> ScrolledPage<S> mapResults(SearchResponse response, Class<T> clazz) {
         long totalHits = response.getHits().getTotalHits();
-        List<T> results = new ArrayList<>();
+        List<S> results = new ArrayList<>();
         for (SearchHit hit : response.getHits()) {
             if (hit != null) {
-                T result = null;
+                S result = null;
                 if (!StringUtils.isEmpty(hit.getSourceAsString())) {
                     result = this.mapEntity(hit.getSourceAsString(), clazz);
                 } else {
