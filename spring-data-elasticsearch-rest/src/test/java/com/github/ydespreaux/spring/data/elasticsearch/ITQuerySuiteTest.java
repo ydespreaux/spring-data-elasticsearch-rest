@@ -41,7 +41,7 @@ import org.junit.runners.Suite;
 public class ITQuerySuiteTest {
 
     @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2")
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION)
             .withConfigDirectory("elastic-config")
             .withFileInitScript("scripts/queries.script");
 

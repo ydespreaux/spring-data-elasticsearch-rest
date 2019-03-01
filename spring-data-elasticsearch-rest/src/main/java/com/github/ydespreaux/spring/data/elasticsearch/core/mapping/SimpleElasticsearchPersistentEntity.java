@@ -101,11 +101,10 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
 
         if (this.entityClass.isAnnotationPresent(Parent.class)) {
             Parent parentAnnotation = this.entityClass.getAnnotation(Parent.class);
-            this.parentDescriptor = ParentDescriptor.<T>builder()
+            this.parentDescriptor = new ParentDescriptor<T>()
                     .name(getEnvironmentValue(parentAnnotation.name()))
                     .type(getEnvironmentValue(parentAnnotation.type()))
-                    .javaType(this.entityClass)
-                    .build();
+                    .javaType(this.entityClass);
             this.parentDocument = true;
         } else if (this.entityClass.isAnnotationPresent(Child.class)) {
             Class<? super T> parentClass = findParentClass();
@@ -119,13 +118,17 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
             if (StringUtils.isEmpty(childAnnotation.type())) {
                 throw new MappingException("type attribute is mandatory. Check your mapping configuration!");
             }
-            this.childDescriptor = ChildDescriptor.<T>builder()
-                    .name(parentClass.getAnnotation(Parent.class).name())
+            Parent parentAnnotation = parentClass.getAnnotation(Parent.class);
+            ParentDescriptor<? super T> parent = new ParentDescriptor<>()
+                    .name(getEnvironmentValue(parentAnnotation.name()))
+                    .type(getEnvironmentValue(parentAnnotation.type()))
+                    .javaType((Class<Object>) parentClass);
+            this.childDescriptor = new ChildDescriptor<T>()
+                    .name(parentAnnotation.name())
                     .type(getEnvironmentValue(childAnnotation.type()))
                     .routing(getEnvironmentValue(childAnnotation.routing()))
                     .javaType(this.entityClass)
-                    .parentJavaType(parentClass)
-                    .build();
+                    .parent(parent);
         }
     }
 

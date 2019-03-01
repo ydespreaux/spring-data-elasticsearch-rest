@@ -88,7 +88,7 @@ public class DefaultResultsMapper implements ResultsMapper {
     public <S extends T, T> S mapResult(GetResponse response, Class<T> clazz) {
         S result = mapEntity(response.getSourceAsString(), clazz);
         if (result != null) {
-            setPersistentEntity(result, response, clazz);
+            setPersistentEntity(result, response, (Class<S>) result.getClass());
         }
         return result;
     }
@@ -108,7 +108,7 @@ public class DefaultResultsMapper implements ResultsMapper {
         String sourceString = searchHit.getSourceAsString();
         S entity = mapEntity(sourceString, type);
         if (entity != null) {
-            setPersistentEntity(entity, searchHit, type);
+            setPersistentEntity(entity, searchHit, (Class<S>) entity.getClass());
         }
         return entity;
     }
@@ -139,7 +139,7 @@ public class DefaultResultsMapper implements ResultsMapper {
                 } else {
                     result = this.mapEntity(hit.getFields().values(), clazz);
                 }
-                setPersistentEntity(result, hit, clazz);
+                setPersistentEntity(result, hit, (Class<S>) result.getClass());
                 results.add(result);
             }
         }
@@ -197,7 +197,7 @@ public class DefaultResultsMapper implements ResultsMapper {
      * @param clazz
      * @param <T>
      */
-    private <T> void setPersistentEntity(T result, GetResponse response, Class<T> clazz) {
+    private <S extends T, T> void setPersistentEntity(S result, GetResponse response, Class<S> clazz) {
         this.converter.getRequiredPersistentEntity(clazz).setPersistentEntity(result, response);
     }
 
@@ -207,7 +207,7 @@ public class DefaultResultsMapper implements ResultsMapper {
      * @param clazz
      * @param <T>
      */
-    private <T> void setPersistentEntity(T result, SearchHit hit, Class<T> clazz) {
+    private <S extends T, T> void setPersistentEntity(S result, SearchHit hit, Class<S> clazz) {
         this.converter.getRequiredPersistentEntity(clazz).setPersistentEntity(result, hit);
     }
 

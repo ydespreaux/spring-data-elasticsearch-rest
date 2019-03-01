@@ -21,6 +21,7 @@
 package com.github.ydespreaux.spring.data.elasticsearch.core;
 
 import com.github.ydespreaux.spring.data.elasticsearch.AbstractElasticsearchTest;
+import com.github.ydespreaux.spring.data.elasticsearch.Versions;
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
 import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.core.scroll.ScrolledPage;
@@ -63,7 +64,7 @@ import static org.junit.Assert.assertThat;
 public class ITSampleEntityWithAliasRepositoryTest extends AbstractElasticsearchTest<SampleEntityWithAlias> {
 
     @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION);
 
     private static final String INDEX_NAME = "sample-entity-alias-index";
     @Autowired

@@ -20,6 +20,7 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core;
 
+import com.github.ydespreaux.spring.data.elasticsearch.Versions;
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
 import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.VehicleEvent;
@@ -55,7 +56,7 @@ import java.util.concurrent.TimeUnit;
 public class ITTriggerRolloverTest {
 
     @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION);
 
     @Autowired
     private VehicleEventRepository repository;

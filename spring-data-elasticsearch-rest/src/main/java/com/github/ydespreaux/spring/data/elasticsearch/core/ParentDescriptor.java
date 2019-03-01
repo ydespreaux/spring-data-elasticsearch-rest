@@ -20,7 +20,6 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,10 +31,6 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@Builder
-public class ParentDescriptor<T> {
+public class ParentDescriptor<T> extends JoinDescriptor<ParentDescriptor<T>, T> {
 
-    private String name;
-    private String type;
-    private Class<T> javaType;
 }

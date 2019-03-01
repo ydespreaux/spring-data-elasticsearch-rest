@@ -18,25 +18,31 @@
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
  */
 
-package com.github.ydespreaux.spring.data.autoconfigure.elasticsearch;
+package com.github.ydespreaux.spring.data.elasticsearch.core;
 
-import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
-import org.junit.ClassRule;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import lombok.Getter;
+import lombok.Setter;
 
-/**
- * @author Yoann Despréaux
- * @since 1.0.0
- */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-        ITElasticsearchConfigurationTest.class,
-        ITReactiveElasticsearchConfigurationTest.class
-})
-public class ITSuiteTest {
+@Getter
+@Setter
+public abstract class JoinDescriptor<D extends JoinDescriptor, T> {
 
-    @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION);
+    private String name;
+    private String type;
+    private Class<T> javaType;
 
+    public D name(String name) {
+        this.name = name;
+        return (D) this;
+    }
+
+    public D type(String type) {
+        this.type = type;
+        return (D) this;
+    }
+
+    public D javaType(Class<T> javaType) {
+        this.javaType = javaType;
+        return (D) this;
+    }
 }

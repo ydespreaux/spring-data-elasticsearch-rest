@@ -20,23 +20,7 @@
 
 package com.github.ydespreaux.spring.data.autoconfigure.elasticsearch;
 
-import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
-import org.junit.ClassRule;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+public class Versions {
 
-/**
- * @author Yoann Despréaux
- * @since 1.0.0
- */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-        ITElasticsearchConfigurationTest.class,
-        ITReactiveElasticsearchConfigurationTest.class
-})
-public class ITSuiteTest {
-
-    @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION);
-
+    public static final String ELASTICSEARCH_VERSION = "6.4.2";
 }

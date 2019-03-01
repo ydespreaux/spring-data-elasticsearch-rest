@@ -19,6 +19,7 @@
  */
 package com.github.ydespreaux.spring.data.elasticsearch.core;
 
+import com.github.ydespreaux.spring.data.elasticsearch.Versions;
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
 import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.HasChildQuery;
@@ -57,7 +58,7 @@ import static org.junit.Assert.assertThat;
 public class ITElasticsearchTemplateParentFieldChildTest {
 
     @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2")
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION)
             .withFileInitScript("scripts/parent-child.script");
     private ElasticsearchTemplate elasticsearchTemplate;
 
