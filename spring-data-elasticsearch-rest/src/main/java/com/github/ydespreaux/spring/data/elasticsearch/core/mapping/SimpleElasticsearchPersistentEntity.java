@@ -101,12 +101,21 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
 
         if (this.entityClass.isAnnotationPresent(Parent.class)) {
             Parent parentAnnotation = this.entityClass.getAnnotation(Parent.class);
+
+            String name = null;
+            Parent inheritedParentAnnotation = findParentAnnotation();
+            if (inheritedParentAnnotation != null) {
+                name = getEnvironmentValue(inheritedParentAnnotation.name());
+            } else {
+                name = getEnvironmentValue(parentAnnotation.name());
+            }
             this.parentDescriptor = new ParentDescriptor<T>()
-                    .name(getEnvironmentValue(parentAnnotation.name()))
+                    .name(name)
                     .type(getEnvironmentValue(parentAnnotation.type()))
                     .javaType(this.entityClass);
             this.parentDocument = true;
-        } else if (this.entityClass.isAnnotationPresent(Child.class)) {
+        }
+        if (this.entityClass.isAnnotationPresent(Child.class)) {
             Class<? super T> parentClass = findParentClass();
             if (parentClass == null) {
                 throw new MappingException("Child class no extends to a parentDocument class");
@@ -119,12 +128,20 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
                 throw new MappingException("type attribute is mandatory. Check your mapping configuration!");
             }
             Parent parentAnnotation = parentClass.getAnnotation(Parent.class);
+            String name = getEnvironmentValue(parentAnnotation.name());
+            if (StringUtils.isEmpty(name)) {
+                Parent inheritedParentAnnotation = findParentAnnotation();
+                name = getEnvironmentValue(inheritedParentAnnotation.name());
+            }
+            if (StringUtils.isEmpty(name)) {
+                throw new MappingException("name attribute is mandatory. Check your mapping configuration!");
+            }
             ParentDescriptor<? super T> parent = new ParentDescriptor<>()
-                    .name(getEnvironmentValue(parentAnnotation.name()))
+                    .name(name)
                     .type(getEnvironmentValue(parentAnnotation.type()))
                     .javaType((Class<Object>) parentClass);
             this.childDescriptor = new ChildDescriptor<T>()
-                    .name(parentAnnotation.name())
+                    .name(name)
                     .type(getEnvironmentValue(childAnnotation.type()))
                     .routing(getEnvironmentValue(childAnnotation.routing()))
                     .javaType(this.entityClass)
@@ -137,6 +154,20 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
         while (parentClass != null) {
             if (parentClass.isAnnotationPresent(Parent.class)) {
                 return parentClass;
+            }
+            parentClass = parentClass.getSuperclass();
+        }
+        return null;
+    }
+
+    private Parent findParentAnnotation() {
+        Class<? super T> parentClass = this.entityClass.getSuperclass();
+        while (parentClass != null) {
+            if (parentClass.isAnnotationPresent(Parent.class)) {
+                Parent parentAnnotation = parentClass.getAnnotation(Parent.class);
+                if (StringUtils.hasText(parentAnnotation.name())) {
+                    return parentAnnotation;
+                }
             }
             parentClass = parentClass.getSuperclass();
         }
@@ -505,7 +536,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
      * @return evaluate the expression
      */
     private String getEnvironmentValue(String expression) {
-        if (this.context == null) {
+        if (this.context == null || StringUtils.isEmpty(expression)) {
             return expression;
         }
         Environment environment = context.getEnvironment();

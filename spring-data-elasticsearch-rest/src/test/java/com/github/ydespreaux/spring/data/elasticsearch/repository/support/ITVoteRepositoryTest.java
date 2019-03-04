@@ -20,13 +20,16 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
 
+import com.github.ydespreaux.spring.data.elasticsearch.Versions;
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
 import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.Criteria;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.Question;
-import com.github.ydespreaux.spring.data.elasticsearch.repositories.parent.AnswerRepository;
+import com.github.ydespreaux.spring.data.elasticsearch.repositories.parent.VoteRepository;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +40,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Profile;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
@@ -47,87 +51,76 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
         RestClientAutoConfiguration.class,
-        ITAnswerRepositoryTest.ElasticsearchConfiguration.class})
+        ITVoteRepositoryTest.ElasticsearchConfiguration.class})
 @Profile("test-no-template")
-public class ITAnswerRepositoryTest {
+public class ITVoteRepositoryTest {
+
+    @ClassRule
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION)
+            .withConfigDirectory("elastic-config")
+            .withFileInitScript("scripts/queries.script");
 
     @Autowired
-    private AnswerRepository answerRepository;
+    private VoteRepository voteRepository;
 
     @Test
     public void hasChild() {
-        List<Question> questions = this.answerRepository.hasChild();
-        assertThat(questions, contains(hasProperty("id", is("1")), hasProperty("id", is("2"))));
+        List<Question.Answer> answers = this.voteRepository.hasChild();
+        assertThat(answers, contains(hasProperty("id", is("4")), hasProperty("id", is("6"))));
     }
 
     @Test
     public void hasChildWithCriteria() {
-        List<Question> questions = this.answerRepository.hasChildByQuery(new Criteria("description").contains("java"));
-        assertThat(questions, contains(hasProperty("id", is("2"))));
+        List<Question.Answer> answers = this.voteRepository.hasChildByQuery(new Criteria("stars").is(4));
+        assertThat(answers, contains(hasProperty("id", is("4"))));
     }
 
     @Test
     public void hasChildWithQuery() {
-        List<Question> questions = this.answerRepository.hasChildByQuery(QueryBuilders.matchPhraseQuery("description", "java"));
-        assertThat(questions, contains(hasProperty("id", is("2"))));
+        List<Question.Answer> answers = this.voteRepository.hasChildByQuery(QueryBuilders.termQuery("stars", 4));
+        assertThat(answers, contains(hasProperty("id", is("4"))));
     }
 
     @Test
     public void hasParentId() {
-        List<Question.Answer> answers = this.answerRepository.hasParentId("1");
-        assertThat(answers, contains(hasProperty("id", is("4"))));
-        assertThat(answers, contains(hasProperty("parentId", is("1"))));
+        List<Question.Vote> votes = this.voteRepository.hasParentId("4");
+        assertThat(votes, contains(hasProperty("id", is("10"))));
+        assertThat(votes, contains(hasProperty("parentId", is("4"))));
     }
 
     @Test
     public void hasParentIdWithoutChild() {
-        List<Question.Answer> answers = this.answerRepository.hasParentId("3");
-        assertThat(answers.isEmpty(), is(true));
+        List<Question.Vote> votes = this.voteRepository.hasParentId("5");
+        assertThat(votes.isEmpty(), is(true));
     }
 
     @Test
     public void hasParentIdWithCriteria() {
-        List<Question.Answer> answers = this.answerRepository.hasParentId("2", new Criteria("description").contains("java"));
-        assertThat(answers, contains(hasProperty("id", is("5"))));
-        assertThat(answers, contains(hasProperty("parentId", is("2"))));
+        List<Question.Vote> votes = this.voteRepository.hasParentId("4", new Criteria("stars").is(4));
+        assertThat(votes, contains(hasProperty("id", is("10"))));
+        assertThat(votes, contains(hasProperty("parentId", is("4"))));
     }
 
     @Test
     public void hasParentIdWithQueryBuilder() {
-        List<Question.Answer> answers = this.answerRepository.hasParentId("2", QueryBuilders.matchPhraseQuery("description", "angular"));
-        assertThat(answers, contains(hasProperty("id", is("6"))));
-        assertThat(answers, contains(hasProperty("parentId", is("2"))));
+        List<Question.Vote> votes = this.voteRepository.hasParentId("4", QueryBuilders.termQuery("stars", 4));
+        assertThat(votes, contains(hasProperty("id", is("10"))));
+        assertThat(votes, contains(hasProperty("parentId", is("4"))));
     }
 
-    @Test
+    @Test(expected = InvalidDataAccessApiUsageException.class)
     public void hasParent() {
-        List<? extends Question.Answer> childs = this.answerRepository.hasParent();
-        assertThat(childs, contains(
-                hasProperty("id", is("10")),
-                hasProperty("id", is("11"))));
-        assertThat(childs, contains(
-                hasProperty("parentId", is("4")),
-                hasProperty("parentId", is("6"))));
+        this.voteRepository.hasParent();
     }
 
-    @Test
+    @Test(expected = InvalidDataAccessApiUsageException.class)
     public void hasParentWithQuery() {
-        List<? extends Question.Answer> childs = this.answerRepository.hasParentByQuery(QueryBuilders.matchAllQuery());
-        assertThat(childs, contains(
-                hasProperty("id", is("10")),
-                hasProperty("id", is("11"))));
-        assertThat(childs, contains(
-                hasProperty("parentId", is("4")),
-                hasProperty("parentId", is("6"))));
+        this.voteRepository.hasParentByQuery(QueryBuilders.matchAllQuery());
     }
 
-    @Test
+    @Test(expected = InvalidDataAccessApiUsageException.class)
     public void hasParentWithCriteria() {
-        List<? extends Question.Answer> childs = this.answerRepository.hasParentByQuery(Criteria.where("description").is("Answer 1 of Question 1"));
-        assertThat(childs, contains(
-                hasProperty("id", is("10"))));
-        assertThat(childs, contains(
-                hasProperty("parentId", is("4"))));
+        this.voteRepository.hasParentByQuery(Criteria.where("description").is("Answer 1 of Question 1"));
     }
 
     @Configuration

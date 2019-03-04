@@ -149,13 +149,13 @@ public class EntitySerializerRegistry {
             ParentDescriptor<?> descriptor = persistentEntity.getParentDescriptor();
             descriptors.put(persistentEntity.getJavaType(), descriptor);
             this.addRelationship(persistentEntity.getJavaType(), persistentEntity.getJavaType(), descriptor.getType());
-        } else if (persistentEntity.isChildDocument()) {
+        }
+        if (persistentEntity.isChildDocument()) {
             ChildDescriptor<?> descriptor = persistentEntity.getChildDescriptor();
             descriptors.put(persistentEntity.getJavaType(), descriptor);
             this.addRelationship(descriptor.getParentJavaType(), persistentEntity.getJavaType(), descriptor.getType());
             this.addRelationship(descriptor.getJavaType(), descriptor.getParentJavaType(), descriptor.getParent().getType());
             this.addRelationship(descriptor.getJavaType(), descriptor.getJavaType(), descriptor.getType());
-
         }
     }
 

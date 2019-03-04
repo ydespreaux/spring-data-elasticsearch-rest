@@ -18,30 +18,10 @@
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
  */
 
-package com.github.ydespreaux.spring.data.elasticsearch.annotations;
+package com.github.ydespreaux.spring.data.elasticsearch.repositories.parent;
 
-import java.lang.annotation.*;
+import com.github.ydespreaux.spring.data.elasticsearch.entities.Question;
+import com.github.ydespreaux.spring.data.elasticsearch.repository.ElasticsearchRepository;
 
-/**
- * Parent
- *
- * @author Yoann Despréaux
- * @since 1.0.1
- */
-
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
-public @interface Parent {
-
-    /**
-     * @return
-     */
-    String name() default "";
-
-    /**
-     * @return
-     */
-    String type();
-
+public interface VoteRepository extends ElasticsearchRepository<Question.Vote, String> {
 }

@@ -10,3 +10,5 @@ PUT:questions/_doc/6?routing=1&refresh:{ "description" : "Answer 2 of Question 2
 PUT:questions/_doc/7?routing=1&refresh:{ "description" : "This is a comment for question 1", "join_field": {"name": "comment", "parent": "1"}}
 PUT:questions/_doc/8?routing=1&refresh:{ "description" : "This is another comment for question 1", "join_field": {"name": "comment", "parent": "1"}}
 PUT:questions/_doc/9?routing=1&refresh:{ "description" : "This is a comment for question 3", "join_field": {"name": "comment", "parent": "3"}}
+PUT:questions/_doc/10?routing=1&refresh:{ "stars" : 4, "join_field": {"name": "vote", "parent": "4"}}
+PUT:questions/_doc/11?routing=1&refresh:{ "stars" : 1, "join_field": {"name": "vote", "parent": "6"}}
