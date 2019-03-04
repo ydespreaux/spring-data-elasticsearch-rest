@@ -4,6 +4,7 @@
 ### Added
 - Add mapping annotations for parent / child
 - ElasticsearchRepository : Add methods for search parent / child  
+- Added multiple levels of join parent  
 
 ### Changed
 - Externalized @Parent attributes

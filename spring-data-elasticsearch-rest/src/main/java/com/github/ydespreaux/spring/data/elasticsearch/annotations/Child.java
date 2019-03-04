@@ -44,4 +44,9 @@ public @interface Child {
      */
     String routing() default "1";
 
+    /**
+     * @return
+     */
+    boolean isParent() default false;
+
 }

@@ -24,7 +24,7 @@ import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.ResolvableDeserializer;
-import com.github.ydespreaux.spring.data.elasticsearch.core.ChildDescriptor;
+import com.github.ydespreaux.spring.data.elasticsearch.core.JoinDescriptor;
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
 
 import java.io.IOException;
@@ -51,7 +51,7 @@ public class PersistentEntityDeserializer<T> extends JsonDeserializer<T> impleme
         T bean = this.defaultDeserializer.deserialize(jsonParser, deserializationContext);
         if (persistentEntity.isChildDocument()) {
             JsonNode node = new ObjectMapper().readTree(startLocation.getSourceRef().toString());
-            ChildDescriptor childDescriptor = persistentEntity.getChildDescriptor();
+            JoinDescriptor<T> childDescriptor = persistentEntity.getJoinDescriptor();
             String fieldName = childDescriptor.getName();
             if (node.has(fieldName)) {
                 JsonNode joinNode = node.get(fieldName);

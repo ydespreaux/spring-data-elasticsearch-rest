@@ -49,7 +49,7 @@ public class EntitySerializerRegistry {
     private final SimpleModule deserializersCustomModule = new SimpleModule("deserializersCustomModule");
     private final ObjectMapper mapper;
     private Map<Class<?>, ElasticsearchPersistentEntity<?>> customSerializers = new ConcurrentHashMap<>();
-    private Map<Class<?>, JoinDescriptor<?, ?>> descriptors = new ConcurrentHashMap<>();
+    private Map<Class<?>, JoinDescriptor<?>> descriptors = new ConcurrentHashMap<>();
     private Map<Class<?>, Map<String, Class<?>>> relationships = new ConcurrentHashMap<>();
     private Map<Class<?>, Boolean> registry = new ConcurrentHashMap<>();
 
@@ -82,7 +82,7 @@ public class EntitySerializerRegistry {
      */
     public <S extends T, T> Class<S> getEntityClassFromJson(Class<T> clazz, String source) throws IOException {
         if (isJoinDocument(clazz)) {
-            return getEntityClassFromJson((JoinDescriptor<?, T>) descriptors.get(clazz), source);
+            return getEntityClassFromJson((JoinDescriptor<T>) descriptors.get(clazz), source);
         }
         return (Class<S>) clazz;
     }
@@ -113,7 +113,7 @@ public class EntitySerializerRegistry {
      * @param json
      * @return
      */
-    private <S extends T, T> Class<S> getEntityClassFromJson(JoinDescriptor<?, T> descriptor, String json) throws IOException {
+    private <S extends T, T> Class<S> getEntityClassFromJson(JoinDescriptor<T> descriptor, String json) throws IOException {
         JsonNode rootNode = new ObjectMapper().readTree(json);
         String fieldName = descriptor.getName();
         if (rootNode.has(fieldName)) {
@@ -145,17 +145,15 @@ public class EntitySerializerRegistry {
 
 
     private void addRelationship(ElasticsearchPersistentEntity<?> persistentEntity) {
-        if (persistentEntity.isParentDocument()) {
-            ParentDescriptor<?> descriptor = persistentEntity.getParentDescriptor();
-            descriptors.put(persistentEntity.getJavaType(), descriptor);
-            this.addRelationship(persistentEntity.getJavaType(), persistentEntity.getJavaType(), descriptor.getType());
+        JoinDescriptor<?> descriptor = persistentEntity.getJoinDescriptor();
+        if (descriptor == null) {
+            return;
         }
-        if (persistentEntity.isChildDocument()) {
-            ChildDescriptor<?> descriptor = persistentEntity.getChildDescriptor();
-            descriptors.put(persistentEntity.getJavaType(), descriptor);
+        descriptors.put(persistentEntity.getJavaType(), descriptor);
+        this.addRelationship(persistentEntity.getJavaType(), persistentEntity.getJavaType(), descriptor.getType());
+        if (descriptor.isChildDocument()) {
             this.addRelationship(descriptor.getParentJavaType(), persistentEntity.getJavaType(), descriptor.getType());
             this.addRelationship(descriptor.getJavaType(), descriptor.getParentJavaType(), descriptor.getParent().getType());
-            this.addRelationship(descriptor.getJavaType(), descriptor.getJavaType(), descriptor.getType());
         }
     }
 

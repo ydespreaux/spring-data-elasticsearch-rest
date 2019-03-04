@@ -22,27 +22,63 @@ package com.github.ydespreaux.spring.data.elasticsearch.core;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.util.Assert;
 
+/**
+ * JoinDescriptor
+ *
+ * @author Yoann Despréaux
+ * @since 1.0.2
+ */
 @Getter
 @Setter
-public abstract class JoinDescriptor<D extends JoinDescriptor, T> {
+public class JoinDescriptor<T> {
 
     private String name;
     private String type;
+    private String routing;
+    private JoinDescriptor<? super T> parent;
     private Class<T> javaType;
+    private boolean parentDocument;
+    private boolean childDocument;
 
-    public D name(String name) {
+    public JoinDescriptor<T> name(String name) {
         this.name = name;
-        return (D) this;
+        return this;
     }
 
-    public D type(String type) {
+    public JoinDescriptor<T> type(String type) {
         this.type = type;
-        return (D) this;
+        return this;
     }
 
-    public D javaType(Class<T> javaType) {
+    public JoinDescriptor<T> javaType(Class<T> javaType) {
         this.javaType = javaType;
-        return (D) this;
+        return this;
+    }
+
+    public JoinDescriptor<T> routing(String routing) {
+        this.routing = routing;
+        return this;
+    }
+
+    public JoinDescriptor<T> parent(JoinDescriptor<? super T> parent) {
+        this.parent = parent;
+        return this;
+    }
+
+    public Class<? super T> getParentJavaType() {
+        Assert.notNull(this.parent, "parent must be defined");
+        return this.parent.getJavaType();
+    }
+
+    public JoinDescriptor<T> parentDocument(boolean parentDocument) {
+        this.parentDocument = parentDocument;
+        return this;
+    }
+
+    public JoinDescriptor<T> childDocument(boolean childDocument) {
+        this.childDocument = childDocument;
+        return this;
     }
 }

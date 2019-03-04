@@ -37,7 +37,7 @@ public @interface Parent {
     /**
      * @return
      */
-    String name() default "";
+    String name();
 
     /**
      * @return

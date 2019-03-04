@@ -69,7 +69,7 @@ public class ITElasticsearchTemplateParentFieldChildTest {
         mapper.register(elasticsearchTemplate.getPersistentEntityFor(Question.class));
         mapper.register(elasticsearchTemplate.getPersistentEntityFor(Question.Answer.class));
         mapper.register(elasticsearchTemplate.getPersistentEntityFor(Question.Comment.class));
-
+        mapper.register(elasticsearchTemplate.getPersistentEntityFor(Question.Vote.class));
     }
 
     @Test
@@ -161,6 +161,28 @@ public class ITElasticsearchTemplateParentFieldChildTest {
         assertThat(childs, contains(
                 hasProperty("parentId", is("2")),
                 hasProperty("parentId", is("2"))));
+    }
+
+    @Test
+    public void hasParentMultiLevel() {
+        // find all childs
+        List<? extends Question.Answer> childs = elasticsearchTemplate.hasParent(HasParentQuery.builder().type("answer").query(QueryBuilders.matchAllQuery()).build(), Question.Answer.class);
+        assertThat(childs, contains(
+                hasProperty("id", is("10")),
+                hasProperty("id", is("11"))));
+        assertThat(childs, contains(
+                hasProperty("parentId", is("4")),
+                hasProperty("parentId", is("6"))));
+    }
+
+    @Test
+    public void hasParentBySearchQueryMultiLevel() {
+        // find all childs
+        List<? extends Question.Answer> childs = elasticsearchTemplate.hasParent(HasParentQuery.builder().type("answer").query(QueryBuilders.queryStringQuery("Answer 1 of Question 1").field("description").defaultOperator(AND)).build(), Question.Answer.class);
+        assertThat(childs, contains(
+                hasProperty("id", is("10"))));
+        assertThat(childs, contains(
+                hasProperty("parentId", is("4"))));
     }
 
     @Test

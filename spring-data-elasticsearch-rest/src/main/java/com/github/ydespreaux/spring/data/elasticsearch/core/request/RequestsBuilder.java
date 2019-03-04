@@ -215,7 +215,7 @@ public class RequestsBuilder {
             indexRequest.versionType(EXTERNAL);
         }
         if (persistentEntity.isChildDocument()) {
-            indexRequest.routing(persistentEntity.getChildDescriptor().getRouting());
+            indexRequest.routing(persistentEntity.getJoinDescriptor().getRouting());
         }
         return indexRequest;
     }

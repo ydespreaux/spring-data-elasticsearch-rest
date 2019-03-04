@@ -48,8 +48,7 @@ public class Question {
     @Setter
     @NoArgsConstructor
     @ToString
-    @Parent(type = "answer")
-    @Child(type = "answer")
+    @Child(type = "answer", isParent = true)
     public static class Answer extends Question {
 
         @ParentId

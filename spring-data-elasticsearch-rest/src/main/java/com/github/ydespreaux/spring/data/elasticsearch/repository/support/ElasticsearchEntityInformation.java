@@ -20,8 +20,7 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
 
-import com.github.ydespreaux.spring.data.elasticsearch.core.ChildDescriptor;
-import com.github.ydespreaux.spring.data.elasticsearch.core.ParentDescriptor;
+import com.github.ydespreaux.spring.data.elasticsearch.core.JoinDescriptor;
 import org.springframework.data.repository.core.EntityInformation;
 
 /**
@@ -38,17 +37,11 @@ public interface ElasticsearchEntityInformation<T, K> extends EntityInformation<
     /**
      * @return
      */
-    ParentDescriptor<T> getParentDescriptor();
-
-    /**
-     * @return
-     */
     boolean isChildDocument();
 
     /**
      * @return
      */
-    ChildDescriptor<T> getChildDescriptor();
-
+    JoinDescriptor<T> getJoinDescriptor();
 
 }
