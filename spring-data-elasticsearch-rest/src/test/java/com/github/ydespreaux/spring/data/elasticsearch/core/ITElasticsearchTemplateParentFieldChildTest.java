@@ -24,6 +24,7 @@ import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect
 import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.HasChildQuery;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.HasParentQuery;
+import com.github.ydespreaux.spring.data.elasticsearch.core.query.NativeSearchQuery;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.ParentIdQuery;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.Question;
 import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
@@ -207,6 +208,38 @@ public class ITElasticsearchTemplateParentFieldChildTest {
         assertThat(commentsWithParentId, contains(
                 hasProperty("id", is("7")),
                 hasProperty("id", is("8"))));
+    }
+
+    @Test
+    public void findAll() {
+        List<? extends Question> entities = elasticsearchTemplate.search(new NativeSearchQuery(QueryBuilders.matchAllQuery()), Question.class);
+        assertThat(entities, contains(
+                hasProperty("id", is("1")),
+                hasProperty("id", is("2")),
+                hasProperty("id", is("3")),
+                hasProperty("id", is("4")),
+                hasProperty("id", is("5")),
+                hasProperty("id", is("6")),
+                hasProperty("id", is("7")),
+                hasProperty("id", is("8")),
+                hasProperty("id", is("9")),
+                hasProperty("id", is("10")),
+                hasProperty("id", is("11"))
+        ));
+        assertThat(entities, contains(
+                hasProperty("description", is("Question 1")),
+                hasProperty("description", is("Question 2")),
+                hasProperty("description", is("Question 3")),
+                hasProperty("description", is("Answer 1 of Question 1")),
+                hasProperty("description", is("Answer 1 of Question 2 with Java")),
+                hasProperty("description", is("Answer 2 of Question 2 with Angular")),
+                hasProperty("description", is("This is a comment for question 1")),
+                hasProperty("description", is("This is another comment for question 1")),
+                hasProperty("description", is("This is a comment for question 3")),
+                hasProperty("stars", is(4)),
+                hasProperty("stars", is(1))
+        ));
+
     }
 
     @Configuration

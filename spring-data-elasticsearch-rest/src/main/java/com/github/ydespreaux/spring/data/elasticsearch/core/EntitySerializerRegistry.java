@@ -29,9 +29,9 @@ import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.Elasticsearc
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -133,16 +133,31 @@ public class EntitySerializerRegistry {
      * @return
      */
     private <S extends T, T> Class<S> getEntityClassByType(Class<T> entityClass, String type) {
-        Class<S> childClass = null;
-        if (relationships.containsKey(entityClass)) {
-            childClass = (Class<S>) relationships.get(entityClass).get(type);
-        }
+        Class<S> childClass = (Class<S>) getChildEntityClassByTypeImpl(entityClass, type, new HashSet<>());
         if (childClass == null) {
             throw new InvalidDataAccessApiUsageException(format("No entity found with type %s for the parent document %s", type, entityClass.getSimpleName()));
         }
         return childClass;
     }
 
+    private Class<?> getChildEntityClassByTypeImpl(Class<?> entityClass, String type, Set<Class<?>> discovryClasses) {
+        if (relationships.containsKey(entityClass)) {
+            Map<String, Class<?>> relationsByEntity = relationships.get(entityClass);
+            if (relationsByEntity.containsKey(type)) {
+                return relationsByEntity.get(type);
+            } else {
+                discovryClasses.add(entityClass);
+                List<Class<?>> childrenClass = relationsByEntity.values().stream().filter(subClass -> !discovryClasses.contains(subClass)).collect(Collectors.toList());
+                for (Class<?> subChildClass : childrenClass) {
+                    Class<?> childClass = getChildEntityClassByTypeImpl(subChildClass, type, discovryClasses);
+                    if (childClass != null) {
+                        return childClass;
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
     private void addRelationship(ElasticsearchPersistentEntity<?> persistentEntity) {
         JoinDescriptor<?> descriptor = persistentEntity.getJoinDescriptor();
