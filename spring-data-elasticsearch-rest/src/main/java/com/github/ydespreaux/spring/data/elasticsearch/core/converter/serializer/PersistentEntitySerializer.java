@@ -79,4 +79,5 @@ public class PersistentEntitySerializer<T> extends JsonSerializer<T> {
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private Object parent;
     }
+
 }

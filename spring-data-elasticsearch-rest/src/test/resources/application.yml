@@ -5,7 +5,7 @@ spring:
   elasticsearch:
     template:
       action: CREATE_OR_UPDATE
-      scripts: classpath:templates/article.template,classpath:templates/city.template
+      scripts: classpath:templates/article.template,classpath:templates/city.template,classpath:templates/shape.template
     index-pattern:
       article: "'article-%s-'yyyy"
     aliases:
@@ -34,3 +34,4 @@ index:
   vehicles:
     trigger:
       enabled: true
+

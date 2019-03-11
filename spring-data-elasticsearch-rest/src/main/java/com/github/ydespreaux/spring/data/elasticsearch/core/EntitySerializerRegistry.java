@@ -96,18 +96,27 @@ public class EntitySerializerRegistry {
         if (this.registry.containsKey(javaType)) {
             return;
         }
-        if (persistentEntity.isParentDocument() || persistentEntity.isChildDocument()) {
-            addRelationship(persistentEntity);
+        if (isCustomSerializer(persistentEntity)) {
+            this.customSerializers.put(javaType, persistentEntity);
+        }
+        if (isCustomDeserializer(persistentEntity)) {
             deserializersCustomModule.addSerializer(javaType, new PersistentEntitySerializer<>(persistentEntity));
-            if (persistentEntity.isChildDocument()) {
-                customSerializers.put(javaType, persistentEntity);
-            }
             // Update registry module
             mapper.registerModule(deserializersCustomModule);
+        }
+        if (persistentEntity.isParentDocument() || persistentEntity.isChildDocument()) {
+            addRelationship(persistentEntity);
         }
         this.registry.put(javaType, persistentEntity.isParentDocument() || persistentEntity.isChildDocument());
     }
 
+    private <T> boolean isCustomSerializer(ElasticsearchPersistentEntity<T> persistentEntity) {
+        return persistentEntity.isChildDocument();
+    }
+
+    private <T> boolean isCustomDeserializer(ElasticsearchPersistentEntity<T> persistentEntity) {
+        return persistentEntity.isParentDocument() || persistentEntity.isChildDocument();
+    }
     /**
      * @param descriptor
      * @param json

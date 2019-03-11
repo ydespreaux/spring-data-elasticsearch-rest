@@ -205,6 +205,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
         }
     }
 
+
     @Override
     public String getIndexName() {
         if (isIndexTimeBased()) {
@@ -456,6 +457,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     public boolean isChildDocument() {
         return this.joinDescriptor != null && this.joinDescriptor.isChildDocument();
     }
+
 
     /**
      * @param expression  the SPel expression

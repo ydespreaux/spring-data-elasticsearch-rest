@@ -49,20 +49,25 @@ public class PersistentEntityDeserializer<T> extends JsonDeserializer<T> impleme
     public T deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         JsonLocation startLocation = jsonParser.getCurrentLocation();
         T bean = this.defaultDeserializer.deserialize(jsonParser, deserializationContext);
-        if (persistentEntity.isChildDocument()) {
+        if (isCustomDeserializer()) {
             JsonNode node = new ObjectMapper().readTree(startLocation.getSourceRef().toString());
-            JoinDescriptor<T> childDescriptor = persistentEntity.getJoinDescriptor();
-            String fieldName = childDescriptor.getName();
-            if (node.has(fieldName)) {
-                JsonNode joinNode = node.get(fieldName);
-                if (joinNode.has("parent")) {
-                    persistentEntity.setParentId(bean, joinNode.get("parent").asText());
+            if (persistentEntity.isChildDocument()) {
+                JoinDescriptor<T> childDescriptor = persistentEntity.getJoinDescriptor();
+                String fieldName = childDescriptor.getName();
+                if (node.has(fieldName)) {
+                    JsonNode joinNode = node.get(fieldName);
+                    if (joinNode.has("parent")) {
+                        persistentEntity.setParentId(bean, joinNode.get("parent").asText());
+                    }
                 }
             }
         }
         return bean;
     }
 
+    private boolean isCustomDeserializer() {
+        return persistentEntity.isChildDocument();
+    }
     @Override
     public void resolve(DeserializationContext deserializationContext) throws JsonMappingException {
         ((ResolvableDeserializer) defaultDeserializer).resolve(deserializationContext);

@@ -12,7 +12,9 @@ import org.junit.runners.Suite;
         ITSampleEntityRepositoryTest.class,
         ITSampleEntityWithAliasRepositoryTest.class,
         ITElasticsearchTemplateRolloverTest.class,
-        ITElasticsearchTemplateParentFieldChildTest.class
+        ITElasticsearchTemplateParentFieldChildTest.class,
+        ITTriggerRolloverTest.class,
+        ITShapeEntityRepositoryTest.class
 })
 public class ITSuiteTest {
 

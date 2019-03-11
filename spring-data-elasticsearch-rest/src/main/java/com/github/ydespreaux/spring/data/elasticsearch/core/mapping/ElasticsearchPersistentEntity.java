@@ -247,5 +247,4 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
      */
     void setParentId(T entity, Object id);
 
-
 }

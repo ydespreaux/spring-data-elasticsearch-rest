@@ -36,7 +36,8 @@ import org.junit.runners.Suite;
         ITElasticsearchTemplateCompletionTest.class,
         ITAnswerRepositoryTest.class,
         ITCommentRepositoryTest.class,
-        ITQuestionRepositoryTest.class
+        ITQuestionRepositoryTest.class,
+        ITVoteRepositoryTest.class
 })
 public class ITQuerySuiteTest {
 

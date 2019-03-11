@@ -167,11 +167,13 @@ public class SimpleElasticsearchPersistentProperty extends
         SimpleElasticsearchPersistentProperty that = (SimpleElasticsearchPersistentProperty) o;
         return isScore == that.isScore &&
                 isParent == that.isParent &&
-                isId == that.isId;
+                isId == that.isId &&
+                isCompletion == that.isCompletion &&
+                isIndexName == that.isIndexName;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), isScore, isParent, isId);
+        return Objects.hash(super.hashCode(), isScore, isParent, isId, isCompletion, isIndexName);
     }
 }
