@@ -45,10 +45,10 @@ import java.util.Objects;
 public class PolygonShape extends AbstractShape implements CoordinatesShape<Coordinate[][]> {
 
     @JsonIgnore
-    private transient List<Coordinate> outerCoordinates;
+    private List<Coordinate> outerCoordinates;
 
     @JsonIgnore
-    private transient List<Coordinate> innerCoordinates;
+    private List<Coordinate> innerCoordinates;
 
     /**
      *

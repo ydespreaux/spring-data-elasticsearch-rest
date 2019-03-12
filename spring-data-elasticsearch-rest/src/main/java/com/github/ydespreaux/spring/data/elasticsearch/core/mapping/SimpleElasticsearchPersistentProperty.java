@@ -20,10 +20,7 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core.mapping;
 
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.CompletionField;
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.IndexName;
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.ParentId;
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Score;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.*;
 import com.github.ydespreaux.spring.data.elasticsearch.core.completion.Completion;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.MappingException;
@@ -53,6 +50,7 @@ public class SimpleElasticsearchPersistentProperty extends
     private final boolean isId;
     private final boolean isIndexName;
     private final boolean isCompletion;
+    private final boolean isScript;
 
     public SimpleElasticsearchPersistentProperty(Property property,
                                                  PersistentEntity<?, ElasticsearchPersistentProperty> owner,
@@ -65,6 +63,7 @@ public class SimpleElasticsearchPersistentProperty extends
         this.isParent = isAnnotationPresent(ParentId.class);
         this.isIndexName = isAnnotationPresent(IndexName.class);
         this.isCompletion = isAnnotationPresent(CompletionField.class);
+        this.isScript = isAnnotationPresent(ScriptedField.class);
 
         if (isVersionProperty() && getType() != Long.class) {
             throw new MappingException(String.format("Version property %s must be of type Long!", property.getName()));
@@ -159,6 +158,14 @@ public class SimpleElasticsearchPersistentProperty extends
         return this.isCompletion;
     }
 
+    /**
+     * @return
+     */
+    @Override
+    public boolean isScriptProperty() {
+        return this.isScript;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -169,11 +176,12 @@ public class SimpleElasticsearchPersistentProperty extends
                 isParent == that.isParent &&
                 isId == that.isId &&
                 isCompletion == that.isCompletion &&
-                isIndexName == that.isIndexName;
+                isIndexName == that.isIndexName &&
+                isScript == that.isScript;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), isScore, isParent, isId, isCompletion, isIndexName);
+        return Objects.hash(super.hashCode(), isScore, isParent, isId, isCompletion, isIndexName, isScript);
     }
 }

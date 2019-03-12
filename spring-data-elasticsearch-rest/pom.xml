@@ -22,7 +22,7 @@
         <findbugs.version>3.0.2</findbugs.version>
         <javaassist.version>3.24.1-GA</javaassist.version>
         <spatial4j.version>0.7</spatial4j.version>
-        <sonar.exclusions>**/Reactive*.java</sonar.exclusions>
+        <sonar.exclusions>**/Reactive*.java,**/*MixInBuilder.java</sonar.exclusions>
     </properties>
     <dependencies>
         <dependency>

@@ -126,6 +126,52 @@ public class MyBean extends ParentBean{
 }
 ```
 
+##### @ScriptedField (version 1.0.2)
+
+The ScriptedField annotation defines an attribute whose value matches a custom expression. This attribute is not added to the document when it is indexed.
+
+```java
+@IndexedDocument(
+        index = @Index(
+                name = "my_bean",
+                type = "_doc"
+        )
+)
+public class MyBean {
+
+    private String name;
+    
+    @ScriptedField
+    private String scriptedName;
+}
+```
+
+Sample query:
+
+```java
+SearchQuery searchQuery = new NativeSearchQuery.NativeSearchQueryBuilder()
+        .withQuery(matchAllQuery())
+        .withScriptField(new ScriptField("scriptedName",
+                new Script(ScriptType.INLINE, "painless", "doc['name'].value.toUpperCase()", Collections.emptyMap())))
+        .build();
+List<MyBean> entities = this.operations.search(searchQuery, MyBean.class);
+```
+
+### Geo Shape data type
+
+|   GeoShape type       |   Type                                                                                |
+|:---------------------:|:-------------------------------------------------------------------------------------:|
+|   point               |   com.github.ydespreaux.spring.data.elasticsearch.core.geo.PointShape                 |
+|   multipoint          |   com.github.ydespreaux.spring.data.elasticsearch.core.geo.MultiPointShape            |
+|   linestring          |   com.github.ydespreaux.spring.data.elasticsearch.core.geo.LinestringShape            |
+|   multilinestring     |   com.github.ydespreaux.spring.data.elasticsearch.core.geo.MultiLinestringShape       |
+|   polygon             |   com.github.ydespreaux.spring.data.elasticsearch.core.geo.PolygonShape               |
+|   multipolygon        |   com.github.ydespreaux.spring.data.elasticsearch.core.geo.MultiPolygonShape          |
+|   envelope            |   com.github.ydespreaux.spring.data.elasticsearch.core.geo.EnvelopeShape              |
+|   circle              |   com.github.ydespreaux.spring.data.elasticsearch.core.geo.CircleShape                |
+|   geometrycollection  |   com.github.ydespreaux.spring.data.elasticsearch.core.geo.GeometryCollectionShape    |
+
+
 ### Description of documents
 
 #### @IndexedDocument

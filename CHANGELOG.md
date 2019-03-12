@@ -6,6 +6,7 @@
 - ElasticsearchRepository : Add methods for search parent / child  
 - Added multiple levels of join parent  
 - Added Geo-shape type
+- Script field
 
 ### Changed
 - Externalized @Parent attributes

@@ -45,7 +45,7 @@ import java.util.Objects;
 public class MultiLinestringShape extends AbstractShape implements CoordinatesShape<Coordinate[][]> {
 
     @JsonIgnore
-    private transient List<LinestringShape> shapes;
+    private List<LinestringShape> shapes;
 
     public MultiLinestringShape() {
     }
@@ -79,7 +79,7 @@ public class MultiLinestringShape extends AbstractShape implements CoordinatesSh
     @Override
     public Coordinate[][] getCoordinates() {
         if (shapes == null) {
-            return null;
+            return new Coordinate[0][];
         }
         Coordinate[][] coordinates = new Coordinate[shapes.size()][];
         for (int i = 0; i < coordinates.length; i++) {

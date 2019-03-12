@@ -31,6 +31,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.IndexName;
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.ParentId;
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.Score;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.ScriptedField;
 import com.github.ydespreaux.spring.data.elasticsearch.core.converter.ElasticsearchTypeModule;
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
 import org.elasticsearch.ElasticsearchException;
@@ -77,6 +78,7 @@ public class DefaultEntityMapper implements EntityMapper {
                         || m.hasAnnotation(IndexName.class)
                         || m.hasAnnotation(Score.class)
                         || m.hasAnnotation(ParentId.class)
+                        || m.hasAnnotation(ScriptedField.class)
                         || super.hasIgnoreMarker(m);
             }
         });

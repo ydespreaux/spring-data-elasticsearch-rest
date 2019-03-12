@@ -42,9 +42,9 @@ import java.util.Objects;
 public class EnvelopeShape extends AbstractShape implements CoordinatesShape<Coordinate[]> {
 
     @JsonIgnore
-    private transient Coordinate upperLeft;
+    private Coordinate upperLeft;
     @JsonIgnore
-    private transient Coordinate lowerRight;
+    private Coordinate lowerRight;
 
     public EnvelopeShape() {
     }
@@ -53,9 +53,7 @@ public class EnvelopeShape extends AbstractShape implements CoordinatesShape<Coo
         Assert.notNull(upperLeft, "upperLeft must not be null !!");
         Assert.notNull(lowerRight, "lowerRight must not be null !!");
         this.upperLeft = upperLeft;
-        ;
         this.lowerRight = lowerRight;
-        ;
     }
 
     public EnvelopeShape(Coordinate[] coordinates) {
@@ -71,7 +69,7 @@ public class EnvelopeShape extends AbstractShape implements CoordinatesShape<Coo
     @Override
     public Coordinate[] getCoordinates() {
         if (upperLeft == null || lowerRight == null) {
-            return null;
+            return new Coordinate[0];
         }
         return new Coordinate[]{this.upperLeft, this.lowerRight};
     }

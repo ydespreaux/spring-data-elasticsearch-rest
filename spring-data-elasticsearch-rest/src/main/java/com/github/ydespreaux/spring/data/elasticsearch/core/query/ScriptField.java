@@ -18,30 +18,29 @@
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
  */
 
-package com.github.ydespreaux.spring.data.elasticsearch.core.converter.serializer;
+package com.github.ydespreaux.spring.data.elasticsearch.core.query;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import org.elasticsearch.common.geo.GeoShapeType;
-import org.springframework.util.StringUtils;
-
-import java.io.IOException;
+import lombok.Getter;
+import org.elasticsearch.script.Script;
+import org.springframework.util.Assert;
 
 /**
- * GeoShapeTypeDeserializer
+ * ScriptField
  *
  * @author Yoann Despréaux
  * @since 1.0.2
  */
-public class GeoShapeTypeDeserializer extends JsonDeserializer<GeoShapeType> {
+@Getter
+public class ScriptField {
 
-    @Override
-    public GeoShapeType deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        String geoshapename = jsonParser.readValueAs(String.class);
-        if (StringUtils.isEmpty(geoshapename)) {
-            return null;
-        }
-        return GeoShapeType.forName(geoshapename);
+    private final String fieldName;
+    private final Script script;
+
+    public ScriptField(String fieldName, Script script) {
+        Assert.notNull(fieldName, "fieldName is mandatory !");
+        Assert.notNull(script, "fieldName is mandatory !");
+        this.fieldName = fieldName;
+        this.script = script;
     }
+
 }

@@ -273,6 +273,11 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
         if (searchQuery.getAggregations() != null) {
             searchQuery.getAggregations().forEach(searchRequest.source()::aggregation);
         }
+        if (!searchQuery.getScriptFields().isEmpty()) {
+            for (ScriptField scriptedField : searchQuery.getScriptFields()) {
+                searchRequest.source().scriptField(scriptedField.getFieldName(), scriptedField.getScript());
+            }
+        }
         return searchRequest;
     }
 

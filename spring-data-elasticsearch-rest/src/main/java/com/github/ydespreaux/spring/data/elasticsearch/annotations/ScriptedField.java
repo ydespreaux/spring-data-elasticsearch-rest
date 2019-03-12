@@ -18,30 +18,25 @@
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
  */
 
-package com.github.ydespreaux.spring.data.elasticsearch.core.converter.serializer;
+package com.github.ydespreaux.spring.data.elasticsearch.annotations;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import org.elasticsearch.common.geo.GeoShapeType;
-import org.springframework.util.StringUtils;
-
-import java.io.IOException;
+import java.lang.annotation.*;
 
 /**
- * GeoShapeTypeDeserializer
+ * ScriptedField
  *
  * @author Yoann Despréaux
  * @since 1.0.2
  */
-public class GeoShapeTypeDeserializer extends JsonDeserializer<GeoShapeType> {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+@Documented
+public @interface ScriptedField {
 
-    @Override
-    public GeoShapeType deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        String geoshapename = jsonParser.readValueAs(String.class);
-        if (StringUtils.isEmpty(geoshapename)) {
-            return null;
-        }
-        return GeoShapeType.forName(geoshapename);
-    }
+    /**
+     * (Optional) The name of the scripted field. Defaults to
+     * the field name.
+     */
+    String name() default "";
+
 }

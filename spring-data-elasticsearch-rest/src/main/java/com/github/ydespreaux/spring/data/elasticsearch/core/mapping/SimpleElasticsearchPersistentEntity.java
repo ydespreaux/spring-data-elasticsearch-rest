@@ -43,6 +43,8 @@ import org.springframework.util.StringUtils;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @param <T> generic type
@@ -67,6 +69,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     private ElasticsearchPersistentProperty scoreProperty;
     private ElasticsearchPersistentProperty indexNameProperty;
     private ElasticsearchPersistentProperty completionProperty;
+    private Set<ScriptFieldProperty> scriptProperties = new HashSet<>();
     private SourceFilter sourceFilter;
     private Duration scrollTime;
     private RolloverConfig rollover;
@@ -202,6 +205,8 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
             addPersistentIndexNameProperty(property);
         } else if (property.isCompletionProperty()) {
             addPersistentCompletionProperty(property);
+        } else if (property.isScriptProperty()) {
+            addPersistentScriptProperty(property);
         }
     }
 
@@ -522,5 +527,34 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
                             + "as completion property. Check your mapping configuration!", property.getField(), completionProperty.getField()));
         }
         this.completionProperty = property;
+    }
+
+    private void addPersistentScriptProperty(ElasticsearchPersistentProperty property) {
+        this.scriptProperties.add(new ScriptFieldPropertyImpl(property));
+    }
+
+    /**
+     *
+     */
+    public class ScriptFieldPropertyImpl implements ScriptFieldProperty<T> {
+
+        private final String fieldName;
+        private final ElasticsearchPersistentProperty property;
+
+        public ScriptFieldPropertyImpl(ElasticsearchPersistentProperty property) {
+            this.property = property;
+            String name = property.findAnnotation(ScriptedField.class).name();
+            this.fieldName = StringUtils.isEmpty(name) ? property.getFieldName() : name;
+        }
+
+        @Override
+        public void setScriptValue(T entity, Object value) {
+            getPropertyAccessor(entity).setProperty(property, value);
+        }
+
+
+        public String getFieldName() {
+            return this.fieldName;
+        }
     }
 }

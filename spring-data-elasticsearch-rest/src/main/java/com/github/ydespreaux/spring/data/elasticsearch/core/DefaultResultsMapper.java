@@ -96,21 +96,22 @@ public class DefaultResultsMapper implements ResultsMapper {
     /**
      * Map a single {@link SearchHit} to an instance of the given type.
      *
-     * @param searchHit must not be {@literal null}.
+     * @param hit must not be {@literal null}.
      * @param type      must not be {@literal null}.
      * @return can be {@literal null} if the {@link SearchHit} does not have {@link SearchHit#hasSource() a source}.
      */
     @Override
-    public <S extends T, T> S mapEntity(SearchHit searchHit, Class<T> type) {
-        if (!searchHit.hasSource()) {
-            return null;
+    public <S extends T, T> S mapEntity(SearchHit hit, Class<T> type) {
+        S result = null;
+        if (!StringUtils.isEmpty(hit.getSourceAsString())) {
+            result = mapEntity(hit.getSourceAsString(), type);
+        } else {
+            result = mapEntity(hit.getFields().values(), type);
         }
-        String sourceString = searchHit.getSourceAsString();
-        S entity = mapEntity(sourceString, type);
-        if (entity != null) {
-            setPersistentEntity(entity, searchHit, (Class<S>) entity.getClass());
+        if (result != null) {
+            setPersistentEntity(result, hit, (Class<S>) result.getClass());
         }
-        return entity;
+        return result;
     }
 
     @Override
@@ -170,7 +171,7 @@ public class DefaultResultsMapper implements ResultsMapper {
     private String buildJSONFromFields(Collection<DocumentField> values) {
         JsonFactory nodeFactory = new JsonFactory();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        try (JsonGenerator generator = nodeFactory.createGenerator(new ByteArrayOutputStream(), JsonEncoding.UTF8)) {
+        try (JsonGenerator generator = nodeFactory.createGenerator(stream, JsonEncoding.UTF8)) {
             generator.writeStartObject();
             for (DocumentField value : values) {
                 if (value.getValues().size() > 1) {
