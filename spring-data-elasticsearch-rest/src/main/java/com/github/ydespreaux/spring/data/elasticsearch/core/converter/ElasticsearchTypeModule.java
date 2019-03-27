@@ -27,7 +27,6 @@ import com.github.ydespreaux.spring.data.elasticsearch.core.geo.Shape;
 import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.common.geo.GeoShapeType;
 import org.elasticsearch.common.unit.DistanceUnit;
-import org.locationtech.jts.geom.Coordinate;
 
 /**
  * ElasticsearchTypeModule
@@ -40,12 +39,10 @@ public class ElasticsearchTypeModule extends SimpleModule {
     public ElasticsearchTypeModule() {
 
         this.addSerializer(GeoPoint.class, new GeoPointSerializer());
-        this.addSerializer(Coordinate.class, new JtsCoordinateSerializer());
         this.addSerializer(GeoShapeType.class, new GeoShapeTypeSerializer());
         this.addSerializer(DistanceUnit.Distance.class, new DistanceSerializer());
         this.addSerializer(GeoShapeOrientation.class, new GeoShapeOrientationSerializer());
 
-        this.addDeserializer(Coordinate.class, new JtsCoordinateDeserializer());
         this.addDeserializer(GeoShapeType.class, new GeoShapeTypeDeserializer());
         this.addDeserializer(DistanceUnit.Distance.class, new DistanceDeserializer());
         this.addDeserializer(GeoShapeOrientation.class, new GeoShapeOrientationDeserializer());

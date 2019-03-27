@@ -10,6 +10,7 @@
 
 ### Changed
 - Externalized @Parent attributes
+- Migrate to JDK 11
 
 ### Fixed
 
