@@ -17,6 +17,11 @@
         <apache.commons.io.version>2.6</apache.commons.io.version>
         <apache.commons.lang.version>2.6</apache.commons.lang.version>
         <github-testcontainers.version>1.1.0</github-testcontainers.version>
+        <!-- Sonar configuration -->
+        <jacoco.report.ut>${project.build.directory}/jacoco-ut.exec</jacoco.report.ut>
+        <jacoco.report.it>${project.build.directory}/jacoco-it.exec</jacoco.report.it>
+        <sonar.junit.reportPaths>${project.build.directory}/surefire-reports</sonar.junit.reportPaths>
+        <sonar.jacoco.reportPaths>${jacoco.report.ut},${jacoco.report.it}</sonar.jacoco.reportPaths>
     </properties>
     <scm>
         <connection>scm:git:git://github.com/ydespreaux/spring-data-elasticsearch-rest.git</connection>
@@ -92,13 +97,17 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.9</version>
+                <version>0.8.3</version>
                 <executions>
                     <execution>
                         <id>pre-unit-agent</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
+                        <configuration>
+                            <destFile>${jacoco.report.ut}</destFile>
+                            <propertyName>surefireArgLine</propertyName>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>post-unit-test</id>
@@ -112,6 +121,10 @@
                         <goals>
                             <goal>prepare-agent-integration</goal>
                         </goals>
+                        <configuration>
+                            <destFile>${jacoco.report.it}</destFile>
+                            <propertyName>failsafeArgLine</propertyName>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>post-integration-test</id>
@@ -125,7 +138,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <forkCount>0</forkCount>
+                    <argLine>${surefireArgLine}</argLine>
                     <!-- Excludes integration tests when unit tests are run. -->
                     <excludes>
                         <exclude>**/IT*.java</exclude>
@@ -136,7 +149,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
-                    <forkCount>0</forkCount>
+                    <argLine>${failsafeArgLine}</argLine>
                 </configuration>
                 <executions>
                     <execution>
@@ -243,7 +256,7 @@
                 <sonar.projectKey>${project.artifactId}:${project.version}</sonar.projectKey>
                 <sonar.projectName>${project.name}</sonar.projectName>
                 <sonar.host.url>http://localhost:9000</sonar.host.url>
-                <sonar.login>da16359805e9a011aeb035fbc3292c41ba741aa8</sonar.login>
+                <sonar.login>5549f3d3f080584a31490f039b4aa9a5cad572a6</sonar.login>
             </properties>
         </profile>
     </profiles>

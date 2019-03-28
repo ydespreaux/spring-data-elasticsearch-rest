@@ -152,7 +152,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
         this.indexTimeBased = StringUtils.hasText(this.indexPattern);
         if (this.indexTimeBased) {
             try {
-                this.indexSupport = indexAnnotation.indexTimeBasedSupport().newInstance();
+                this.indexSupport = indexAnnotation.indexTimeBasedSupport().getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw new ElasticsearchException(e);
             }

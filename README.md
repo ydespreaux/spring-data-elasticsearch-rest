@@ -19,9 +19,9 @@ The library supports the following types of indexes:
 
 |   spring-data-elasticsearch-rest   |   spring-boot    |   elasticsearch  |
 |:----------------------------------:|:----------------:|:----------------:|
-|   1.0.2                            |       2.1.0      |       6.4.2      |
-|   1.0.1                            |       2.1.0      |       6.4.2      |
-|   1.0.0                            |       2.1.0      |       6.4.2      |
+|   1.0.2                            |       2.1.x      |       6.4.2      |
+|   1.0.1                            |       2.1.x      |       6.4.2      |
+|   1.0.0                            |       2.1.x      |       6.4.2      |
 
 ## Maven dependency
 
@@ -171,11 +171,19 @@ List<MyBean> entities = this.operations.search(searchQuery, MyBean.class);
 |   circle              |   com.github.ydespreaux.spring.data.elasticsearch.core.geo.CircleShape                |
 |   geometrycollection  |   com.github.ydespreaux.spring.data.elasticsearch.core.geo.GeometryCollectionShape    |
 
+The use of GeoShape types requires the addition of the following dependencies:
+
+```xml
+<dependency>
+    <groupId>org.locationtech.jts</groupId>
+    <artifactId>jts-core</artifactId>
+    <version>1.16.1</version>
+</dependency>
+```
 
 ### Description of documents
 
 #### @IndexedDocument
-
 
 The @IndexedDocument annotation allows you to define elasticsearch documents for the following index types:
 - Simple index with or without alias
@@ -198,7 +206,7 @@ The alias attribute is required for a time-based index.
 |   Attribut              |                 Type                    |   Mandatory   |           Default value       |     Description                                                               |
 |:-----------------------:|:---------------------------------------:|:-------------:|:-----------------------------:|:-----------------------------------------------------------------------------:|
 | name                    | String                                  |     No        |                               |   Index name                                                                  |
-| type                    | String                                  |     Yes       |                               |   Defined the document type                                                   |
+| type                    | String                                  |     No        |   _doc                        |   Defined the document type                                                   |
 | indexPattern            | String                                  |     No        |                               |   Index pattern for index time based                                          |
 | indexTimeBasedSupport   | Class<? extends IndexTimeBasedSupport>  |     No        |   IndexTimeBasedSupport.class |   Defined the IndextimeBasedSupport for determinate the current index name    |
 | createIndex             | boolean                                 |     No        |   true                        |   Create index on startup                                                     |
@@ -421,6 +429,29 @@ public class ArticleTimeBasedSupport extends IndexTimeBasedSupport<Article> {
 
 #### @RolloverDocument
 
+Declaring a document using rollover indexes requires the definition of an alias for read operations and an another alias for write operations.
+
+```java
+@Getter
+@Setter
+@RolloverDocument(
+        alias = @Alias(name = "read-tracks"),
+        index = @Index(name = "tracks"),
+        rollover = @Rollover(
+                alias = @Alias(name = "write-tracks"),
+                maxSize = "10gb",
+                trigger = @Trigger(true)
+        )
+)
+public class Track {
+
+    private String name;
+    private Integer number;
+    private Integer length;
+
+}
+```
+
 
 
 #### @Parent / @Child (version 1.0.2)
@@ -517,11 +548,6 @@ public class Vote extends Answer{
     private Integer stars;
 }
 ```
-
-
-#### @ProjectionDocument
-
-##### Attributes description
 
 ## Repository
 ### CRUD operations
