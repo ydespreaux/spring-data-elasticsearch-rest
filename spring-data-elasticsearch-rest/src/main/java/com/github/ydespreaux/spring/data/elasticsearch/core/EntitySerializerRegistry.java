@@ -117,6 +117,7 @@ public class EntitySerializerRegistry {
     private <T> boolean isCustomDeserializer(ElasticsearchPersistentEntity<T> persistentEntity) {
         return persistentEntity.isParentDocument() || persistentEntity.isChildDocument();
     }
+
     /**
      * @param descriptor
      * @param json
