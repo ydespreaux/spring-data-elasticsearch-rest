@@ -175,6 +175,12 @@ The use of GeoShape types requires the addition of the following dependencies:
 
 ```xml
 <dependency>
+    <groupId>org.locationtech.spatial4j</groupId>
+    <artifactId>spatial4j</artifactId>
+    <version>0.7</version>
+    <scope>provided</scope>
+</dependency>
+<dependency>
     <groupId>org.locationtech.jts</groupId>
     <artifactId>jts-core</artifactId>
     <version>1.16.1</version>
