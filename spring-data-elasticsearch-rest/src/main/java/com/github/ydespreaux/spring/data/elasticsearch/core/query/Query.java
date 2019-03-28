@@ -130,9 +130,9 @@ public interface Query {
     float getMinScore();
 
     /**
-     * Get if scores will be computed and tracked, regardless of whether sorting on a field. Defaults to <tt>false</tt>.
+     * Get if scores will be computed and tracked, regardless of whether sorting on a field. Defaults to false.
      *
-     * @return Get if scores will be computed and tracked, regardless of whether sorting on a field. Defaults to <tt>false</tt>.
+     * @return Get if scores will be computed and tracked, regardless of whether sorting on a field. Defaults to false.
      */
     boolean getTrackScores();
 
