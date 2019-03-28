@@ -549,12 +549,130 @@ public class Vote extends Answer{
 }
 ```
 
-## Repository
-### CRUD operations
-### Query named method
-### Query
-### Custom implementation
+## Elasticsearch Repositories
 
+### Introduction
+
+Repository support can be enabled by annotating through JavaConfig.
+
+```java
+@Configuration
+@EnableElasticsearchRepositories(basePackages = {
+        "com.github.ydespreaux.sample.elasticsearch.repositories"
+})
+public class ElasticsearchConfiguration {
+}
+```
+
+Repositories are enabled using the @EnableElasticsearchRepositories annotation, which has essentially the same attributes as the XML namespace. If no base package is configured, it will use the one in which the configuration class resides.
+
+### Query methods
+
+#### Query lookup strategies
+
+The Elasticsearch module supports all basic query building feature as String,Abstract,Criteria or have it being derived from the method name.
+
+Declared queries
+Deriving the query from the method name is not always sufficient and/or may result in unreadable method names. In this case one might make either use of @Query annotation (see Using @Query Annotation ).
+
+#### Query creation
+
+Generally the query creation mechanism for Elasticsearch works as described in Query methods . Here’s a short example of what a Elasticsearch query method translates into:
+
+```java
+public interface BookRepository extends ElasticsearchRepository<Book, String> {
+
+    Book findByName(String value);
+}
+```
+
+The method name above will be translated into the following Elasticsearch json query:
+
+```json
+{"bool" : {"must" : {"field" : {"name" : "?"}}}}
+```
+
+A list of supported keywords for Elasticsearch is shown below.
+
+|Keyword |	Sample	| Elasticsearch Query String|
+|:-------:|:--------:|:-------------------------:|
+| And | findByNameAndPrice | {"bool" : {"must" : [ {"field" : {"name" : "?"}}, {"field" : {"price" : "?"}} ]}} |
+| Or | findByNameOrPrice | {"bool" : {"should" : [ {"field" : {"name" : "?"}}, {"field" : {"price" : "?"}} ]}} |
+| Is | findByName | {"bool" : {"must" : {"field" : {"name" : "?"}}}} |
+| Not | findByNameNot | {"bool" : {"must_not" : {"field" : {"name" : "?"}}}} |
+| Between | findByPriceBetween | {"bool" : {"must" : {"range" : {"price" : {"from" : ?,"to" : ?,"include_lower" : true,"include_upper" : true}}}}} |
+| LessThanEqual | findByPriceLessThan | {"bool" : {"must" : {"range" : {"price" : {"from" : null,"to" : ?,"include_lower" : true,"include_upper" : true}}}}} |
+| GreaterThanEqual | findByPriceGreaterThan | {"bool" : {"must" : {"range" : {"price" : {"from" : ?,"to" : null,"include_lower" : true,"include_upper" : true}}}}} |
+| Before | findByPriceBefore | {"bool" : {"must" : {"range" : {"price" : {"from" : null,"to" : ?,"include_lower" : true,"include_upper" : true}}}}} |
+| After | findByPriceAfter | {"bool" : {"must" : {"range" : {"price" : {"from" : ?,"to" : null,"include_lower" : true,"include_upper" : true}}}}} |
+| Like | findByNameLike | {"bool" : {"must" : {"field" : {"name" : {"query" : "?*","analyze_wildcard" : true}}}}} |
+| StartingWith | findByNameStartingWith | {"bool" : {"must" : {"field" : {"name" : {"query" : "?*","analyze_wildcard" : true}}}}} |
+| EndingWith | findByNameEndingWith | {"bool" : {"must" : {"field" : {"name" : {"query" : "*?","analyze_wildcard" : true}}}}} |
+| Contains/Containing | findByNameContaining | {"bool" : {"must" : {"field" : {"name" : {"query" : "?","analyze_wildcard" : true}}}}} |
+| In | findByNameIn(Collection<String>names) | {"bool" : {"must" : {"bool" : {"should" : [ {"field" : {"name" : "?"}}, {"field" : {"name" : "?"}} ]}}}} |
+| NotIn | findByNameNotIn(Collection<String>names) | {"bool" : {"must_not" : {"bool" : {"should" : {"field" : {"name" : "?"}}}}} |
+| Near | findByLocationNear | {"match_all":{"boost":1.0}},"post_filter":{"geo_bounding_box":{"location":{"top_left":[?],"bottom_right":[?]}}} |
+| Within | findByLocationWithin | {"query":{"match_all":{"boost":1.0}},"post_filter":{"geo_distance":{"location":[?],"distance":10000.0,"distance_type":"plane"}}} |
+| True | findByAvailableTrue | {"bool" : {"must" : {"field" : {"available" : true}}}} |
+| False | findByAvailableFalse | {"bool" : {"must" : {"field" : {"available" : false}}}} |
+| OrderBy | findByAvailableTrueOrderByNameDesc | {"sort" : [{ "name" : {"order" : "desc"} }],"bool" : {"must" : {"field" : {"available" : true}}}} |
+
+#### Using @Query Annotation
+
+Declare query at the method using the @Query annotation.
+
+```java
+public interface ArticleRepository extends ElasticsearchRepository<Article, String> {
+    @Query("{\"match\" : {\"entrepot\" : \"?0\"}}")
+    List<Article> findByEntrepot(EnumEntrepot entrepot);
+}
+```
+
+### Miscellaneous Elasticsearch Operation Support
+
+This chapter covers additional support for Elasticsearch operations that cannot be directly accessed via the repository interface. It is recommended to add those operations as custom implementation as described in [Custom Implementations for Spring Data Repositories](https://docs.spring.io/spring-data/elasticsearch/docs/current/reference/html/#repositories.custom-implementations).
+
+#### Filter Builder
+Filter Builder improves query speed.
+
+```java
+private ElasticsearchTemplate elasticsearchTemplate;
+
+SearchQuery searchQuery = new NativeSearchQueryBuilder()
+    .withQuery(matchAllQuery())
+    .withFilter(boolFilter().must(termFilter("id", documentId)))
+    .build();
+
+List<SampleEntity> sampleEntities =
+    elasticsearchTemplate.search(searchQuery,SampleEntity.class);
+```
+
+#### Using Scroll For Big Result Set
+
+Elasticsearch has a scroll API for getting big result set in chunks. ElasticsearchTemplate has startScroll and continueScroll methods that can be used as below.
+
+Using startScroll and continueScroll
+
+```java
+SearchQuery searchQuery = new NativeSearchQueryBuilder()
+    .withQuery(matchAllQuery())
+    .withIndices(INDEX_NAME)
+    .withTypes(TYPE_NAME)
+    .withFields("message")
+    .withPageable(PageRequest.of(0, 10))
+    .build();
+
+Page<SampleEntity> scroll = elasticsearchTemplate.startScroll(Duration.ofSeconds(60), searchQuery, SampleEntity.class);
+
+String scrollId = ((ScrolledPage) scroll).getScrollId();
+List<SampleEntity> sampleEntities = new ArrayList<>();
+while (scroll.hasContent()) {
+    sampleEntities.addAll(scroll.getContent());
+    scrollId = ((ScrolledPage) scroll).getScrollId();
+    scroll = elasticsearchTemplate.continueScroll(scrollId, Duration.ofSeconds(60), SampleEntity.class);
+}
+elasticsearchTemplate.clearScroll(scrollId);
+```
 
 ## Samples
 

@@ -20,13 +20,16 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
 
+import com.github.ydespreaux.spring.data.elasticsearch.Versions;
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
 import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.core.scroll.ScrolledPage;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.City;
 import com.github.ydespreaux.spring.data.elasticsearch.repositories.template.CityRepository;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.elasticsearch.common.geo.GeoPoint;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +63,10 @@ import static org.junit.Assert.assertTrue;
         ITCityRepositoryTest.ElasticsearchConfiguration.class})
 @Profile("test-no-template")
 public class ITCityRepositoryTest {
+    @ClassRule
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION)
+            .withConfigDirectory("elastic-config")
+            .withFileInitScript("scripts/queries.script");
 
     @Autowired
     private CityRepository repository;

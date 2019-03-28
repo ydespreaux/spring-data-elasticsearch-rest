@@ -38,6 +38,7 @@ public class IndexBuilderTest {
         // given
         CreateIndexBuilder builder = new CreateIndexBuilder().name("music").source(new ClassPathResource("indices/music.index"));
         CreateIndexRequest request = builder.build();
+        assertThat(request.index(), is(equalTo(builder.name())));
         assertThat(new ArrayList<>(request.aliases()).get(0).name(), is(equalTo("musics")));
         assertThat(request.settings().get("number_of_shards"), is(equalTo("1")));
         assertThat(request.settings().get("refresh_interval"), is(equalTo("1s")));
