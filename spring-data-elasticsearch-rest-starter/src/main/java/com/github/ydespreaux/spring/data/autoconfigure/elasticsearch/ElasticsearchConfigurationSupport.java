@@ -24,13 +24,16 @@ import com.github.ydespreaux.spring.data.elasticsearch.core.DefaultResultsMapper
 import com.github.ydespreaux.spring.data.elasticsearch.core.EntityMapper;
 import com.github.ydespreaux.spring.data.elasticsearch.core.ResultsMapper;
 import com.github.ydespreaux.spring.data.elasticsearch.core.converter.ElasticsearchConverter;
+import com.github.ydespreaux.spring.data.elasticsearch.core.converter.JtsGeomTypeModule;
 import com.github.ydespreaux.spring.data.elasticsearch.core.converter.MappingElasticsearchConverter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.SimpleElasticsearchMappingContext;
 import com.github.ydespreaux.spring.data.elasticsearch.core.triggers.TriggerManager;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.elasticsearch.rest.RestClientAutoConfiguration;
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -48,19 +51,14 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @Configuration
 @EnableScheduling
 @AutoConfigureAfter(RestClientAutoConfiguration.class)
-@EnableConfigurationProperties({JacksonProperties.class})
 public class ElasticsearchConfigurationSupport {
+
 
     @Bean
     ElasticsearchConverter elasticsearchConverter(EntityMapper mapper) {
         return new MappingElasticsearchConverter(elasticsearchMappingContext(), mapper);
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    EntityMapper entityMapper(JacksonProperties jacksonPropetrties) {
-        return new DefaultEntityMapper(jacksonPropetrties);
-    }
 
     @Bean
     @ConditionalOnMissingBean
@@ -91,4 +89,32 @@ public class ElasticsearchConfigurationSupport {
     TriggerManager triggerManagement(TaskScheduler taskScheduler) {
         return new TriggerManager(taskScheduler);
     }
+
+    @Configuration
+    @ConditionalOnClass(name = {"org.locationtech.jts.geom.Coordinate"})
+    @EnableConfigurationProperties({JacksonProperties.class})
+    static class EntityMapperWithJtsGeomTypeConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        EntityMapper entityMapper(JacksonProperties jacksonProperties) {
+            DefaultEntityMapper mapper = new DefaultEntityMapper(jacksonProperties);
+            mapper.registerModules(new JtsGeomTypeModule());
+            return mapper;
+        }
+    }
+
+    @Configuration
+    @ConditionalOnMissingClass({"org.locationtech.jts.geom.Coordinate"})
+    @EnableConfigurationProperties({JacksonProperties.class})
+    static class EntityMapperWithoutJtsGeomTypeConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        EntityMapper entityMapper(JacksonProperties jacksonProperties) {
+            return new DefaultEntityMapper(jacksonProperties);
+        }
+
+    }
+
 }

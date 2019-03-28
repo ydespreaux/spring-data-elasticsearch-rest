@@ -19,10 +19,12 @@
  */
 package com.github.ydespreaux.spring.data.elasticsearch.core;
 
+import com.github.ydespreaux.spring.data.elasticsearch.Versions;
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
 import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.HasChildQuery;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.HasParentQuery;
+import com.github.ydespreaux.spring.data.elasticsearch.core.query.NativeSearchQuery;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.ParentIdQuery;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.Question;
 import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
@@ -57,7 +59,7 @@ import static org.junit.Assert.assertThat;
 public class ITElasticsearchTemplateParentFieldChildTest {
 
     @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2")
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION)
             .withFileInitScript("scripts/parent-child.script");
     private ElasticsearchTemplate elasticsearchTemplate;
 
@@ -68,7 +70,7 @@ public class ITElasticsearchTemplateParentFieldChildTest {
         mapper.register(elasticsearchTemplate.getPersistentEntityFor(Question.class));
         mapper.register(elasticsearchTemplate.getPersistentEntityFor(Question.Answer.class));
         mapper.register(elasticsearchTemplate.getPersistentEntityFor(Question.Comment.class));
-
+        mapper.register(elasticsearchTemplate.getPersistentEntityFor(Question.Vote.class));
     }
 
     @Test
@@ -163,6 +165,28 @@ public class ITElasticsearchTemplateParentFieldChildTest {
     }
 
     @Test
+    public void hasParentMultiLevel() {
+        // find all childs
+        List<? extends Question.Answer> childs = elasticsearchTemplate.hasParent(HasParentQuery.builder().type("answer").query(QueryBuilders.matchAllQuery()).build(), Question.Answer.class);
+        assertThat(childs, contains(
+                hasProperty("id", is("10")),
+                hasProperty("id", is("11"))));
+        assertThat(childs, contains(
+                hasProperty("parentId", is("4")),
+                hasProperty("parentId", is("6"))));
+    }
+
+    @Test
+    public void hasParentBySearchQueryMultiLevel() {
+        // find all childs
+        List<? extends Question.Answer> childs = elasticsearchTemplate.hasParent(HasParentQuery.builder().type("answer").query(QueryBuilders.queryStringQuery("Answer 1 of Question 1").field("description").defaultOperator(AND)).build(), Question.Answer.class);
+        assertThat(childs, contains(
+                hasProperty("id", is("10"))));
+        assertThat(childs, contains(
+                hasProperty("parentId", is("4"))));
+    }
+
+    @Test
     public void hasParentIdAnswer() {
         ParentIdQuery query = ParentIdQuery.builder().type("answer").parentId("1").build();
         List<Question.Answer> answersWithParentId = elasticsearchTemplate.hasParentId(query, Question.Answer.class);
@@ -184,6 +208,38 @@ public class ITElasticsearchTemplateParentFieldChildTest {
         assertThat(commentsWithParentId, contains(
                 hasProperty("id", is("7")),
                 hasProperty("id", is("8"))));
+    }
+
+    @Test
+    public void findAll() {
+        List<? extends Question> entities = elasticsearchTemplate.search(new NativeSearchQuery(QueryBuilders.matchAllQuery()), Question.class);
+        assertThat(entities, contains(
+                hasProperty("id", is("1")),
+                hasProperty("id", is("2")),
+                hasProperty("id", is("3")),
+                hasProperty("id", is("4")),
+                hasProperty("id", is("5")),
+                hasProperty("id", is("6")),
+                hasProperty("id", is("7")),
+                hasProperty("id", is("8")),
+                hasProperty("id", is("9")),
+                hasProperty("id", is("10")),
+                hasProperty("id", is("11"))
+        ));
+        assertThat(entities, contains(
+                hasProperty("description", is("Question 1")),
+                hasProperty("description", is("Question 2")),
+                hasProperty("description", is("Question 3")),
+                hasProperty("description", is("Answer 1 of Question 1")),
+                hasProperty("description", is("Answer 1 of Question 2 with Java")),
+                hasProperty("description", is("Answer 2 of Question 2 with Angular")),
+                hasProperty("description", is("This is a comment for question 1")),
+                hasProperty("description", is("This is another comment for question 1")),
+                hasProperty("description", is("This is a comment for question 3")),
+                hasProperty("stars", is(4)),
+                hasProperty("stars", is(1))
+        ));
+
     }
 
     @Configuration

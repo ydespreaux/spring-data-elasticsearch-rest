@@ -22,9 +22,13 @@
 ### Added
 - Add mapping annotations for parent / child
 - ElasticsearchRepository : Add methods for search parent / child  
+- Added multiple levels of join parent  
+- Added Geo-shape type
+- Script field
 
 ### Changed
 - Externalized @Parent attributes
+- Migrate to JDK 11
 
 ### Fixed
 

@@ -24,7 +24,6 @@ import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.github.ydespreaux.spring.data.elasticsearch.core.converter.ElasticsearchConverter;
-import com.github.ydespreaux.spring.data.elasticsearch.core.scroll.ScrolledPage;
 import com.github.ydespreaux.spring.data.elasticsearch.core.scroll.ScrolledPageResult;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.get.MultiGetItemResponse;
@@ -34,6 +33,7 @@ import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.index.get.GetResult;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.springframework.data.domain.Page;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -88,7 +88,7 @@ public class DefaultResultsMapper implements ResultsMapper {
     public <S extends T, T> S mapResult(GetResponse response, Class<T> clazz) {
         S result = mapEntity(response.getSourceAsString(), clazz);
         if (result != null) {
-            setPersistentEntity(result, response, clazz);
+            setPersistentEntity(result, response, (Class<S>) result.getClass());
         }
         return result;
     }
@@ -96,21 +96,22 @@ public class DefaultResultsMapper implements ResultsMapper {
     /**
      * Map a single {@link SearchHit} to an instance of the given type.
      *
-     * @param searchHit must not be {@literal null}.
+     * @param hit must not be {@literal null}.
      * @param type      must not be {@literal null}.
      * @return can be {@literal null} if the {@link SearchHit} does not have {@link SearchHit#hasSource() a source}.
      */
     @Override
-    public <S extends T, T> S mapEntity(SearchHit searchHit, Class<T> type) {
-        if (!searchHit.hasSource()) {
-            return null;
+    public <S extends T, T> S mapEntity(SearchHit hit, Class<T> type) {
+        S result = null;
+        if (!StringUtils.isEmpty(hit.getSourceAsString())) {
+            result = mapEntity(hit.getSourceAsString(), type);
+        } else {
+            result = mapEntity(hit.getFields().values(), type);
         }
-        String sourceString = searchHit.getSourceAsString();
-        S entity = mapEntity(sourceString, type);
-        if (entity != null) {
-            setPersistentEntity(entity, searchHit, type);
+        if (result != null) {
+            setPersistentEntity(result, hit, (Class<S>) result.getClass());
         }
-        return entity;
+        return result;
     }
 
     @Override
@@ -125,10 +126,10 @@ public class DefaultResultsMapper implements ResultsMapper {
      * @param response the response
      * @param clazz    the entity class
      * @param <T>      the generic type
-     * @return the new {@link ScrolledPage}
+     * @return the new {@link Page}
      */
     @Override
-    public <S extends T, T> ScrolledPage<S> mapResults(SearchResponse response, Class<T> clazz) {
+    public <S extends T, T> Page<S> mapResults(SearchResponse response, Class<T> clazz) {
         long totalHits = response.getHits().getTotalHits();
         List<S> results = new ArrayList<>();
         for (SearchHit hit : response.getHits()) {
@@ -139,7 +140,7 @@ public class DefaultResultsMapper implements ResultsMapper {
                 } else {
                     result = this.mapEntity(hit.getFields().values(), clazz);
                 }
-                setPersistentEntity(result, hit, clazz);
+                setPersistentEntity(result, hit, (Class<S>) result.getClass());
                 results.add(result);
             }
         }
@@ -170,7 +171,7 @@ public class DefaultResultsMapper implements ResultsMapper {
     private String buildJSONFromFields(Collection<DocumentField> values) {
         JsonFactory nodeFactory = new JsonFactory();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        try (JsonGenerator generator = nodeFactory.createGenerator(new ByteArrayOutputStream(), JsonEncoding.UTF8)) {
+        try (JsonGenerator generator = nodeFactory.createGenerator(stream, JsonEncoding.UTF8)) {
             generator.writeStartObject();
             for (DocumentField value : values) {
                 if (value.getValues().size() > 1) {
@@ -197,7 +198,7 @@ public class DefaultResultsMapper implements ResultsMapper {
      * @param clazz
      * @param <T>
      */
-    private <T> void setPersistentEntity(T result, GetResponse response, Class<T> clazz) {
+    private <S extends T, T> void setPersistentEntity(S result, GetResponse response, Class<S> clazz) {
         this.converter.getRequiredPersistentEntity(clazz).setPersistentEntity(result, response);
     }
 
@@ -207,7 +208,7 @@ public class DefaultResultsMapper implements ResultsMapper {
      * @param clazz
      * @param <T>
      */
-    private <T> void setPersistentEntity(T result, SearchHit hit, Class<T> clazz) {
+    private <S extends T, T> void setPersistentEntity(S result, SearchHit hit, Class<S> clazz) {
         this.converter.getRequiredPersistentEntity(clazz).setPersistentEntity(result, hit);
     }
 

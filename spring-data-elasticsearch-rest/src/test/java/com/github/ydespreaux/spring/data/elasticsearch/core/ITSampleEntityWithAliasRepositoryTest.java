@@ -21,9 +21,9 @@
 package com.github.ydespreaux.spring.data.elasticsearch.core;
 
 import com.github.ydespreaux.spring.data.elasticsearch.AbstractElasticsearchTest;
+import com.github.ydespreaux.spring.data.elasticsearch.Versions;
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
 import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
-import com.github.ydespreaux.spring.data.elasticsearch.core.scroll.ScrolledPage;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.SampleEntityWithAlias;
 import com.github.ydespreaux.spring.data.elasticsearch.repositories.sampleindex.SampleEntityWithAliasRepository;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
@@ -41,6 +41,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.DirtiesContext;
@@ -63,7 +64,7 @@ import static org.junit.Assert.assertThat;
 public class ITSampleEntityWithAliasRepositoryTest extends AbstractElasticsearchTest<SampleEntityWithAlias> {
 
     @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2");
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION);
 
     private static final String INDEX_NAME = "sample-entity-alias-index";
     @Autowired
@@ -136,7 +137,7 @@ public class ITSampleEntityWithAliasRepositoryTest extends AbstractElasticsearch
     @Test
     public void findAllWithPageable() {
         insertData();
-        ScrolledPage<SampleEntityWithAlias> entities = this.repository.findAll(PageRequest.of(0, 3));
+        Page<SampleEntityWithAlias> entities = this.repository.findAll(PageRequest.of(0, 3));
         assertThat(entities.getTotalElements(), is(equalTo(4L)));
         assertThat(entities.hasContent(), is(true));
         assertThat(entities.getContent().size(), is(equalTo(3)));

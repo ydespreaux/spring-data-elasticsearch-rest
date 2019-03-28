@@ -29,6 +29,7 @@ import org.elasticsearch.search.sort.SortBuilder;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -49,6 +50,7 @@ public class NativeSearchQuery extends AbstractQuery implements SearchQuery {
     private HighlightBuilder highlightBuilder;
     private HighlightBuilder.Field[] highlightFields;
     private List<IndexBoost> indicesBoost;
+    private List<ScriptField> scriptFields = new ArrayList<>();
 
 
     public NativeSearchQuery(QueryBuilder query) {
@@ -129,6 +131,19 @@ public class NativeSearchQuery extends AbstractQuery implements SearchQuery {
         this.indicesBoost = indicesBoost;
     }
 
+    @Override
+    public List<ScriptField> getScriptFields() {
+        return scriptFields;
+    }
+
+    public void setScriptFields(List<ScriptField> scriptFields) {
+        this.scriptFields.addAll(scriptFields);
+    }
+
+    public void addScriptField(ScriptField... scriptField) {
+        scriptFields.addAll(Arrays.asList(scriptField));
+    }
+
     /**
      * NativeSearchQuery Builder
      */
@@ -152,6 +167,7 @@ public class NativeSearchQuery extends AbstractQuery implements SearchQuery {
         private String route;
         private SearchType searchType;
         private IndicesOptions indicesOptions;
+        private List<ScriptField> scriptFields = new ArrayList<>();
 
         public NativeSearchQueryBuilder withQuery(QueryBuilder queryBuilder) {
             this.queryBuilder = queryBuilder;
@@ -247,6 +263,11 @@ public class NativeSearchQuery extends AbstractQuery implements SearchQuery {
             return this;
         }
 
+        public NativeSearchQueryBuilder withScriptField(ScriptField scriptField) {
+            this.scriptFields.add(scriptField);
+            return this;
+        }
+
         public NativeSearchQuery build() {
             NativeSearchQuery nativeSearchQuery = new NativeSearchQuery(queryBuilder, filterBuilder, sortBuilders,
                     highlightBuilder, highlightFields);
@@ -297,7 +318,9 @@ public class NativeSearchQuery extends AbstractQuery implements SearchQuery {
             if (indicesOptions != null) {
                 nativeSearchQuery.setIndicesOptions(indicesOptions);
             }
-
+            if (!isEmpty(scriptFields)) {
+                nativeSearchQuery.setScriptFields(scriptFields);
+            }
             return nativeSearchQuery;
         }
     }

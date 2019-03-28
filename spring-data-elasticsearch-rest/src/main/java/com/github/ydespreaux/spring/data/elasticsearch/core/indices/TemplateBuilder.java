@@ -64,12 +64,18 @@ public class TemplateBuilder extends IndiceBuilder<PutIndexTemplateRequest, Temp
             }
             request.patterns(indexPatterns);
             // Aliases
-            request.aliases(xContentBuilder(settings.get(ALIASES_CONFIG)));
+            if (settings.containsKey(ALIASES_CONFIG)) {
+                request.aliases(xContentBuilder(settings.get(ALIASES_CONFIG)));
+            }
             // Settings
-            request.settings(settings.get(SETTINGS_CONFIG).toString(), XContentType.JSON);
+            if (settings.containsKey(SETTINGS_CONFIG)) {
+                request.settings(settings.get(SETTINGS_CONFIG).toString(), XContentType.JSON);
+            }
             // Mappings
-            TreeNode mappingsElement = settings.get(MAPPINGS_CONFIG);
-            mappingsElement.fieldNames().forEachRemaining(field -> request.mapping(field, xContentBuilder(mappingsElement.get(field))));
+            if (settings.containsKey(MAPPINGS_CONFIG)) {
+                TreeNode mappingsElement = settings.get(MAPPINGS_CONFIG);
+                mappingsElement.fieldNames().forEachRemaining(field -> request.mapping(field, xContentBuilder(mappingsElement.get(field))));
+            }
             // Order
             if (settings.containsKey(ORDER_CONFIG)) {
                 request.order(((JsonNode) settings.get(ORDER_CONFIG)).asInt());

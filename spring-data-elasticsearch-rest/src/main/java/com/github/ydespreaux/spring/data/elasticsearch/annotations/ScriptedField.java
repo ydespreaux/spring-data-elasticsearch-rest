@@ -18,28 +18,25 @@
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
  */
 
-package com.github.ydespreaux.spring.data.elasticsearch.core;
+package com.github.ydespreaux.spring.data.elasticsearch.annotations;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import java.lang.annotation.*;
 
 /**
- * ChildDescriptor
+ * ScriptedField
  *
- * @author yoann Despréaux
+ * @author Yoann Despréaux
  * @since 1.0.2
  */
-@Getter
-@Setter
-@Builder
-public class ChildDescriptor<T> {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+@Documented
+public @interface ScriptedField {
 
-    private String name;
-    private String type;
-    private String routing;
-
-    private Class<T> javaType;
-    private Class<? super T> parentJavaType;
+    /**
+     * (Optional) The name of the scripted field. Defaults to
+     * the field name.
+     */
+    String name() default "";
 
 }

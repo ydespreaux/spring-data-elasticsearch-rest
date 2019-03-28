@@ -36,12 +36,13 @@ import org.junit.runners.Suite;
         ITElasticsearchTemplateCompletionTest.class,
         ITAnswerRepositoryTest.class,
         ITCommentRepositoryTest.class,
-        ITQuestionRepositoryTest.class
+        ITQuestionRepositoryTest.class,
+        ITVoteRepositoryTest.class
 })
 public class ITQuerySuiteTest {
 
     @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer("6.4.2")
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION)
             .withConfigDirectory("elastic-config")
             .withFileInitScript("scripts/queries.script");
 

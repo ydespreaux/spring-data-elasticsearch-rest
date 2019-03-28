@@ -48,7 +48,7 @@ public class Question {
     @Setter
     @NoArgsConstructor
     @ToString
-    @Child(type = "answer")
+    @Child(type = "answer", isParent = true)
     public static class Answer extends Question {
 
         @ParentId
@@ -57,6 +57,21 @@ public class Question {
         public Answer(String id, String parentId, String description) {
             super(id, description);
             this.parentId = parentId;
+        }
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @ToString
+    @Child(type = "vote")
+    public static class Vote extends Answer {
+
+        private Integer stars;
+
+        public Vote(String id, String parentId, String description, Integer stars) {
+            super(id, parentId, description);
+            this.stars = stars;
         }
     }
 

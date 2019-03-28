@@ -37,7 +37,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Profile;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
@@ -100,19 +99,35 @@ public class ITAnswerRepositoryTest {
         assertThat(answers, contains(hasProperty("parentId", is("2"))));
     }
 
-    @Test(expected = InvalidDataAccessApiUsageException.class)
+    @Test
     public void hasParent() {
-        this.answerRepository.hasParent();
+        List<? extends Question.Answer> childs = this.answerRepository.hasParent();
+        assertThat(childs, contains(
+                hasProperty("id", is("10")),
+                hasProperty("id", is("11"))));
+        assertThat(childs, contains(
+                hasProperty("parentId", is("4")),
+                hasProperty("parentId", is("6"))));
     }
 
-    @Test(expected = InvalidDataAccessApiUsageException.class)
+    @Test
     public void hasParentWithQuery() {
-        this.answerRepository.hasParentByQuery(QueryBuilders.matchAllQuery());
+        List<? extends Question.Answer> childs = this.answerRepository.hasParentByQuery(QueryBuilders.matchAllQuery());
+        assertThat(childs, contains(
+                hasProperty("id", is("10")),
+                hasProperty("id", is("11"))));
+        assertThat(childs, contains(
+                hasProperty("parentId", is("4")),
+                hasProperty("parentId", is("6"))));
     }
 
-    @Test(expected = InvalidDataAccessApiUsageException.class)
+    @Test
     public void hasParentWithCriteria() {
-        this.answerRepository.hasParentByQuery(Criteria.where("description").is("Question 2"));
+        List<? extends Question.Answer> childs = this.answerRepository.hasParentByQuery(Criteria.where("description").is("Answer 1 of Question 1"));
+        assertThat(childs, contains(
+                hasProperty("id", is("10"))));
+        assertThat(childs, contains(
+                hasProperty("parentId", is("4"))));
     }
 
     @Configuration

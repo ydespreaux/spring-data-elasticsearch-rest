@@ -19,6 +19,9 @@
         <java.version>1.8</java.version>
         <commons-io.version>2.6</commons-io.version>
         <findbugs.version>3.0.2</findbugs.version>
+        <javaassist.version>3.24.1-GA</javaassist.version>
+        <spatial4j.version>0.7</spatial4j.version>
+        <sonar.exclusions>**/*MixInBuilder.java</sonar.exclusions>
     </properties>
     <dependencies>
         <dependency>
@@ -45,6 +48,19 @@
                     <artifactId>transport</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.locationtech.spatial4j/spatial4j -->
+        <dependency>
+            <groupId>org.locationtech.spatial4j</groupId>
+            <artifactId>spatial4j</artifactId>
+            <version>${spatial4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.locationtech.jts</groupId>
+            <artifactId>jts-core</artifactId>
+            <version>1.16.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -75,6 +91,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>${javaassist.version}</version>
         </dependency>
         <!-- Reactive Infrastructure -->
         <dependency>
@@ -115,6 +136,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
+                    <argLine>${failsafeArgLine}</argLine>
                     <includes>
                         <include>**/IT*SuiteTest.java</include>
                     </includes>
@@ -127,6 +149,25 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>1.4.6</version>
+                <configuration>
+                    <targetClasses>
+                        <param>com.github.ydespreaux.spring.data.elasticsearch*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>com.github.ydespreaux.spring.data.elasticsearch*</param>
+                    </targetTests>
+                    <mutators>
+                        <mutator>CONSTRUCTOR_CALLS</mutator>
+                        <mutator>NON_VOID_METHOD_CALLS</mutator>
+                        <mutator>REMOVE_CONDITIONALS</mutator>
+                        <mutator>NULL_RETURNS</mutator>
+                    </mutators>
+                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -49,6 +49,8 @@ public interface SearchQuery extends Query {
 
     List<IndexBoost> getIndicesBoost();
 
+    List<ScriptField> getScriptFields();
+
     default boolean hasHighlight() {
         return getHighlightBuilder() != null || getHighlightFields() != null;
     }

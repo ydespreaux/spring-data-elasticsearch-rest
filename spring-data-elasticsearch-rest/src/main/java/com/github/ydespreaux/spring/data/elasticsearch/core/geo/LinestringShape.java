@@ -18,24 +18,41 @@
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
  */
 
-package com.github.ydespreaux.spring.data.elasticsearch.core;
+package com.github.ydespreaux.spring.data.elasticsearch.core.geo;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import org.elasticsearch.common.geo.GeoShapeType;
+import org.locationtech.jts.geom.Coordinate;
+
+import java.util.List;
 
 /**
- * ParentDescriptor
+ * MultiPointShape
  *
- * @author yoann Despréaux
- * @since 1.0.1
+ * @author Yoann Despréaux
+ * @since 1.0.2
  */
 @Getter
 @Setter
-@Builder
-public class ParentDescriptor<T> {
+@ToString
+public class LinestringShape extends MultiPointShape {
 
-    private String name;
-    private String type;
-    private Class<T> javaType;
+    public LinestringShape() {
+    }
+
+    public LinestringShape(List<Coordinate> coordinates) {
+        super(coordinates);
+    }
+
+    public LinestringShape(Coordinate... coordinates) {
+        super(coordinates);
+    }
+
+    @Override
+    public GeoShapeType getType() {
+        return GeoShapeType.LINESTRING;
+    }
+
 }

@@ -273,6 +273,11 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
         if (searchQuery.getAggregations() != null) {
             searchQuery.getAggregations().forEach(searchRequest.source()::aggregation);
         }
+        if (!searchQuery.getScriptFields().isEmpty()) {
+            for (ScriptField scriptedField : searchQuery.getScriptFields()) {
+                searchRequest.source().scriptField(scriptedField.getFieldName(), scriptedField.getScript());
+            }
+        }
         return searchRequest;
     }
 
@@ -504,7 +509,7 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
 
     protected <T> SearchQuery prepareHasChildQuery(HasChildQuery query, Class<T> clazz) {
         assertNotNull(query);
-        setPersistentEntityJoinType(query, clazz);
+        setPersistentEntityJoinType(query, clazz, false);
         return prepareHasChildQuery(query);
     }
 
@@ -521,7 +526,7 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
 
     protected <T> SearchQuery prepareHasParentQuery(HasParentQuery query, Class<T> entityClass) {
         assertNotNull(query);
-        setPersistentEntityJoinType(query, entityClass);
+        setPersistentEntityJoinType(query, entityClass, true);
         return prepareHasParentQuery(query);
     }
 
@@ -537,7 +542,7 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
 
     protected <T> SearchQuery prepareHasParentId(ParentIdQuery query, Class<T> entityClass) {
         assertNotNull(query);
-        setPersistentEntityJoinType(query, entityClass);
+        setPersistentEntityJoinType(query, entityClass, false);
         return prepareHasParentId(query);
     }
 
@@ -560,27 +565,15 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
         return new NativeSearchQuery(completedQuery);
     }
 
-    private <T> void setPersistentEntityJoinType(HasChildQuery query, Class<T> clazz) {
+    private <T> void setPersistentEntityJoinType(JoinQuery<?> query, Class<T> clazz, boolean mustBeParentDocument) {
         ElasticsearchPersistentEntity<T> persistentEntity = getPersistentEntityFor(clazz);
-        assertChildDocument(persistentEntity);
-        if (StringUtils.isEmpty(query.getType())) {
-            query.setType(persistentEntity.getChildDescriptor().getType());
+        if (mustBeParentDocument) {
+            assertParentDocument(persistentEntity);
+        } else {
+            assertChildDocument(persistentEntity);
         }
-    }
-
-    private <T> void setPersistentEntityJoinType(HasParentQuery query, Class<T> entityClass) {
-        ElasticsearchPersistentEntity<T> persistentEntity = getPersistentEntityFor(entityClass);
-        assertParentDocument(persistentEntity);
         if (StringUtils.isEmpty(query.getType())) {
-            query.setType(persistentEntity.getParentDescriptor().getType());
-        }
-    }
-
-    private <T> void setPersistentEntityJoinType(ParentIdQuery query, Class<T> clazz) {
-        ElasticsearchPersistentEntity<T> persistentEntity = getPersistentEntityFor(clazz);
-        assertChildDocument(persistentEntity);
-        if (StringUtils.isEmpty(query.getType())) {
-            query.setType(persistentEntity.getChildDescriptor().getType());
+            query.setType(persistentEntity.getJoinDescriptor().getType());
         }
     }
 

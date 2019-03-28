@@ -27,11 +27,15 @@ import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.search.SearchHit;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.lang.Nullable;
 
 import java.time.Duration;
+import java.util.Set;
+
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 /**
  * @param <T> generic type
@@ -231,6 +235,7 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
         setPersistentEntityVersion(result, hit.getVersion());
         setPersistentEntityScore(result, hit.getScore());
         setPersistentEntityIndexName(result, hit.getIndex());
+        populateScriptFields(result, hit);
     }
 
     /**
@@ -247,5 +252,46 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
      */
     void setParentId(T entity, Object id);
 
+    /**
+     * @return
+     */
+    default boolean hasScriptProperty() {
+        return !isEmpty(getScriptProperties());
+    }
+
+    /**
+     * @return
+     */
+    Set<ScriptFieldProperty> getScriptProperties();
+
+
+    /**
+     * @param result
+     * @param hit
+     */
+    default void populateScriptFields(T result, SearchHit hit) {
+        if (!hasScriptProperty()) {
+            return;
+        }
+        if (hit.getFields() != null && !hit.getFields().isEmpty() && result != null) {
+            for (ScriptFieldProperty field : getScriptProperties()) {
+                String name = field.getFieldName();
+                DocumentField searchHitField = hit.getFields().get(name);
+                if (searchHitField != null) {
+                    field.setScriptValue(result, searchHitField.getValue());
+                }
+            }
+        }
+    }
+
+    /**
+     * @param <T>
+     */
+    interface ScriptFieldProperty<T> {
+
+        void setScriptValue(T entity, Object value);
+
+        String getFieldName();
+    }
 
 }

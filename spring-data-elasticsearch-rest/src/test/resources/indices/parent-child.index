@@ -11,10 +11,14 @@
           "description": {
             "type": "text"
           },
+          "stars": {
+            "type": "integer"
+          },
           "join_field": {
             "type": "join",
             "relations": {
-                "question": ["answer", "comment"]
+                "question": ["answer", "comment"],
+                "answer": "vote"
             }
           }
         }
