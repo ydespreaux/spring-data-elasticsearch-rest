@@ -20,10 +20,10 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.repositories.template;
 
-import com.github.ydespreaux.spring.data.elasticsearch.core.scroll.ScrolledPage;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.City;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.ElasticsearchRepository;
 import org.elasticsearch.common.geo.GeoPoint;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.geo.Box;
 import org.springframework.data.geo.Distance;
@@ -51,11 +51,11 @@ public interface CityRepository extends ElasticsearchRepository<City, String> {
 
     List<City> findCityByLocationWithinOrderByNameAsc(String origin, String distance);
 
-    ScrolledPage<City> findCityByLocationWithin(GeoPoint origin, String distance, Pageable pageable);
+    Page<City> findCityByLocationWithin(GeoPoint origin, String distance, Pageable pageable);
 
-    ScrolledPage<City> findCityByLocationWithin(Point origin, Distance distance, Pageable pageable);
+    Page<City> findCityByLocationWithin(Point origin, Distance distance, Pageable pageable);
 
-    ScrolledPage<City> findCityByLocationWithin(String origin, String distance, Pageable pageable);
+    Page<City> findCityByLocationWithin(String origin, String distance, Pageable pageable);
 
     Long countByLocationNear(Box box);
 
@@ -81,13 +81,13 @@ public interface CityRepository extends ElasticsearchRepository<City, String> {
 
     List<City> findCityByLocationNearOrderByNameAsc(String topLeftPoint, String bottomRightPoint);
 
-    ScrolledPage<City> findCityByLocationNear(Box box, Pageable pageable);
+    Page<City> findCityByLocationNear(Box box, Pageable pageable);
 
-    ScrolledPage<City> findCityByLocationNear(GeoPoint topLeftPoint, GeoPoint bottomRightPoint, Pageable pageable);
+    Page<City> findCityByLocationNear(GeoPoint topLeftPoint, GeoPoint bottomRightPoint, Pageable pageable);
 
-    ScrolledPage<City> findCityByLocationNear(Point topLeftPoint, Point bottomRightPoint, Pageable pageable);
+    Page<City> findCityByLocationNear(Point topLeftPoint, Point bottomRightPoint, Pageable pageable);
 
-    ScrolledPage<City> findCityByLocationNear(String topLeftPoint, String bottomRightPoint, Pageable pageable);
+    Page<City> findCityByLocationNear(String topLeftPoint, String bottomRightPoint, Pageable pageable);
 
     Long countByRegion(String region);
 
@@ -125,15 +125,15 @@ public interface CityRepository extends ElasticsearchRepository<City, String> {
 
     List<City> findCityByPopulationLessThanOrderByNameAsc(long max);
 
-    ScrolledPage<City> findCityByRegion(String region, Pageable pageable);
+    Page<City> findCityByRegion(String region, Pageable pageable);
 
-    ScrolledPage<City> findCityByPopulationBetween(long min, long max, Pageable pageable);
+    Page<City> findCityByPopulationBetween(long min, long max, Pageable pageable);
 
-    ScrolledPage<City> findCityByPopulationGreaterThanEqual(long min, Pageable pageable);
+    Page<City> findCityByPopulationGreaterThanEqual(long min, Pageable pageable);
 
-    ScrolledPage<City> findCityByPopulationGreaterThan(long min, Pageable pageable);
+    Page<City> findCityByPopulationGreaterThan(long min, Pageable pageable);
 
-    ScrolledPage<City> findCityByPopulationLessThanEqual(long max, Pageable pageable);
+    Page<City> findCityByPopulationLessThanEqual(long max, Pageable pageable);
 
-    ScrolledPage<City> findCityByPopulationLessThan(long max, Pageable pageable);
+    Page<City> findCityByPopulationLessThan(long max, Pageable pageable);
 }

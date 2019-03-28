@@ -429,7 +429,7 @@ public class ArticleTimeBasedSupport extends IndexTimeBasedSupport<Article> {
 
 #### @RolloverDocument
 
-Declaring a document using rollover indexes requires the definition of an alias for read operations and an another alias for write operations.
+Declaring a document using indexes rollover requires the definition of an alias for read operations and an another alias for write operations.
 
 ```java
 @Getter
@@ -452,7 +452,18 @@ public class Track {
 }
 ```
 
+##### Manage index rollover
 
+If you have the x-pack plugin then using policies to manage index rollover. 
+
+If not, you can enable a trigger as in the above example using the trigger attribute.
+The @Trigger annotation has the following attributes:
+
+| Attribut | Data type | Description | Default value |
+|:--------:|:-----------:|:--------------:|:---------:| 
+| value | boolean | enabled the trigger | false |
+| enabled | String | enabled the trigger | |
+| cronExpression | String | The cron expression for management index rollover | 0 */1 * * * * |
 
 #### @Parent / @Child (version 1.0.2)
 

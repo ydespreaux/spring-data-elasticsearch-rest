@@ -26,7 +26,6 @@ import com.github.ydespreaux.spring.data.elasticsearch.configuration.Elasticsear
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.NativeSearchQuery;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.ScriptField;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.SearchQuery;
-import com.github.ydespreaux.spring.data.elasticsearch.core.scroll.ScrolledPage;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.Article;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.Book;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
@@ -61,6 +60,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.data.domain.Page;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -264,7 +264,7 @@ public class ITElasticsearchTemplateTest {
         this.operations.refresh(Book.class);
 
         SearchQuery query = new NativeSearchQuery.NativeSearchQueryBuilder().withQuery(QueryBuilders.matchAllQuery()).build();
-        ScrolledPage<Book> result = this.operations.startScroll(Duration.ofMinutes(1), query, Book.class);
+        Page<Book> result = this.operations.startScroll(Duration.ofMinutes(1), query, Book.class);
         assertThat(result.getTotalElements(), is(equalTo(2L)));
         assertThat(result.hasContent(), is(true));
     }
@@ -272,14 +272,14 @@ public class ITElasticsearchTemplateTest {
     @Test
     public void startScrollWithIndexNotFound() {
         SearchQuery query = new NativeSearchQuery.NativeSearchQueryBuilder().withQuery(QueryBuilders.matchAllQuery()).build();
-        ScrolledPage<Book> result = this.operations.startScroll(Duration.ofSeconds(1), query, Book.class);
+        Page<Book> result = this.operations.startScroll(Duration.ofSeconds(1), query, Book.class);
         assertThat(result.getTotalElements(), is(equalTo(0L)));
         assertThat(result.hasContent(), is(false));
     }
 
     @Test
     public void continueScrollWithIndexNotFound() {
-        ScrolledPage<Book> result = this.operations.continueScroll("DnF1ZXJ5VGhlbkZldGNoAgAAAAAAAAAEFjhMUUhIa1ZsVDVtdDhrZWVjQ05WeFEAAAAAAAAAAxY4TFFISGtWbFQ1bXQ4a2VlY0NOVnhR", Duration.ofSeconds(1), Book.class);
+        Page<Book> result = this.operations.continueScroll("DnF1ZXJ5VGhlbkZldGNoAgAAAAAAAAAEFjhMUUhIa1ZsVDVtdDhrZWVjQ05WeFEAAAAAAAAAAxY4TFFISGtWbFQ1bXQ4a2VlY0NOVnhR", Duration.ofSeconds(1), Book.class);
         assertThat(result.getTotalElements(), is(equalTo(0L)));
         assertThat(result.hasContent(), is(false));
     }

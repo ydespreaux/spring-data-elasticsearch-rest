@@ -24,7 +24,6 @@ import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.github.ydespreaux.spring.data.elasticsearch.core.converter.ElasticsearchConverter;
-import com.github.ydespreaux.spring.data.elasticsearch.core.scroll.ScrolledPage;
 import com.github.ydespreaux.spring.data.elasticsearch.core.scroll.ScrolledPageResult;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.get.MultiGetItemResponse;
@@ -34,6 +33,7 @@ import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.index.get.GetResult;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.springframework.data.domain.Page;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -126,10 +126,10 @@ public class DefaultResultsMapper implements ResultsMapper {
      * @param response the response
      * @param clazz    the entity class
      * @param <T>      the generic type
-     * @return the new {@link ScrolledPage}
+     * @return the new {@link Page}
      */
     @Override
-    public <S extends T, T> ScrolledPage<S> mapResults(SearchResponse response, Class<T> clazz) {
+    public <S extends T, T> Page<S> mapResults(SearchResponse response, Class<T> clazz) {
         long totalHits = response.getHits().getTotalHits();
         List<S> results = new ArrayList<>();
         for (SearchHit hit : response.getHits()) {

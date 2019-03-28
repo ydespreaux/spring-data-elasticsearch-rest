@@ -20,16 +20,12 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
 
-import com.github.ydespreaux.spring.data.elasticsearch.Versions;
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
 import com.github.ydespreaux.spring.data.elasticsearch.configuration.ElasticsearchConfigurationSupport;
-import com.github.ydespreaux.spring.data.elasticsearch.core.scroll.ScrolledPage;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.City;
 import com.github.ydespreaux.spring.data.elasticsearch.repositories.template.CityRepository;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
-import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.elasticsearch.common.geo.GeoPoint;
-import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +36,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.geo.Box;
@@ -63,10 +60,6 @@ import static org.junit.Assert.assertTrue;
         ITCityRepositoryTest.ElasticsearchConfiguration.class})
 @Profile("test-no-template")
 public class ITCityRepositoryTest {
-    @ClassRule
-    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION)
-            .withConfigDirectory("elastic-config")
-            .withFileInitScript("scripts/queries.script");
 
     @Autowired
     private CityRepository repository;
@@ -179,7 +172,7 @@ public class ITCityRepositoryTest {
 
     @Test
     public void findByLocationNearPageable() {
-        ScrolledPage<City> cities = this.repository.findCityByLocationNear(transformLocation(topLeftBox), transformLocation(bottomRightBox),
+        Page<City> cities = this.repository.findCityByLocationNear(transformLocation(topLeftBox), transformLocation(bottomRightBox),
                 PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(3L)));
         assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
@@ -189,7 +182,7 @@ public class ITCityRepositoryTest {
 
     @Test
     public void findByLocationNearPageableWithBox() {
-        ScrolledPage<City> cities = this.repository.findCityByLocationNear(transformBox(topLeftBox, bottomRightBox),
+        Page<City> cities = this.repository.findCityByLocationNear(transformBox(topLeftBox, bottomRightBox),
                 PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(3L)));
         assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
@@ -199,7 +192,7 @@ public class ITCityRepositoryTest {
 
     @Test
     public void findByLocationNearPageableWithPoint() {
-        ScrolledPage<City> cities = this.repository.findCityByLocationNear(transformLocationToPoint(topLeftBox), transformLocationToPoint(bottomRightBox),
+        Page<City> cities = this.repository.findCityByLocationNear(transformLocationToPoint(topLeftBox), transformLocationToPoint(bottomRightBox),
                 PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(3L)));
         assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
@@ -209,7 +202,7 @@ public class ITCityRepositoryTest {
 
     @Test
     public void findByLocationNearPageableWithGeoHash() {
-        ScrolledPage<City> cities = this.repository.findCityByLocationNear(transformLocationToGeoHash(topLeftBox), transformLocationToGeoHash(bottomRightBox),
+        Page<City> cities = this.repository.findCityByLocationNear(transformLocationToGeoHash(topLeftBox), transformLocationToGeoHash(bottomRightBox),
                 PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(3L)));
         assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
@@ -219,7 +212,7 @@ public class ITCityRepositoryTest {
 
     @Test
     public void findByLocationNearPageableWithGeoPoint() {
-        ScrolledPage<City> cities = this.repository.findCityByLocationNear(topLeftBox, bottomRightBox,
+        Page<City> cities = this.repository.findCityByLocationNear(topLeftBox, bottomRightBox,
                 PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(3L)));
         assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
@@ -310,7 +303,7 @@ public class ITCityRepositoryTest {
 
     @Test
     public void findByLocationWithinPageable() {
-        ScrolledPage<City> cities = this.repository.findCityByLocationWithin(transformLocation(castriesLocation), "10km",
+        Page<City> cities = this.repository.findCityByLocationWithin(transformLocation(castriesLocation), "10km",
                 PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(3L)));
         assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
@@ -320,7 +313,7 @@ public class ITCityRepositoryTest {
 
     @Test
     public void findByLocationWithinPageableWithGeoHash() {
-        ScrolledPage<City> cities = this.repository.findCityByLocationWithin(transformLocationToGeoHash(castriesLocation), "10km",
+        Page<City> cities = this.repository.findCityByLocationWithin(transformLocationToGeoHash(castriesLocation), "10km",
                 PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(3L)));
         assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
@@ -330,7 +323,7 @@ public class ITCityRepositoryTest {
 
     @Test
     public void findByLocationWithinPageableWithPoint() {
-        ScrolledPage<City> cities = this.repository.findCityByLocationWithin(
+        Page<City> cities = this.repository.findCityByLocationWithin(
                 transformLocationToPoint(castriesLocation),
                 new Distance(10, Metrics.KILOMETERS),
                 PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
@@ -342,7 +335,7 @@ public class ITCityRepositoryTest {
 
     @Test
     public void findByLocationWithinPageableWithGeoPoint() {
-        ScrolledPage<City> cities = this.repository.findCityByLocationWithin(
+        Page<City> cities = this.repository.findCityByLocationWithin(
                 castriesLocation,
                 "10km",
                 PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
@@ -387,7 +380,7 @@ public class ITCityRepositoryTest {
 
     @Test
     public void findCityByRegionWithPageable() {
-        ScrolledPage<City> cities = this.repository.findCityByRegion("SE", PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
+        Page<City> cities = this.repository.findCityByRegion("SE", PageRequest.of(0, 50, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(5L)));
         assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
         assertThat(cities.getContent().get(1).getId(), is(equalTo(mauguio)));
@@ -416,7 +409,7 @@ public class ITCityRepositoryTest {
 
     @Test
     public void findCityByPopulationBetween() {
-        ScrolledPage<City> cities = this.repository.findCityByPopulationBetween(5000L, 10000L, PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name")));
+        Page<City> cities = this.repository.findCityByPopulationBetween(5000L, 10000L, PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(2L)));
         assertThat(cities.getContent().get(0).getId(), is(equalTo(castries)));
         assertThat(cities.getContent().get(1).getId(), is(equalTo(vendargues)));
@@ -443,7 +436,7 @@ public class ITCityRepositoryTest {
 
     @Test
     public void findCityByPopulationGreaterThanEqual() {
-        ScrolledPage<City> cities = this.repository.findCityByPopulationGreaterThanEqual(6186L, PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name")));
+        Page<City> cities = this.repository.findCityByPopulationGreaterThanEqual(6186L, PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(3L)));
         assertThat(cities.getContent().get(0).getId(), is(equalTo(mauguio)));
         assertThat(cities.getContent().get(1).getId(), is(equalTo(montpellier)));
@@ -470,7 +463,7 @@ public class ITCityRepositoryTest {
 
     @Test
     public void findCityByPopulationGreaterThan() {
-        ScrolledPage<City> cities = this.repository.findCityByPopulationGreaterThan(6186L, PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name")));
+        Page<City> cities = this.repository.findCityByPopulationGreaterThan(6186L, PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(2L)));
         assertThat(cities.getContent().get(0).getId(), is(equalTo(mauguio)));
         assertThat(cities.getContent().get(1).getId(), is(equalTo(montpellier)));
@@ -495,7 +488,7 @@ public class ITCityRepositoryTest {
 
     @Test
     public void findCityByPopulationLessThanEqual() {
-        ScrolledPage<City> cities = this.repository.findCityByPopulationLessThanEqual(4644L, PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name")));
+        Page<City> cities = this.repository.findCityByPopulationLessThanEqual(4644L, PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.getTotalElements(), is(equalTo(1L)));
         assertThat(cities.getContent().get(0).getId(), is(equalTo(sommieres)));
     }
@@ -518,7 +511,7 @@ public class ITCityRepositoryTest {
 
     @Test
     public void findCityByPopulationLessThan() {
-        ScrolledPage<City> cities = this.repository.findCityByPopulationLessThan(4644L, PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name")));
+        Page<City> cities = this.repository.findCityByPopulationLessThan(4644L, PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "name")));
         assertThat(cities.hasContent(), is(false));
     }
 
