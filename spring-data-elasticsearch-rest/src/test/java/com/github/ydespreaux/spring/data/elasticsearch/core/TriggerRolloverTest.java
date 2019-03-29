@@ -28,9 +28,8 @@ import com.github.ydespreaux.spring.data.elasticsearch.repositories.rollover.Veh
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.elasticsearch.common.geo.GeoPoint;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.elasticsearch.rest.RestClientAutoConfiguration;
@@ -40,22 +39,24 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 
+@Tag("integration")
 @DirtiesContext
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
         RestClientAutoConfiguration.class,
-        ITTriggerRolloverTest.ElasticsearchConfiguration.class})
+        TriggerRolloverTest.ElasticsearchConfiguration.class})
 @Profile({"test-no-template", "test-trigger-rollover"})
-public class ITTriggerRolloverTest {
+@Testcontainers
+public class TriggerRolloverTest {
 
-    @ClassRule
+    @Container
     public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION);
 
     @Autowired
@@ -65,7 +66,7 @@ public class ITTriggerRolloverTest {
     private ElasticsearchOperations elasticsearchOperations;
 
     @Test
-    public void trigger() throws InterruptedException {
+    void trigger() throws InterruptedException {
         this.elasticsearchOperations.index(VehicleEvent.builder()
                 .vehicleId("v-101")
                 .location(new GeoPoint(40, 70))

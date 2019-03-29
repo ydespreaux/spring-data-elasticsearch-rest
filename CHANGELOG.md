@@ -2,19 +2,13 @@
 
 ## [Unreleased]
 ### Added
-- Mapping annotation (o)
-
-### Changed
-
-### Fixed
-
-## [1.1.0-SNAPSHOT]
-### Added
 - Dependency spring-boot version from 2.1.0 to 2.1.3
 - Dependency elasticsearch version from 6.4.2 to 6.4.3
 - Reactive repository (o)
 
 ### Changed
+
+- Migration Junit 4 to Junit 5
 
 ### Fixed
 

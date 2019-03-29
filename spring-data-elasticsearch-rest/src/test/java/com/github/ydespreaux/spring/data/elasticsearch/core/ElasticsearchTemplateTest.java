@@ -49,10 +49,9 @@ import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.elasticsearch.rest.RestClientAutoConfiguration;
@@ -62,7 +61,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.domain.Page;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
 import java.time.Clock;
@@ -73,21 +73,22 @@ import java.util.*;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.search.aggregations.AggregationBuilders.terms;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
 
 /**
  * @author Yoann Despréaux
  * @since 1.0.0
  */
+@Tag("integration")
 @DirtiesContext
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
         RestClientAutoConfiguration.class,
-        ITElasticsearchTemplateTest.ElasticsearchConfiguration.class})
-public class ITElasticsearchTemplateTest {
+        ElasticsearchTemplateTest.ElasticsearchConfiguration.class})
+@Testcontainers
+public class ElasticsearchTemplateTest {
 
-    @ClassRule
+    @Container
     public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION)
             .withConfigDirectory("elastic-config");
     private static final String DEFAULT_TEMPLATE_NAME = "junit-template";
@@ -102,8 +103,8 @@ public class ITElasticsearchTemplateTest {
     @Autowired
     private RestHighLevelClient client;
 
-    @Before
-    public void initialize() {
+    @BeforeEach
+    void initialize() {
         this.operations.deleteTemplate(DEFAULT_TEMPLATE_NAME);
         this.operations.deleteIndexByName(INDEX1_NAME);
         this.operations.deleteIndexByName(INDEX_BOOK_NAME);
@@ -111,7 +112,7 @@ public class ITElasticsearchTemplateTest {
     }
 
     @Test
-    public void createTemplate() throws IOException {
+    void createTemplate() throws IOException {
         this.operations.createTemplate(DEFAULT_TEMPLATE_NAME, DEFAULT_TEMPLATE_URL, false);
 
         IndexTemplateMetaData template = AdminClientUtils.getTemplate(client, DEFAULT_TEMPLATE_NAME);
@@ -131,7 +132,7 @@ public class ITElasticsearchTemplateTest {
     }
 
     @Test
-    public void updateTemplate_whenTemplateExists_withCreateOnly() throws IOException {
+    void updateTemplate_whenTemplateExists_withCreateOnly() throws IOException {
         // Create template
         this.operations.createTemplate(DEFAULT_TEMPLATE_NAME, DEFAULT_TEMPLATE_URL, false);
         IndexTemplateMetaData templateInserted = AdminClientUtils.getTemplate(client, DEFAULT_TEMPLATE_NAME);
@@ -167,7 +168,7 @@ public class ITElasticsearchTemplateTest {
     }
 
     @Test
-    public void updateTemplate_whenTemplateExists() throws IOException {
+    void updateTemplate_whenTemplateExists() throws IOException {
         // Create template
         this.operations.createTemplate(DEFAULT_TEMPLATE_NAME, DEFAULT_TEMPLATE_URL, false);
         IndexTemplateMetaData templateInserted = AdminClientUtils.getTemplate(client, DEFAULT_TEMPLATE_NAME);
@@ -202,24 +203,24 @@ public class ITElasticsearchTemplateTest {
     }
 
     @Test
-    public void templateExists_withTemplateDefined() {
+    void templateExists_withTemplateDefined() {
         this.operations.createTemplate(DEFAULT_TEMPLATE_NAME, DEFAULT_TEMPLATE_URL, false);
-        assertTrue(this.operations.templateExists(DEFAULT_TEMPLATE_NAME));
+        assertThat(this.operations.templateExists(DEFAULT_TEMPLATE_NAME), is(true));
     }
 
     @Test
-    public void templateExists_withTemplateUndefined() {
-        assertFalse(this.operations.templateExists("UNKNOWN"));
+    void templateExists_withTemplateUndefined() {
+        assertThat(this.operations.templateExists("UNKNOWN"), is(false));
     }
 
     @Test
-    public void createIndex() {
+    void createIndex() {
         assertThat(this.operations.createIndex(INDEX1_NAME), is(true));
         assertThat(this.operations.indexExists(INDEX1_NAME), is(true));
     }
 
     @Test
-    public void createIndexWithSettingsAndMapping() throws Exception {
+    void createIndexWithSettingsAndMapping() throws Exception {
         assertThat(this.operations.createIndexWithSettingsAndMapping(INDEX_BOOK_NAME, INDEX_BOOK_PATH), is(true));
         assertThat(this.operations.indexExists(INDEX_BOOK_NAME), is(true));
 
@@ -245,7 +246,7 @@ public class ITElasticsearchTemplateTest {
     }
 
     @Test
-    public void bulkEntities() {
+    void bulkEntities() {
         List entities = new ArrayList<>();
         entities.add(createBook("1", "BOOK", "DESCRIPTION", 10d));
         entities.add(createArticle("1", "ARTICLE", "DESCRIPTION", Article.EnumEntrepot.E1));
@@ -253,12 +254,12 @@ public class ITElasticsearchTemplateTest {
 
         this.operations.refresh(Article.class);
         this.operations.refresh(Book.class);
-        assertNotNull(this.operations.findById(Book.class, "1"));
-        assertNotNull(this.operations.findById(Article.class, "1"));
+        assertThat(this.operations.findById(Book.class, "1"), is(notNullValue()));
+        assertThat(this.operations.findById(Article.class, "1"), is(notNullValue()));
     }
 
     @Test
-    public void startScroll() {
+    void startScroll() {
         this.operations.index(createBook("1", "BOOK_1", "DESCRIPTION", 10d), Book.class);
         this.operations.index(createBook("2", "BOOK_2", "DESCRIPTION", 10d), Book.class);
         this.operations.refresh(Book.class);
@@ -270,7 +271,7 @@ public class ITElasticsearchTemplateTest {
     }
 
     @Test
-    public void startScrollWithIndexNotFound() {
+    void startScrollWithIndexNotFound() {
         SearchQuery query = new NativeSearchQuery.NativeSearchQueryBuilder().withQuery(QueryBuilders.matchAllQuery()).build();
         Page<Book> result = this.operations.startScroll(Duration.ofSeconds(1), query, Book.class);
         assertThat(result.getTotalElements(), is(equalTo(0L)));
@@ -278,19 +279,19 @@ public class ITElasticsearchTemplateTest {
     }
 
     @Test
-    public void continueScrollWithIndexNotFound() {
+    void continueScrollWithIndexNotFound() {
         Page<Book> result = this.operations.continueScroll("DnF1ZXJ5VGhlbkZldGNoAgAAAAAAAAAEFjhMUUhIa1ZsVDVtdDhrZWVjQ05WeFEAAAAAAAAAAxY4TFFISGtWbFQ1bXQ4a2VlY0NOVnhR", Duration.ofSeconds(1), Book.class);
         assertThat(result.getTotalElements(), is(equalTo(0L)));
         assertThat(result.hasContent(), is(false));
     }
 
     @Test
-    public void clearScrollWithIndexNotFound() {
+    void clearScrollWithIndexNotFound() {
         this.operations.clearScroll("DnF1ZXJ5VGhlbkZldGNoAgAAAAAAAAAEFjhMUUhIa1ZsVDVtdDhrZWVjQ05WeFEAAAAAAAAAAxY4TFFISGtWbFQ1bXQ4a2VlY0NOVnhR");
     }
 
     @Test
-    public void shouldReturnAggregatedResponseForGivenSearchQuery() {
+    void shouldReturnAggregatedResponseForGivenSearchQuery() {
         this.operations.deleteAll(Article.class);
         List entities = new ArrayList<>();
         entities.add(createArticle("1", "ARTICLE1", "DESCRIPTION1", Article.EnumEntrepot.E1));
@@ -327,7 +328,7 @@ public class ITElasticsearchTemplateTest {
     }
 
     @Test
-    public void saveArticle() {
+    void saveArticle() {
         Article article = createArticle(null, "MyArticle", "MyArticle description", Article.EnumEntrepot.E1);
         Article articleIndexed = this.operations.index(article, Article.class);
         this.operations.refresh(Article.class);
@@ -343,7 +344,7 @@ public class ITElasticsearchTemplateTest {
     //------------------------------------------------
 
     @Test
-    public void saveArticle_bulk() {
+    void saveArticle_bulk() {
         List<Article> articles = new ArrayList<>();
         articles.add(createArticle(null, "MyArticle1", "MyArticle 1 description", Article.EnumEntrepot.E1));
         articles.add(createArticle(null, "MyArticle2", "MyArticle 2 description", Article.EnumEntrepot.E2));
@@ -359,7 +360,7 @@ public class ITElasticsearchTemplateTest {
     }
 
     @Test
-    public void deleteArticleById() {
+    void deleteArticleById() {
         Article article = createArticle(null, "MyArticle", "MyArticle description", Article.EnumEntrepot.E1);
         Article articleIndexed = this.operations.index(article, Article.class);
         this.operations.refresh(Article.class);
@@ -370,7 +371,7 @@ public class ITElasticsearchTemplateTest {
     }
 
     @Test
-    public void deleteArticle() {
+    void deleteArticle() {
         Article article = createArticle(null, "MyArticle", "MyArticle description", Article.EnumEntrepot.E1);
         Article articleIndexed = this.operations.index(article, Article.class);
         this.operations.refresh(Article.class);
@@ -381,7 +382,7 @@ public class ITElasticsearchTemplateTest {
     }
 
     @Test
-    public void deleteAllArticle() {
+    void deleteAllArticle() {
         List<Article> articles = this.operations.bulkIndex(Arrays.asList(
                 createArticle(null, "MyArticle1", "MyArticle 1 description", Article.EnumEntrepot.E1),
                 createArticle(null, "MyArticle2", "MyArticle 2 description", Article.EnumEntrepot.E1),
@@ -397,7 +398,7 @@ public class ITElasticsearchTemplateTest {
     }
 
     @Test
-    public void findByQueryWithScript() {
+    void findByQueryWithScript() {
         this.operations.bulkIndex(Arrays.asList(
                 createArticle(null, "MyArticle1", "MyArticle 1 description", Article.EnumEntrepot.E1),
                 createArticle(null, "MyArticle2", "MyArticle 2 description", Article.EnumEntrepot.E1),
@@ -456,7 +457,7 @@ public class ITElasticsearchTemplateTest {
     //------------------------------------------------
 
     @Test
-    public void saveBook() {
+    void saveBook() {
         Book book = createBook("New book", "Description", 10.5d, LocalDate.now(Clock.systemUTC()));
         Book bookIndexed = this.operations.index(book, Book.class);
         this.operations.refresh(Book.class);
@@ -468,7 +469,7 @@ public class ITElasticsearchTemplateTest {
     }
 
     @Test
-    public void saveBook_bulk() {
+    void saveBook_bulk() {
         List<Book> books = new ArrayList<>();
         books.add(createBook("new_Livre1", "Description du livre 1", 10.5d, LocalDate.now(Clock.systemUTC())));
         books.add(createBook("new_Livre2", "Description du livre 2", 8d, LocalDate.now(Clock.systemUTC())));
@@ -485,7 +486,7 @@ public class ITElasticsearchTemplateTest {
     }
 
     @Test
-    public void deleteBookById() {
+    void deleteBookById() {
         Book book = createBook("New book", "Description", 10.5d, LocalDate.now(Clock.systemUTC()));
         Book bookIndexed = this.operations.index(book, Book.class);
         this.operations.refresh(Book.class);
@@ -496,7 +497,7 @@ public class ITElasticsearchTemplateTest {
     }
 
     @Test
-    public void deleteBook() {
+    void deleteBook() {
         Book book = createBook("New book", "Description", 10.5d, LocalDate.now(Clock.systemUTC()));
         Book bookIndexed = this.operations.index(book, Book.class);
         this.operations.refresh(Book.class);
@@ -507,7 +508,7 @@ public class ITElasticsearchTemplateTest {
     }
 
     @Test
-    public void deleteAllBook() {
+    void deleteAllBook() {
         List<Book> books = this.operations.bulkIndex(Arrays.asList(
                 createBook("Book1", "Description", 10.5d, LocalDate.now(Clock.systemUTC())),
                 createBook("Book2", "Description", 10.5d, LocalDate.now(Clock.systemUTC())),

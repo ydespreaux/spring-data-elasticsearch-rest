@@ -20,9 +20,7 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
@@ -30,11 +28,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@RunWith(SpringRunner.class)
 public class IndexTimeBasedSupportTest {
 
     @Test
-    public void buildIndex() {
+    void buildIndex() {
         LocalDate now = LocalDate.of(2018, 10, 25);
         IndexTimeBasedSupport<String> support = new IndexTimeBasedSupport();
         IndexTimeBasedParameter<String> parameter = IndexTimeBasedParameter.of("'my-index-'yyyy-MM", now);

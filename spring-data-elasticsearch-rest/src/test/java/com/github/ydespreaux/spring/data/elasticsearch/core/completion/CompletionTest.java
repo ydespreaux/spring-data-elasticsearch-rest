@@ -20,20 +20,17 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core.completion;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@RunWith(SpringRunner.class)
 public class CompletionTest {
 
 
     @Test
-    public void builder() {
+    void builder() {
         Completion completion = Completion.builder()
                 .weight(10)
                 .input(new String[]{"input1"})
@@ -43,14 +40,14 @@ public class CompletionTest {
     }
 
     @Test
-    public void setInput() {
+    void setInput() {
         Completion completion = new Completion();
         completion.setInput(new String[]{"input1"});
         assertThat(completion.getInput(), is(equalTo(new String[]{"input1"})));
     }
 
     @Test
-    public void setWeight() {
+    void setWeight() {
         Completion completion = new Completion();
         completion.setWeight(10);
         assertThat(completion.getWeight(), is(equalTo(10)));

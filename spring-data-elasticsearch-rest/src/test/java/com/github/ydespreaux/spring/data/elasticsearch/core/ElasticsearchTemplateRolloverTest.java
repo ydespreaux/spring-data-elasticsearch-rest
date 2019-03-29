@@ -29,10 +29,9 @@ import com.github.ydespreaux.spring.data.elasticsearch.repositories.rollover.Veh
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.elasticsearch.common.geo.GeoPoint;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.elasticsearch.rest.RestClientAutoConfiguration;
@@ -42,7 +41,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -51,22 +51,23 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
 
 
+@Tag("integration")
 @DirtiesContext
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
         RestClientAutoConfiguration.class,
-        ITElasticsearchTemplateRolloverTest.ElasticsearchConfiguration.class})
+        ElasticsearchTemplateRolloverTest.ElasticsearchConfiguration.class})
 @Profile("test-no-template")
-public class ITElasticsearchTemplateRolloverTest extends AbstractElasticsearchTest<VehicleEvent> {
+@Testcontainers
+public class ElasticsearchTemplateRolloverTest extends AbstractElasticsearchTest<VehicleEvent> {
 
-    @ClassRule
+    @Container
     public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION);
 
-    public ITElasticsearchTemplateRolloverTest() {
+    public ElasticsearchTemplateRolloverTest() {
         super(VehicleEvent.class);
     }
 
@@ -76,13 +77,13 @@ public class ITElasticsearchTemplateRolloverTest extends AbstractElasticsearchTe
     @Autowired
     private ElasticsearchOperations elasticsearchOperations;
 
-    @Before
-    public void onSetup() {
+    @BeforeEach
+    void onSetup() {
         cleanData();
     }
 
     @Test
-    public void findById() {
+    void findById() {
         List<VehicleEvent> vehicles = insertData();
         VehicleEvent myVehicule = vehicles.get(0);
         Optional<VehicleEvent> vehicleEvent = repository.findById(myVehicule.getDocumentId());
@@ -90,7 +91,7 @@ public class ITElasticsearchTemplateRolloverTest extends AbstractElasticsearchTe
     }
 
     @Test
-    public void save() {
+    void save() {
         VehicleEvent vehicle_1 = repository.save(VehicleEvent.builder()
                 .vehicleId("v-100")
                 .location(new GeoPoint(40, 70))
@@ -101,7 +102,7 @@ public class ITElasticsearchTemplateRolloverTest extends AbstractElasticsearchTe
     }
 
     @Test
-    public void deleteByIdFromIndexReader() {
+    void deleteByIdFromIndexReader() {
         List<VehicleEvent> vehicles = insertData();
         VehicleEvent myVehicule = vehicles.get(0);
         this.repository.deleteById(myVehicule.getDocumentId());
@@ -110,7 +111,7 @@ public class ITElasticsearchTemplateRolloverTest extends AbstractElasticsearchTe
     }
 
     @Test
-    public void deleteById() {
+    void deleteById() {
         VehicleEvent vehicle_1 = repository.save(VehicleEvent.builder()
                 .vehicleId("v-101")
                 .location(new GeoPoint(40, 70))

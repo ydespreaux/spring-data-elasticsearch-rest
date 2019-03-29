@@ -20,30 +20,56 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch;
 
-import com.github.ydespreaux.spring.data.elasticsearch.core.ITElasticsearchTemplateCompletionTest;
+import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchTemplateCompletionTest;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.support.*;
 import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
-import org.junit.ClassRule;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-        ITArticleRepositoryTest.class,
-        ITBookRepositoryTest.class,
-        ITCityRepositoryTest.class,
-        ITProductRepositoryTest.class,
-        ITElasticsearchTemplateCompletionTest.class,
-        ITAnswerRepositoryTest.class,
-        ITCommentRepositoryTest.class,
-        ITQuestionRepositoryTest.class,
-        ITVoteRepositoryTest.class
-})
-public class ITQuerySuiteTest {
+@Tag("integration")
+@Testcontainers
+public class QuerySuiteTest {
 
-    @ClassRule
+    @Container
     public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION)
             .withConfigDirectory("elastic-config")
             .withFileInitScript("scripts/queries.script");
 
+    @Nested
+    class ArticleRepositoryNested extends ArticleRepositoryTest {
+    }
+
+    @Nested
+    class BookRepositoryNested extends BookRepositoryTest {
+    }
+
+    @Nested
+    class CityRepositoryNested extends CityRepositoryTest {
+    }
+
+    @Nested
+    class ProductRepositoryNested extends ProductRepositoryTest {
+    }
+
+    @Nested
+    class ElasticsearchTemplateCompletionNested extends ElasticsearchTemplateCompletionTest {
+    }
+
+    @Nested
+    class AnswerRepositoryNested extends AnswerRepositoryTest {
+    }
+
+    @Nested
+    class CommentRepositoryNested extends CommentRepositoryTest {
+    }
+
+    @Nested
+    class QuestionRepositoryNested extends QuestionRepositoryTest {
+    }
+
+    @Nested
+    class VoteRepositoryNested extends VoteRepositoryTest {
+    }
 }

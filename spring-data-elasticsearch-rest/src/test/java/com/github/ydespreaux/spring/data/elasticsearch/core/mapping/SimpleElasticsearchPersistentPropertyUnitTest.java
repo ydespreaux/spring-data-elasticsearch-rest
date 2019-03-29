@@ -21,7 +21,7 @@
 package com.github.ydespreaux.spring.data.elasticsearch.core.mapping;
 
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.Score;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.data.mapping.MappingException;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 public class SimpleElasticsearchPersistentPropertyUnitTest {
 
     @Test // DATAES-462
-    public void rejectsScorePropertyOfTypeOtherthanFloat() {
+    void rejectsScorePropertyOfTypeOtherthanFloat() {
 
         SimpleElasticsearchMappingContext context = new SimpleElasticsearchMappingContext();
 

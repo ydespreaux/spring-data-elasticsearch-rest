@@ -27,8 +27,8 @@ import com.github.ydespreaux.spring.data.elasticsearch.entities.Question;
 import com.github.ydespreaux.spring.data.elasticsearch.repositories.parent.QuestionRepository;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.elasticsearch.rest.RestClientAutoConfiguration;
@@ -38,56 +38,56 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
 import static org.elasticsearch.index.query.Operator.AND;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@RunWith(SpringRunner.class)
+@Tag("integration-nested")
 @SpringBootTest(classes = {
         RestClientAutoConfiguration.class,
-        ITQuestionRepositoryTest.ElasticsearchConfiguration.class})
+        QuestionRepositoryTest.ElasticsearchConfiguration.class})
 @Profile("test-no-template")
-public class ITQuestionRepositoryTest {
+public class QuestionRepositoryTest {
 
     @Autowired
     private QuestionRepository questionRepository;
 
-    @Test(expected = InvalidDataAccessApiUsageException.class)
-    public void hasChild() {
-        this.questionRepository.hasChild();
-    }
-
-    @Test(expected = InvalidDataAccessApiUsageException.class)
-    public void hasChildWithCriteria() {
-        this.questionRepository.hasChildByQuery(new Criteria("description").contains("another"));
-    }
-
-    @Test(expected = InvalidDataAccessApiUsageException.class)
-    public void hasChildWithQuery() {
-        this.questionRepository.hasChildByQuery(QueryBuilders.matchPhraseQuery("description", "another"));
-    }
-
-    @Test(expected = InvalidDataAccessApiUsageException.class)
-    public void hasParentId() {
-        this.questionRepository.hasParentId("1");
-    }
-
-    @Test(expected = InvalidDataAccessApiUsageException.class)
-    public void hasParentIdWithCriteria() {
-        this.questionRepository.hasParentId("1", new Criteria("description").contains("another"));
-    }
-
-    @Test(expected = InvalidDataAccessApiUsageException.class)
-    public void hasParentIdWithQueryBuilder() {
-        this.questionRepository.hasParentId("1", QueryBuilders.matchPhraseQuery("description", "another"));
+    @Test
+    void hasChild() {
+        assertThrows(InvalidDataAccessApiUsageException.class, () -> this.questionRepository.hasChild());
     }
 
     @Test
-    public void hasParent() {
+    void hasChildWithCriteria() {
+        assertThrows(InvalidDataAccessApiUsageException.class, () -> this.questionRepository.hasChildByQuery(new Criteria("description").contains("another")));
+    }
+
+    @Test
+    void hasChildWithQuery() {
+        assertThrows(InvalidDataAccessApiUsageException.class, () -> this.questionRepository.hasChildByQuery(QueryBuilders.matchPhraseQuery("description", "another")));
+    }
+
+    @Test
+    void hasParentId() {
+        assertThrows(InvalidDataAccessApiUsageException.class, () -> this.questionRepository.hasParentId("1"));
+    }
+
+    @Test
+    void hasParentIdWithCriteria() {
+        assertThrows(InvalidDataAccessApiUsageException.class, () -> this.questionRepository.hasParentId("1", new Criteria("description").contains("another")));
+    }
+
+    @Test
+    void hasParentIdWithQueryBuilder() {
+        assertThrows(InvalidDataAccessApiUsageException.class, () -> this.questionRepository.hasParentId("1", QueryBuilders.matchPhraseQuery("description", "another")));
+    }
+
+    @Test
+    void hasParent() {
         // find all childs
         List<? extends Question> childs = questionRepository.hasParent();
         assertThat(childs, contains(
@@ -107,7 +107,7 @@ public class ITQuestionRepositoryTest {
     }
 
     @Test
-    public void hasParentBySearchQuery() {
+    void hasParentBySearchQuery() {
         // find all childs for Question 2
         List<? extends Question> childs = questionRepository.hasParentByQuery(QueryBuilders.queryStringQuery("Question 2").field("description").defaultOperator(AND));
         assertThat(childs, contains(
@@ -119,7 +119,7 @@ public class ITQuestionRepositoryTest {
     }
 
     @Test
-    public void hasParentByCriteriaQuery() {
+    void hasParentByCriteriaQuery() {
         // find all childs for Question 2
         List<? extends Question> childs = questionRepository.hasParentByQuery(Criteria.where("description").is("Question 2"));
         assertThat(childs, contains(
@@ -130,10 +130,9 @@ public class ITQuestionRepositoryTest {
                 hasProperty("parentId", is("2"))));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void hasParentByCriteriaQueryNull() {
-        // find all childs for Question 2
-        questionRepository.hasParentByQuery((Criteria) null);
+    @Test
+    void hasParentByCriteriaQueryNull() {
+        assertThrows(IllegalArgumentException.class, () -> questionRepository.hasParentByQuery((Criteria) null));
     }
 
     @Configuration

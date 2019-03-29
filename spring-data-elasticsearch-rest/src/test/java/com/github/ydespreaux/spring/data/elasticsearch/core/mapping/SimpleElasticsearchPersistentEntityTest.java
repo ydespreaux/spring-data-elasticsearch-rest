@@ -21,7 +21,7 @@
 package com.github.ydespreaux.spring.data.elasticsearch.core.mapping;
 
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.Score;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mapping.MappingException;
 import org.springframework.data.mapping.model.Property;
@@ -30,9 +30,8 @@ import org.springframework.data.util.ClassTypeInformation;
 import org.springframework.data.util.TypeInformation;
 import org.springframework.util.ReflectionUtils;
 
-import java.beans.IntrospectionException;
-
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Yoann Despréaux
@@ -49,38 +48,41 @@ public class SimpleElasticsearchPersistentEntityTest {
 
     }
 
-    @Test(expected = MappingException.class)
-    public void shouldThrowExceptionGivenVersionPropertyIsNotLong() throws NoSuchFieldException, IntrospectionException {
-        // given
-        TypeInformation typeInformation = ClassTypeInformation.from(EntityWithWrongVersionType.class);
-        SimpleElasticsearchPersistentEntity<EntityWithWrongVersionType> entity = new SimpleElasticsearchPersistentEntity<>(
-                typeInformation);
+    @Test
+    void shouldThrowExceptionGivenVersionPropertyIsNotLong() {
+        assertThrows(MappingException.class, () -> {
+            // given
+            TypeInformation typeInformation = ClassTypeInformation.from(EntityWithWrongVersionType.class);
+            SimpleElasticsearchPersistentEntity<EntityWithWrongVersionType> entity = new SimpleElasticsearchPersistentEntity<>(
+                    typeInformation);
 
-        SimpleElasticsearchPersistentProperty persistentProperty = createProperty(entity, "version");
+            SimpleElasticsearchPersistentProperty persistentProperty = createProperty(entity, "version");
 
-        // when
-        entity.addPersistentProperty(persistentProperty);
+            // when
+            entity.addPersistentProperty(persistentProperty);
+        });
     }
 
-    @Test(expected = MappingException.class)
-    public void shouldThrowExceptionGivenMultipleVersionPropertiesArePresent()
-            throws NoSuchFieldException, IntrospectionException {
-        // given
-        TypeInformation typeInformation = ClassTypeInformation.from(EntityWithMultipleVersionField.class);
-        SimpleElasticsearchPersistentEntity<EntityWithMultipleVersionField> entity = new SimpleElasticsearchPersistentEntity<>(
-                typeInformation);
+    @Test
+    void shouldThrowExceptionGivenMultipleVersionPropertiesArePresent() {
+        assertThrows(MappingException.class, () -> {
+            // given
+            TypeInformation typeInformation = ClassTypeInformation.from(EntityWithMultipleVersionField.class);
+            SimpleElasticsearchPersistentEntity<EntityWithMultipleVersionField> entity = new SimpleElasticsearchPersistentEntity<>(
+                    typeInformation);
 
-        SimpleElasticsearchPersistentProperty persistentProperty1 = createProperty(entity, "version1");
+            SimpleElasticsearchPersistentProperty persistentProperty1 = createProperty(entity, "version1");
 
-        SimpleElasticsearchPersistentProperty persistentProperty2 = createProperty(entity, "version2");
+            SimpleElasticsearchPersistentProperty persistentProperty2 = createProperty(entity, "version2");
 
-        entity.addPersistentProperty(persistentProperty1);
-        // when
-        entity.addPersistentProperty(persistentProperty2);
+            entity.addPersistentProperty(persistentProperty1);
+            // when
+            entity.addPersistentProperty(persistentProperty2);
+        });
     }
 
     @Test // DATAES-462
-    public void rejectsMultipleScoreProperties() {
+    void rejectsMultipleScoreProperties() {
 
         SimpleElasticsearchMappingContext context = new SimpleElasticsearchMappingContext();
 

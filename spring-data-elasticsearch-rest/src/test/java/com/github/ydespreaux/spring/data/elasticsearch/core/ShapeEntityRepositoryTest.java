@@ -29,9 +29,8 @@ import com.github.ydespreaux.spring.data.elasticsearch.repositories.shape.ShapeE
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.elasticsearch.common.unit.DistanceUnit;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -40,28 +39,30 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Arrays;
 import java.util.Optional;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
-@RunWith(SpringRunner.class)
+@Tag("integration")
 @SpringBootTest(classes = {
         RestClientAutoConfiguration.class,
-        ITShapeEntityRepositoryTest.ElasticsearchConfiguration.class})
-public class ITShapeEntityRepositoryTest {
+        ShapeEntityRepositoryTest.ElasticsearchConfiguration.class})
+@Testcontainers
+public class ShapeEntityRepositoryTest {
 
-    @ClassRule
+    @Container
     public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION);
     @Autowired
     private ShapeEntityRepository repository;
 
     @Test
-    public void insertGeoShapeWithPointType() {
+    void insertGeoShapeWithPointType() {
         ShapeEntity shape = this.repository.save(ShapeEntity.builder()
                 .name("plot with point")
                 .point(new PointShape(new Coordinate(50, 20)))
@@ -76,7 +77,7 @@ public class ITShapeEntityRepositoryTest {
     }
 
     @Test
-    public void insertGeoShapeWithLinestringType() {
+    void insertGeoShapeWithLinestringType() {
         ShapeEntity shape = this.repository.save(ShapeEntity.builder()
                 .name("plot with linestring")
                 .linestring(new LinestringShape(
@@ -94,7 +95,7 @@ public class ITShapeEntityRepositoryTest {
     }
 
     @Test
-    public void insertGeoShapeWithPolygonType() {
+    void insertGeoShapeWithPolygonType() {
         ShapeEntity shape = this.repository.save(ShapeEntity.builder()
                 .name("plot with polygone")
                 .polygon(new PolygonShape(new Coordinate[]{
@@ -115,7 +116,7 @@ public class ITShapeEntityRepositoryTest {
     }
 
     @Test
-    public void insertGeoShapeWithPolygonTypeAndOrientation() {
+    void insertGeoShapeWithPolygonTypeAndOrientation() {
         ShapeEntity shape = this.repository.save(ShapeEntity.builder()
                 .name("plot with polygone and orientation")
                 .polygon(new PolygonShape(new Coordinate[]{
@@ -136,7 +137,7 @@ public class ITShapeEntityRepositoryTest {
     }
 
     @Test
-    public void insertGeoShapeWithInnerPolygonType() {
+    void insertGeoShapeWithInnerPolygonType() {
         ShapeEntity shape = this.repository.save(ShapeEntity.builder()
                 .name("plot with inner polygone")
                 .innerPolygon(new PolygonShape(
@@ -165,7 +166,7 @@ public class ITShapeEntityRepositoryTest {
     }
 
     @Test
-    public void insertGeoShapeWithMultipointType() {
+    void insertGeoShapeWithMultipointType() {
         ShapeEntity shape = this.repository.save(ShapeEntity.builder()
                 .name("plot with multipoint")
                 .multipoint(new MultiPointShape(
@@ -183,7 +184,7 @@ public class ITShapeEntityRepositoryTest {
     }
 
     @Test
-    public void insertGeoShapeWithMultilinestringType() {
+    void insertGeoShapeWithMultilinestringType() {
         ShapeEntity shape = this.repository.save(ShapeEntity.builder()
                 .name("plot with multilinestring")
                 .multilinestring(new MultiLinestringShape(new Coordinate[][]{
@@ -202,7 +203,7 @@ public class ITShapeEntityRepositoryTest {
     }
 
     @Test
-    public void insertGeoShapeWithMultipolygonType() {
+    void insertGeoShapeWithMultipolygonType() {
         ShapeEntity shape = this.repository.save(ShapeEntity.builder()
                 .name("plot with inner multipolygon")
                 .multipolygon(new MultiPolygonShape(new Coordinate[][][]{
@@ -224,7 +225,7 @@ public class ITShapeEntityRepositoryTest {
     }
 
     @Test
-    public void insertGeoShapeWithMultipolygonTypeAndOrientation() {
+    void insertGeoShapeWithMultipolygonTypeAndOrientation() {
         ShapeEntity shape = this.repository.save(ShapeEntity.builder()
                 .name("plot with inner multipolygon")
                 .multipolygon(new MultiPolygonShape(new Coordinate[][][]{
@@ -246,7 +247,7 @@ public class ITShapeEntityRepositoryTest {
     }
 
     @Test
-    public void insertGeoShapeWithEnvelopeType() {
+    void insertGeoShapeWithEnvelopeType() {
         ShapeEntity shape = this.repository.save(ShapeEntity.builder()
                 .name("plot with envelope")
                 .envelope(new EnvelopeShape(new Coordinate(50, 20), new Coordinate(50.5, 20.5)))
@@ -261,7 +262,7 @@ public class ITShapeEntityRepositoryTest {
     }
 
     @Test
-    public void insertGeoShapeWithCircleType() {
+    void insertGeoShapeWithCircleType() {
         ShapeEntity shape = this.repository.save(ShapeEntity.builder()
                 .name("plot with circle")
                 .circle(new CircleShape(new Coordinate(25.65, 35.20), new DistanceUnit.Distance(50.0, DistanceUnit.METERS)))
@@ -276,7 +277,7 @@ public class ITShapeEntityRepositoryTest {
     }
 
     @Test
-    public void insertGeoShapeWithGeometrycollectionType() {
+    void insertGeoShapeWithGeometrycollectionType() {
         ShapeEntity shape = this.repository.save(ShapeEntity.builder()
                 .name("plot with geometrycollection")
                 .geometry(new GeometryCollectionShape(new PointShape(new Coordinate(20, 50))))
@@ -291,7 +292,7 @@ public class ITShapeEntityRepositoryTest {
     }
 
     @Test
-    public void insertGeoShapeWithArrayGeometrycollectionType() {
+    void insertGeoShapeWithArrayGeometrycollectionType() {
         ShapeEntity shape = this.repository.save(ShapeEntity.builder()
                 .name("plot with array geometrycollection")
                 .arrayGeometry(new GeometryCollectionShape(

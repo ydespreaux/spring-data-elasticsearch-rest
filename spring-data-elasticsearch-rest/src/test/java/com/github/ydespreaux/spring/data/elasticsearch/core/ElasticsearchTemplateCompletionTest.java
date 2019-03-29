@@ -32,8 +32,8 @@ import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.search.suggest.SuggestBuilder;
 import org.elasticsearch.search.suggest.SuggestBuilders;
 import org.elasticsearch.search.suggest.SuggestionBuilder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.elasticsearch.rest.RestClientAutoConfiguration;
@@ -42,7 +42,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Profile;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,12 +50,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@RunWith(SpringRunner.class)
+@Tag("integration-nested")
 @SpringBootTest(classes = {
         RestClientAutoConfiguration.class,
-        ITElasticsearchTemplateCompletionTest.ElasticsearchConfiguration.class})
+        ElasticsearchTemplateCompletionTest.ElasticsearchConfiguration.class})
 @Profile("test-no-template")
-public class ITElasticsearchTemplateCompletionTest {
+public class ElasticsearchTemplateCompletionTest {
 
     @Autowired
     private ElasticsearchOperations template;
@@ -65,7 +64,7 @@ public class ITElasticsearchTemplateCompletionTest {
     private MusicRepository repository;
 
     @Test
-    public void shouldFindSuggestionsUsingCompletion() {
+    void shouldFindSuggestionsUsingCompletion() {
         SuggestionBuilder completionSuggestionFuzzyBuilder = SuggestBuilders.completionSuggestion("suggest").prefix("m", Fuzziness.AUTO);
         SuggestQuery query = new SuggestQuery(new SuggestBuilder().addSuggestion("test-suggest", completionSuggestionFuzzyBuilder));
         final List<String> suggestions = template.suggest(query, Music.class, new StringSuggestExtractor());
@@ -75,7 +74,7 @@ public class ITElasticsearchTemplateCompletionTest {
     }
 
     @Test
-    public void shouldFindSuggestionsUsingSearch() {
+    void shouldFindSuggestionsUsingSearch() {
         SuggestionBuilder completionSuggestionFuzzyBuilder = SuggestBuilders.completionSuggestion("suggest").prefix("m", Fuzziness.AUTO);
         SuggestQuery query = new SuggestQuery(new SuggestBuilder().addSuggestion("test-suggest", completionSuggestionFuzzyBuilder));
         query.addIndices("musics");
@@ -87,7 +86,7 @@ public class ITElasticsearchTemplateCompletionTest {
     }
 
     @Test
-    public void shouldFindSuggestionsWithRepository() {
+    void shouldFindSuggestionsWithRepository() {
         List<Music> suggestions = this.repository.suggest("m");
         assertThat(suggestions.size(), is(2));
         List<String> titles = suggestions.stream().map(Music::getTitle).collect(Collectors.toList());
@@ -96,7 +95,7 @@ public class ITElasticsearchTemplateCompletionTest {
     }
 
     @Test
-    public void shouldFindSuggestionsWithProjection() {
+    void shouldFindSuggestionsWithProjection() {
         List<MusicInfo> suggestions = this.repository.suggest("m", MusicInfo.class);
         assertThat(suggestions.size(), is(2));
         List<String> titles = suggestions.stream().map(MusicInfo::getTitle).collect(Collectors.toList());

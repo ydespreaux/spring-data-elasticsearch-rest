@@ -27,8 +27,8 @@ import com.github.ydespreaux.spring.data.elasticsearch.entities.Question;
 import com.github.ydespreaux.spring.data.elasticsearch.repositories.parent.AnswerRepository;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.elasticsearch.rest.RestClientAutoConfiguration;
@@ -37,70 +37,69 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Profile;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
 
-@RunWith(SpringRunner.class)
+@Tag("integration-nested")
 @SpringBootTest(classes = {
         RestClientAutoConfiguration.class,
-        ITAnswerRepositoryTest.ElasticsearchConfiguration.class})
+        AnswerRepositoryTest.ElasticsearchConfiguration.class})
 @Profile("test-no-template")
-public class ITAnswerRepositoryTest {
+public class AnswerRepositoryTest {
 
     @Autowired
     private AnswerRepository answerRepository;
 
     @Test
-    public void hasChild() {
+    void hasChild() {
         List<Question> questions = this.answerRepository.hasChild();
         assertThat(questions, contains(hasProperty("id", is("1")), hasProperty("id", is("2"))));
     }
 
     @Test
-    public void hasChildWithCriteria() {
+    void hasChildWithCriteria() {
         List<Question> questions = this.answerRepository.hasChildByQuery(new Criteria("description").contains("java"));
         assertThat(questions, contains(hasProperty("id", is("2"))));
     }
 
     @Test
-    public void hasChildWithQuery() {
+    void hasChildWithQuery() {
         List<Question> questions = this.answerRepository.hasChildByQuery(QueryBuilders.matchPhraseQuery("description", "java"));
         assertThat(questions, contains(hasProperty("id", is("2"))));
     }
 
     @Test
-    public void hasParentId() {
+    void hasParentId() {
         List<Question.Answer> answers = this.answerRepository.hasParentId("1");
         assertThat(answers, contains(hasProperty("id", is("4"))));
         assertThat(answers, contains(hasProperty("parentId", is("1"))));
     }
 
     @Test
-    public void hasParentIdWithoutChild() {
+    void hasParentIdWithoutChild() {
         List<Question.Answer> answers = this.answerRepository.hasParentId("3");
         assertThat(answers.isEmpty(), is(true));
     }
 
     @Test
-    public void hasParentIdWithCriteria() {
+    void hasParentIdWithCriteria() {
         List<Question.Answer> answers = this.answerRepository.hasParentId("2", new Criteria("description").contains("java"));
         assertThat(answers, contains(hasProperty("id", is("5"))));
         assertThat(answers, contains(hasProperty("parentId", is("2"))));
     }
 
     @Test
-    public void hasParentIdWithQueryBuilder() {
+    void hasParentIdWithQueryBuilder() {
         List<Question.Answer> answers = this.answerRepository.hasParentId("2", QueryBuilders.matchPhraseQuery("description", "angular"));
         assertThat(answers, contains(hasProperty("id", is("6"))));
         assertThat(answers, contains(hasProperty("parentId", is("2"))));
     }
 
     @Test
-    public void hasParent() {
+    void hasParent() {
         List<? extends Question.Answer> childs = this.answerRepository.hasParent();
         assertThat(childs, contains(
                 hasProperty("id", is("10")),
@@ -111,7 +110,7 @@ public class ITAnswerRepositoryTest {
     }
 
     @Test
-    public void hasParentWithQuery() {
+    void hasParentWithQuery() {
         List<? extends Question.Answer> childs = this.answerRepository.hasParentByQuery(QueryBuilders.matchAllQuery());
         assertThat(childs, contains(
                 hasProperty("id", is("10")),
@@ -122,7 +121,7 @@ public class ITAnswerRepositoryTest {
     }
 
     @Test
-    public void hasParentWithCriteria() {
+    void hasParentWithCriteria() {
         List<? extends Question.Answer> childs = this.answerRepository.hasParentByQuery(Criteria.where("description").is("Answer 1 of Question 1"));
         assertThat(childs, contains(
                 hasProperty("id", is("10"))));

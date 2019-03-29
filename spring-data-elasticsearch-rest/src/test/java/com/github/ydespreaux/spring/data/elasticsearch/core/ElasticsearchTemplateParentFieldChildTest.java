@@ -31,40 +31,42 @@ import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.elasticsearch.rest.RestClientAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 
 import static org.elasticsearch.index.query.Operator.AND;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Yoann Despréaux
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@Tag("integration")
 @SpringBootTest(classes = {
         RestClientAutoConfiguration.class,
-        ITElasticsearchTemplateParentFieldChildTest.ElasticsearchConfiguration.class
+        ElasticsearchTemplateParentFieldChildTest.ElasticsearchConfiguration.class
 })
-public class ITElasticsearchTemplateParentFieldChildTest {
+@Testcontainers
+public class ElasticsearchTemplateParentFieldChildTest {
 
-    @ClassRule
+    @Container
     public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION)
             .withFileInitScript("scripts/parent-child.script");
     private ElasticsearchTemplate elasticsearchTemplate;
 
     @Autowired
-    public void setElasticsearchTemplate(ElasticsearchTemplate elasticsearchTemplate) {
+    void setElasticsearchTemplate(ElasticsearchTemplate elasticsearchTemplate) {
         this.elasticsearchTemplate = elasticsearchTemplate;
         EntityMapper mapper = elasticsearchTemplate.getResultsMapper().getEntityMapper();
         mapper.register(elasticsearchTemplate.getPersistentEntityFor(Question.class));
@@ -74,7 +76,7 @@ public class ITElasticsearchTemplateParentFieldChildTest {
     }
 
     @Test
-    public void parentSerialize() {
+    void parentSerialize() {
         EntityMapper mapper = elasticsearchTemplate.getResultsMapper().getEntityMapper();
         Question entity = new Question("1", "Parent1");
         String json = mapper.mapToString(entity);
@@ -82,7 +84,7 @@ public class ITElasticsearchTemplateParentFieldChildTest {
     }
 
     @Test
-    public void childSerialize() {
+    void childSerialize() {
         EntityMapper mapper = elasticsearchTemplate.getResultsMapper().getEntityMapper();
         Question.Answer child = new Question.Answer("1", "1", "Child1");
         String json = mapper.mapToString(child);
@@ -91,7 +93,7 @@ public class ITElasticsearchTemplateParentFieldChildTest {
     }
 
     @Test
-    public void parentDeserialize() {
+    void parentDeserialize() {
         EntityMapper mapper = elasticsearchTemplate.getResultsMapper().getEntityMapper();
         String json = "{\"description\":\"Parent1\",\"join_field\":{\"name\":\"question\"}}";
         Question parent = mapper.mapToObject(json, Question.class);
@@ -99,7 +101,7 @@ public class ITElasticsearchTemplateParentFieldChildTest {
     }
 
     @Test
-    public void childDeserialize() {
+    void childDeserialize() {
         // register ChildEntity
         elasticsearchTemplate.getPersistentEntityFor(Question.Answer.class);
         //
@@ -112,20 +114,20 @@ public class ITElasticsearchTemplateParentFieldChildTest {
     }
 
     @Test
-    public void hasChildAnswer() {
+    void hasChildAnswer() {
         QueryBuilder query = QueryBuilders.matchPhraseQuery("description", "question");
         List<Question> questionsWithAnswer =
                 elasticsearchTemplate.hasChild(HasChildQuery.builder().type("answer").query(query).scoreMode(ScoreMode.None).build(), Question.Answer.class);
         assertThat(questionsWithAnswer, contains(hasProperty("id", is("1")), hasProperty("id", is("2"))));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void hasChildAnswerWithNoQuery() {
-        elasticsearchTemplate.hasChild(null, Question.Answer.class);
+    @Test
+    void hasChildAnswerWithNoQuery() {
+        assertThrows(IllegalArgumentException.class, () -> elasticsearchTemplate.hasChild(null, Question.Answer.class));
     }
 
     @Test
-    public void hasChildComment() {
+    void hasChildComment() {
         QueryBuilder query = QueryBuilders.matchPhraseQuery("description", "question");
         List<Question> questionsWithComment =
                 elasticsearchTemplate.hasChild(HasChildQuery.builder().type("comment").query(query).scoreMode(ScoreMode.None).build(), Question.Comment.class);
@@ -133,7 +135,7 @@ public class ITElasticsearchTemplateParentFieldChildTest {
     }
 
     @Test
-    public void hasParent() {
+    void hasParent() {
         // find all childs
         List<? extends Question> childs = elasticsearchTemplate.hasParent(HasParentQuery.builder().type("question").query(QueryBuilders.matchAllQuery()).build(), Question.class);
         assertThat(childs, contains(
@@ -153,7 +155,7 @@ public class ITElasticsearchTemplateParentFieldChildTest {
     }
 
     @Test
-    public void hasParentBySearchQuery() {
+    void hasParentBySearchQuery() {
         // find all childs for Question 2
         List<? extends Question> childs = elasticsearchTemplate.hasParent(HasParentQuery.builder().type("question").query(QueryBuilders.queryStringQuery("Question 2").field("description").defaultOperator(AND)).build(), Question.class);
         assertThat(childs, contains(
@@ -165,7 +167,7 @@ public class ITElasticsearchTemplateParentFieldChildTest {
     }
 
     @Test
-    public void hasParentMultiLevel() {
+    void hasParentMultiLevel() {
         // find all childs
         List<? extends Question.Answer> childs = elasticsearchTemplate.hasParent(HasParentQuery.builder().type("answer").query(QueryBuilders.matchAllQuery()).build(), Question.Answer.class);
         assertThat(childs, contains(
@@ -177,7 +179,7 @@ public class ITElasticsearchTemplateParentFieldChildTest {
     }
 
     @Test
-    public void hasParentBySearchQueryMultiLevel() {
+    void hasParentBySearchQueryMultiLevel() {
         // find all childs
         List<? extends Question.Answer> childs = elasticsearchTemplate.hasParent(HasParentQuery.builder().type("answer").query(QueryBuilders.queryStringQuery("Answer 1 of Question 1").field("description").defaultOperator(AND)).build(), Question.Answer.class);
         assertThat(childs, contains(
@@ -187,14 +189,14 @@ public class ITElasticsearchTemplateParentFieldChildTest {
     }
 
     @Test
-    public void hasParentIdAnswer() {
+    void hasParentIdAnswer() {
         ParentIdQuery query = ParentIdQuery.builder().type("answer").parentId("1").build();
         List<Question.Answer> answersWithParentId = elasticsearchTemplate.hasParentId(query, Question.Answer.class);
         assertThat(answersWithParentId, contains(hasProperty("id", is("4"))));
     }
 
     @Test
-    public void hasParentIdAnswerWithQuery() {
+    void hasParentIdAnswerWithQuery() {
         ParentIdQuery query = ParentIdQuery.builder().type("answer").parentId("2")
                 .query(QueryBuilders.matchPhraseQuery("description", "java")).build();
         List<Question.Answer> answersWithParentId = elasticsearchTemplate.hasParentId(query, Question.Answer.class);
@@ -202,7 +204,7 @@ public class ITElasticsearchTemplateParentFieldChildTest {
     }
 
     @Test
-    public void hasParentIdComment() {
+    void hasParentIdComment() {
         ParentIdQuery query = ParentIdQuery.builder().type("comment").parentId("1").build();
         List<Question.Comment> commentsWithParentId = elasticsearchTemplate.hasParentId(query, Question.Comment.class);
         assertThat(commentsWithParentId, contains(
@@ -211,7 +213,7 @@ public class ITElasticsearchTemplateParentFieldChildTest {
     }
 
     @Test
-    public void findAll() {
+    void findAll() {
         List<? extends Question> entities = elasticsearchTemplate.search(new NativeSearchQuery(QueryBuilders.matchAllQuery()), Question.class);
         assertThat(entities, contains(
                 hasProperty("id", is("1")),

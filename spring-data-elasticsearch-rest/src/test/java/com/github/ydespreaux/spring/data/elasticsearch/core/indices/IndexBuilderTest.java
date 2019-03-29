@@ -21,20 +21,20 @@
 package com.github.ydespreaux.spring.data.elasticsearch.core.indices;
 
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 public class IndexBuilderTest {
 
     @Test
-    public void createIndexRequestToInitializeGivenResource() {
+    void createIndexRequestToInitializeGivenResource() {
         // given
         CreateIndexBuilder builder = new CreateIndexBuilder().name("music").source(new ClassPathResource("indices/music.index"));
         CreateIndexRequest request = builder.build();
@@ -48,7 +48,7 @@ public class IndexBuilderTest {
     }
 
     @Test
-    public void createIndexRequestToInitializeGivenNoResource() {
+    void createIndexRequestToInitializeGivenNoResource() {
         // given
         CreateIndexBuilder builder = new CreateIndexBuilder().name("index_name").sources(Collections.emptyList());
         CreateIndexRequest request = builder.build();
