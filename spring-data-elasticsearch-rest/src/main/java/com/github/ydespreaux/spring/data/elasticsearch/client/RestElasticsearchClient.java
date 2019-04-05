@@ -27,12 +27,10 @@ import org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRespons
 import org.elasticsearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.elasticsearch.action.admin.cluster.settings.ClusterUpdateSettingsResponse;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
-import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.action.admin.indices.mapping.get.GetFieldMappingsRequest;
@@ -40,7 +38,6 @@ import org.elasticsearch.action.admin.indices.mapping.get.GetFieldMappingsRespon
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshResponse;
 import org.elasticsearch.action.admin.indices.rollover.RolloverRequest;
@@ -48,11 +45,9 @@ import org.elasticsearch.action.admin.indices.rollover.RolloverResponse;
 import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
 import org.elasticsearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
-import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsResponse;
 import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesRequest;
 import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesResponse;
 import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRequest;
-import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -64,11 +59,14 @@ import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.*;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.GetAliasesResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.reindex.BulkByScrollResponse;
+import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.script.mustache.MultiSearchTemplateRequest;
 import org.elasticsearch.script.mustache.MultiSearchTemplateResponse;
 import org.elasticsearch.script.mustache.SearchTemplateRequest;
@@ -114,11 +112,11 @@ public interface RestElasticsearchClient {
         return indicesExist(request, getDefaultRequestOptions());
     }
 
-    default UpdateSettingsResponse indexPutSettings(UpdateSettingsRequest request) throws IOException {
+    default AcknowledgedResponse indexPutSettings(UpdateSettingsRequest request) throws IOException {
         return indexPutSettings(request, getDefaultRequestOptions());
     }
 
-    default PutIndexTemplateResponse putTemplate(PutIndexTemplateRequest request) throws IOException {
+    default AcknowledgedResponse putTemplate(PutIndexTemplateRequest request) throws IOException {
         return putTemplate(request, getDefaultRequestOptions());
     }
 
@@ -130,11 +128,11 @@ public interface RestElasticsearchClient {
         return createIndex(request, getDefaultRequestOptions());
     }
 
-    default DeleteIndexResponse deleteIndex(DeleteIndexRequest request) throws IOException {
+    default AcknowledgedResponse deleteIndex(DeleteIndexRequest request) throws IOException {
         return deleteIndex(request, getDefaultRequestOptions());
     }
 
-    default IndicesAliasesResponse updateAliases(IndicesAliasesRequest request) throws IOException {
+    default AcknowledgedResponse updateAliases(IndicesAliasesRequest request) throws IOException {
         return updateAliases(request, getDefaultRequestOptions());
     }
 
@@ -146,7 +144,7 @@ public interface RestElasticsearchClient {
         return getFieldMapping(request, getDefaultRequestOptions());
     }
 
-    default PutMappingResponse putMapping(PutMappingRequest request) throws IOException {
+    default AcknowledgedResponse putMapping(PutMappingRequest request) throws IOException {
         return putMapping(request, getDefaultRequestOptions());
     }
 
@@ -214,6 +212,9 @@ public interface RestElasticsearchClient {
         return multiSearch(request, getDefaultRequestOptions());
     }
 
+    default BulkByScrollResponse deleteBy(DeleteByQueryRequest request) throws IOException {
+        return deleteBy(request, getDefaultRequestOptions());
+    }
 
     ClusterHealthResponse clusterHealth(ClusterHealthRequest request, RequestOptions options) throws IOException;
 
@@ -229,23 +230,23 @@ public interface RestElasticsearchClient {
 
     Boolean indicesExist(GetIndexRequest request, RequestOptions options) throws IOException;
 
-    UpdateSettingsResponse indexPutSettings(UpdateSettingsRequest request, RequestOptions options) throws IOException;
+    AcknowledgedResponse indexPutSettings(UpdateSettingsRequest request, RequestOptions options) throws IOException;
 
-    PutIndexTemplateResponse putTemplate(PutIndexTemplateRequest request, RequestOptions options) throws IOException;
+    AcknowledgedResponse putTemplate(PutIndexTemplateRequest request, RequestOptions options) throws IOException;
 
     GetIndexTemplatesResponse getTemplates(GetIndexTemplatesRequest request, RequestOptions options) throws IOException;
 
     CreateIndexResponse createIndex(CreateIndexRequest request, RequestOptions options) throws IOException;
 
-    DeleteIndexResponse deleteIndex(DeleteIndexRequest request, RequestOptions options) throws IOException;
+    AcknowledgedResponse deleteIndex(DeleteIndexRequest request, RequestOptions options) throws IOException;
 
-    IndicesAliasesResponse updateAliases(IndicesAliasesRequest request, RequestOptions options) throws IOException;
+    AcknowledgedResponse updateAliases(IndicesAliasesRequest request, RequestOptions options) throws IOException;
 
     GetMappingsResponse getMappings(GetMappingsRequest request, RequestOptions options) throws IOException;
 
     GetFieldMappingsResponse getFieldMapping(GetFieldMappingsRequest request, RequestOptions options) throws IOException;
 
-    PutMappingResponse putMapping(PutMappingRequest request, RequestOptions options) throws IOException;
+    AcknowledgedResponse putMapping(PutMappingRequest request, RequestOptions options) throws IOException;
 
     RefreshResponse refresh(RefreshRequest request, RequestOptions options) throws IOException;
 
@@ -281,4 +282,5 @@ public interface RestElasticsearchClient {
 
     MultiSearchResponse multiSearch(MultiSearchRequest request, RequestOptions options) throws IOException;
 
+    BulkByScrollResponse deleteBy(DeleteByQueryRequest request, RequestOptions options) throws IOException;
 }

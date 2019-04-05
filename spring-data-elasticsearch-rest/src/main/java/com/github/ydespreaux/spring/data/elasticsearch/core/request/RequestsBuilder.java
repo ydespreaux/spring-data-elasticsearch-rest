@@ -42,6 +42,9 @@ import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -232,6 +235,32 @@ public class RequestsBuilder {
         ClearScrollRequest request = new ClearScrollRequest();
         request.addScrollId(scrollId);
         return request;
+    }
+
+    /**
+     *
+     * @param indexName
+     * @param typeName
+     * @param query
+     * @return
+     */
+    public DeleteByQueryRequest deleteBy(String indexName, String typeName, QueryBuilder query) {
+        return deleteBy(indexName, typeName, 1000, query);
+    }
+
+    /**
+     *
+     * @param indexName
+     * @param typeName
+     * @param batchSize
+     * @param query
+     * @return
+     */
+    public DeleteByQueryRequest deleteBy(String indexName, String typeName, int batchSize, QueryBuilder query) {
+        return new DeleteByQueryRequest(indexName)
+                .setBatchSize(batchSize)
+                .setQuery(query == null ? QueryBuilders.matchAllQuery() : query)
+                .types(typeName);
     }
 
 

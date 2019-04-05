@@ -1,0 +1,62 @@
+# index article settings
+PUT:_template/article:@resource(templates/article.template)
+# index articles
+PUT:article-e1-2018/article/1:{ "name" : "Article1", "description": "Description de l'article 1 - City", "entrepot": "E1" }
+PUT:article-e2-2018/article/2:{ "name" : "Article2", "description": "Description de l'article 2 - Product", "entrepot": "E2" }
+PUT:article-e3-2018/article/3:{ "name" : "Article3", "description": "Description de l'article 3 - Company", "entrepot": "E3" }
+PUT:article-e1-2018/article/4:{ "name" : "Article4", "description": "Description de l'article 4 - Step", "entrepot": "E1" }
+PUT:article-e1-2018/article/5:{ "name" : "Article5", "description": "Description de l'article 5", "entrepot": "E2" }
+PUT:article-e1-2018/article/6:{ "name" : "Article6", "description": "Description de l'article 6", "entrepot": "E2" }
+PUT:article-e1-2018/article/7:{ "name" : "Article7", "description": "Description de l'article 7", "entrepot": "E3" }
+PUT:article-e1-2018/article/8:{ "name" : "Article8", "description": "Description de l'article 8", "entrepot": "E3" }
+PUT:article-e1-2018/article/9:{ "name" : "Article9", "description": "Description de l'article 9", "entrepot": "E3" }
+PUT:article-e1-2018/article/10:{ "name" : "Article10", "description": "Description de l'article 10", "entrepot": "E2" }
+PUT:article-e1-2018/article/11:{ "name" : "Article11", "description": "Description de l'article 11", "entrepot": "E2" }
+PUT:article-e1-2018/article/12:{ "name" : "Article12", "description": "Description de l'article 12", "entrepot": "E2" }
+PUT:article-e1-2018/article/13:{ "name" : "Article13", "description": "Description de l'article 13", "entrepot": "E2" }
+PUT:article-e1-2018/article/14:{ "name" : "Article14", "description": "Description de l'article 14", "entrepot": "E2" }
+PUT:article-e1-2018/article/15:{ "name" : "Article15", "description": "Description de l'article 15", "entrepot": "E2" }
+PUT:article-e1-2018/article/16:{ "name" : "Article16", "description": "Description de l'article 16", "entrepot": "E2" }
+PUT:article-e1-2018/article/17:{ "name" : "Article17", "description": "Description de l'article 17", "entrepot": "E2" }
+PUT:article-e1-2018/article/18:{ "name" : "Article18", "description": "Description de l'article 18", "entrepot": "E2" }
+PUT:article-e1-2018/article/19:{ "name" : "Article19", "description": "Description de l'article 19", "entrepot": "E2" }
+PUT:article-e1-2018/article/20:{ "name" : "Article20", "description": "Description de l'article 20", "entrepot": "E2" }
+PUT:article-e1-2018/article/21:{ "name" : "Article21", "description": "Description de l'article 21", "entrepot": "E2" }
+PUT:article-e1-2018/article/22:{ "name" : "Article22", "description": "Description de l'article 22", "entrepot": "E2" }
+PUT:article-e1-2018/article/23:{ "name" : "Article23", "description": "Description de l'article 23", "entrepot": "E2" }
+PUT:article-e1-2018/article/24:{ "name" : "Article24", "description": "Description de l'article 24", "entrepot": "E2" }
+PUT:article-e1-2018/article/25:{ "name" : "Article25", "description": "Description de l'article 25", "entrepot": "E2" }
+PUT:article-e1-2018/article/26:{ "name" : "Article26", "description": "Description de l'article 26", "entrepot": "E2" }
+PUT:article-e1-2018/article/27:{ "name" : "Article27", "description": "Description de l'article 27", "entrepot": "E2" }
+PUT:article-e1-2018/article/28:{ "name" : "Article28", "description": "Description de l'article 28", "entrepot": "E2" }
+PUT:article-e1-2018/article/29:{ "name" : "Article29", "description": "Description de l'article 29", "entrepot": "E2" }
+PUT:article-e1-2018/article/30:{ "name" : "Article30", "description": "Description de l'article 30", "entrepot": "E2" }
+PUT:article-e1-2018/article/31:{ "name" : "Article31", "description": "Description de l'article 31", "entrepot": "E2" }
+PUT:article-e1-2018/article/32:{ "name" : "Article32", "description": "Description de l'article 32", "entrepot": "E2" }
+PUT:article-e1-2018/article/33:{ "name" : "Article33", "description": "Description de l'article 33", "entrepot": "E2" }
+PUT:article-e1-2018/article/34:{ "name" : "Article34", "description": "Description de l'article 34", "entrepot": "E2" }
+PUT:article-e1-2018/article/35:{ "name" : "Article35", "description": "Description de l'article 35", "entrepot": "E2" }
+PUT:article-e1-2018/article/36:{ "name" : "Article36", "description": "Description de l'article 36", "entrepot": "E2" }
+PUT:article-e1-2018/article/37:{ "name" : "Article37", "description": "Description de l'article 37", "entrepot": "E2" }
+PUT:article-e1-2018/article/38:{ "name" : "Article38", "description": "Description de l'article 38", "entrepot": "E2" }
+PUT:article-e1-2018/article/39:{ "name" : "Article39", "description": "Description de l'article 39", "entrepot": "E2" }
+PUT:article-e1-2018/article/40:{ "name" : "Article40", "description": "Description de l'article 40", "entrepot": "E2" }
+PUT:article-e1-2018/article/41:{ "name" : "Article41", "description": "Description de l'article 41", "entrepot": "E2" }
+PUT:article-e1-2018/article/42:{ "name" : "Article42", "description": "Description de l'article 42", "entrepot": "E2" }
+PUT:article-e1-2018/article/43:{ "name" : "Article43", "description": "Description de l'article 43", "entrepot": "E2" }
+PUT:article-e1-2018/article/44:{ "name" : "Article44", "description": "Description de l'article 44", "entrepot": "E2" }
+PUT:article-e1-2018/article/45:{ "name" : "Article45", "description": "Description de l'article 45", "entrepot": "E2" }
+PUT:article-e1-2018/article/46:{ "name" : "Article46", "description": "Description de l'article 46", "entrepot": "E2" }
+PUT:article-e1-2018/article/47:{ "name" : "Article47", "description": "Description de l'article 47", "entrepot": "E2" }
+PUT:article-e1-2018/article/48:{ "name" : "Article48", "description": "Description de l'article 48", "entrepot": "E2" }
+PUT:article-e1-2018/article/49:{ "name" : "Article49", "description": "Description de l'article 49", "entrepot": "E2" }
+PUT:article-e1-2018/article/50:{ "name" : "Article50", "description": "Description de l'article 50", "entrepot": "E2" }
+
+# index books settings
+PUT:books:@resource(indices/book.index)
+# index books
+PUT:books/book/1:{"title": "Black City Parade", "description": "Exceptionnel : pour la 1ère fois ! Indochine records et Sony Music sont fiers de proposer les rééditions des 12 albums studio d’Indochine...", "price": 15, "publication": "2015-10-25"}
+PUT:books/book/2:{"title": "Blake et Mortimer - Tome 25 : La vallée des immortels", "description": "À Lhassa, le palais impérial du dictateur Basam-Damdu est anéanti par une escadrille d’Espadons, et le monde, soulagé, fête la fin de la troisième guerre mondiale...", "price": 25, "publication": "2016-05-01"}
+PUT:books/book/3:{"title": "Et puis Colette", "description": "Anouk, trentenaire parisienne enfermée dans la routine, vient d’apprendre le décès de sa soeur...", "price": 9.99, "publication": "2017-02-01"}
+PUT:books/book/4:{"title": "Live Is love Double Vinyle", "description": "Thomas s’est pour ce disque mis à nu, sans concession aucune...", "price": 12.20, "publication": "2018-07-10"}
+PUT:books/book/5:{"title": "Zorro - Cicatrices Tome 01 : Zorro", "description": "Zorro est toujours Don Diego de la Vega sous le masque, et il défend toujours la veuve et l’orphelin grâce à son fouet et son épée. Mais il est cette fois aux prises avec l’amour !", "price": 5}

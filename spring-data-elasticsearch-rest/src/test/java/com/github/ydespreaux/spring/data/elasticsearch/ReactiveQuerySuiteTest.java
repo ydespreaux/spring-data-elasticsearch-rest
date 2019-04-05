@@ -16,11 +16,29 @@
  * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
+ *
  */
 
 package com.github.ydespreaux.spring.data.elasticsearch;
 
-public class Versions {
+import com.github.ydespreaux.spring.data.elasticsearch.core.ReactiveElasticsearchTemplateQueryTest;
+import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-    public static final String ELASTICSEARCH_VERSION = "6.5.0";
+@Tag("integration")
+@Testcontainers
+public class ReactiveQuerySuiteTest {
+
+    @Container
+    public static final ElasticsearchContainer elasticContainer = new ElasticsearchContainer(Versions.ELASTICSEARCH_VERSION)
+            .withConfigDirectory("elastic-config")
+            .withFileInitScript("scripts/reactive-queries.script");
+
+    @Nested
+    class ReactiveElasticsearchTemplateQueryNested extends ReactiveElasticsearchTemplateQueryTest {
+    }
+
 }

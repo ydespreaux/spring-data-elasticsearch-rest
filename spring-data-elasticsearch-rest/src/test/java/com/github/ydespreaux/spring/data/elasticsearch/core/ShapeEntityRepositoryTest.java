@@ -250,7 +250,7 @@ public class ShapeEntityRepositoryTest {
     void insertGeoShapeWithEnvelopeType() {
         ShapeEntity shape = this.repository.save(ShapeEntity.builder()
                 .name("plot with envelope")
-                .envelope(new EnvelopeShape(new Coordinate(50, 20), new Coordinate(50.5, 20.5)))
+                .envelope(new EnvelopeShape(new Coordinate(50, 21), new Coordinate(50.5, 20.5)))
                 .build());
         this.repository.refresh();
         Optional<ShapeEntity> optional = this.repository.findById(shape.getId());
@@ -299,7 +299,7 @@ public class ShapeEntityRepositoryTest {
                         new PointShape(new Coordinate(50, 20)),
                         new CircleShape(new Coordinate(25.65, 35.20), 50.0, DistanceUnit.METERS),
                         new EnvelopeShape(new Coordinate[]{
-                                new Coordinate(50, 20),
+                                new Coordinate(50, 21),
                                 new Coordinate(50.5, 20.5)
                         }),
                         new LinestringShape(new Coordinate[]{

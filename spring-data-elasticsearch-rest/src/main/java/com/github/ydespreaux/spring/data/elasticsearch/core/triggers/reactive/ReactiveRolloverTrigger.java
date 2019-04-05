@@ -16,21 +16,22 @@
  * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
+ *
  */
 
-package com.github.ydespreaux.spring.data.elasticsearch.core.triggers;
+package com.github.ydespreaux.spring.data.elasticsearch.core.triggers.reactive;
 
-import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
+import com.github.ydespreaux.spring.data.elasticsearch.core.ReactiveElasticsearchOperations;
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
+import com.github.ydespreaux.spring.data.elasticsearch.core.triggers.AbstractRolloverTrigger;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.ElasticsearchException;
 
 @Slf4j
-public class RolloverTrigger<T> extends AbstractRolloverTrigger<T> {
+public class ReactiveRolloverTrigger<T> extends AbstractRolloverTrigger<T> {
 
-    private final ElasticsearchOperations elasticsearchOperations;
+    private final ReactiveElasticsearchOperations elasticsearchOperations;
 
-    public RolloverTrigger(ElasticsearchOperations elasticsearchOperations, ElasticsearchPersistentEntity<T> persistentEntity, String cronExpression) {
+    public ReactiveRolloverTrigger(ReactiveElasticsearchOperations elasticsearchOperations, ElasticsearchPersistentEntity<T> persistentEntity, String cronExpression) {
         super(persistentEntity, cronExpression);
         this.elasticsearchOperations = elasticsearchOperations;
     }
@@ -38,13 +39,12 @@ public class RolloverTrigger<T> extends AbstractRolloverTrigger<T> {
     @Override
     public Runnable processor() {
         return () -> {
-            try {
-                elasticsearchOperations.rolloverIndex(getPersistentEntity().getJavaType());
-            } catch (ElasticsearchException e) {
+            elasticsearchOperations.rolloverIndex(getPersistentEntity().getJavaType()).doOnError(e -> {
                 if (log.isWarnEnabled()) {
                     log.warn("Rollover index {} failed : {}", getPersistentEntity().getAliasOrIndexWriter(), e.getLocalizedMessage());
                 }
-            }
+            })
+            .subscribe();
         };
     }
 }

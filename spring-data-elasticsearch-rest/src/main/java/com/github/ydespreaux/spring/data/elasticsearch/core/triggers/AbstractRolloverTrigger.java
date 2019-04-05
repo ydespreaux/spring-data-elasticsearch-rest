@@ -16,35 +16,37 @@
  * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  * Please send bugreports with examples or suggestions to yoann.despreaux@believeit.fr
+ *
  */
 
 package com.github.ydespreaux.spring.data.elasticsearch.core.triggers;
 
-import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.ElasticsearchException;
+import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.util.StringUtils;
 
 @Slf4j
-public class RolloverTrigger<T> extends AbstractRolloverTrigger<T> {
+public abstract class AbstractRolloverTrigger<T> implements Trigger<T> {
 
-    private final ElasticsearchOperations elasticsearchOperations;
+    private static final String DEFAULT_CRON_EXPRESSION = "0 */1 * * * *";
 
-    public RolloverTrigger(ElasticsearchOperations elasticsearchOperations, ElasticsearchPersistentEntity<T> persistentEntity, String cronExpression) {
-        super(persistentEntity, cronExpression);
-        this.elasticsearchOperations = elasticsearchOperations;
+    private final ElasticsearchPersistentEntity<T> persistentEntity;
+    private final CronTrigger cronTrigger;
+
+    public AbstractRolloverTrigger(ElasticsearchPersistentEntity<T> persistentEntity, String cronExpression) {
+        this.persistentEntity = persistentEntity;
+        this.cronTrigger = StringUtils.isEmpty(cronExpression) ? new CronTrigger(DEFAULT_CRON_EXPRESSION) : new CronTrigger(cronExpression);
     }
 
     @Override
-    public Runnable processor() {
-        return () -> {
-            try {
-                elasticsearchOperations.rolloverIndex(getPersistentEntity().getJavaType());
-            } catch (ElasticsearchException e) {
-                if (log.isWarnEnabled()) {
-                    log.warn("Rollover index {} failed : {}", getPersistentEntity().getAliasOrIndexWriter(), e.getLocalizedMessage());
-                }
-            }
-        };
+    public CronTrigger getCronTrigger() {
+        return this.cronTrigger;
     }
+
+    @Override
+    public ElasticsearchPersistentEntity<T> getPersistentEntity() {
+        return this.persistentEntity;
+    }
+
 }

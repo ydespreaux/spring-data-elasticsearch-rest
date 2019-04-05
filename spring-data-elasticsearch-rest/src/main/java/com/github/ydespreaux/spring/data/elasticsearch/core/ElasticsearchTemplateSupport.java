@@ -41,6 +41,7 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.join.query.HasChildQueryBuilder;
 import org.elasticsearch.join.query.HasParentQueryBuilder;
 import org.elasticsearch.join.query.JoinQueryBuilders;
@@ -182,6 +183,20 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
         }
     }
 
+    protected void checkForBulkDeleteFailure(BulkByScrollResponse response) {
+        List<BulkItemResponse.Failure> failures = response.getBulkFailures();
+        if (!failures.isEmpty()) {
+            Map<String, String> failedDocuments = new HashMap<>();
+            for (BulkItemResponse.Failure failure : failures) {
+                failedDocuments.put(failure.getId(), failure.getMessage());
+            }
+            throw new ElasticsearchException(
+                    "Bulk indexing has failures. Use ElasticsearchException.getFailedDocuments() for detailed messages ["
+                            + failedDocuments + "]",
+                    failedDocuments);
+        }
+    }
+
 
     /**
      * @param query
@@ -213,8 +228,6 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
     protected SearchRequest prepareSearch(Query query, Optional<QueryBuilder> builder) {
         assertNotNullIndices(query);
         assertNotNullTypes(query);
-
-        int startRecord = 0;
         SearchRequest request = new SearchRequest(toArray(query.getIndices()));
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         request.types(toArray(query.getTypes()));
@@ -229,13 +242,6 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
             SourceFilter sourceFilter = query.getSourceFilter();
             sourceBuilder.fetchSource(sourceFilter.getIncludes(), sourceFilter.getExcludes());
         }
-
-        if (query.getPageable().isPaged()) {
-            startRecord = query.getPageable().getPageNumber() * query.getPageable().getPageSize();
-            sourceBuilder.size(query.getPageable().getPageSize());
-        }
-        sourceBuilder.from(startRecord);
-
         if (!query.getFields().isEmpty()) {
             sourceBuilder.fetchSource(toArray(query.getFields()), null);
         }
@@ -433,6 +439,8 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
         if (!isEmpty(query.getTypes())) {
             countRequestBuilder.types(toArray(query.getTypes()));
         }
+        // Fix size at 0
+        countRequestBuilder.source().size(0);
         return countRequestBuilder;
     }
 
@@ -455,6 +463,16 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
         QueryBuilder filter = new CriteriaFilterProcessor()
                 .createFilterFromCriteria(criteriaQuery.getCriteria());
         return doCount(searchRequest, query, filter);
+    }
+
+    /**
+     *
+     * @param searchRequest
+     * @param query
+     * @return
+     */
+    protected SearchRequest doCount(SearchRequest searchRequest, StringQuery query) {
+        return doCount(searchRequest, wrapperQuery(query.getSource()), null);
     }
 
     /**
