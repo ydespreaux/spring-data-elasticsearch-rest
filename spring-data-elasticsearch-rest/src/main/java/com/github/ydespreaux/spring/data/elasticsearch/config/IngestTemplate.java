@@ -101,9 +101,6 @@ public class IngestTemplate implements ApplicationContextAware {
     private TemplateSettings buildTemplateSettings(Resource resource) {
         final String[] profiles = applicationContext.getEnvironment().getActiveProfiles();
         List<Resource> resources = buildResourcesWithProfils(resource, profiles);
-        if (resources.isEmpty()) {
-            return null;
-        }
         return TemplateSettings.builder()
                 .name(generateTemplateName(resource, profiles))
                 .locations(resources)

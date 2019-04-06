@@ -132,7 +132,7 @@ public class QuestionRepositoryTest {
 
     @Test
     void hasParentByCriteriaQueryNull() {
-        assertThrows(IllegalArgumentException.class, () -> questionRepository.hasParentByQuery((Criteria) null));
+        assertThrows(NullPointerException.class, () -> questionRepository.hasParentByQuery((Criteria) null));
     }
 
     @Configuration

@@ -34,6 +34,7 @@ import org.elasticsearch.index.get.GetResult;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.springframework.data.domain.Page;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -72,6 +73,7 @@ public class DefaultResultsMapper implements ResultsMapper {
      * @param <T>    generic method
      * @return the entity
      */
+    @Nullable
     @Override
     public <S extends T, T> S mapEntity(Collection<DocumentField> values, Class<T> clazz) {
         return mapEntity(buildJSONFromFields(values), clazz);

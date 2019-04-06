@@ -293,14 +293,10 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
      * @return
      */
     protected SearchRequest doSearch(SearchRequest request, CriteriaQuery criteriaQuery) {
-        QueryBuilder query = new CriteriaQueryProcessor().createQueryFromCriteria(criteriaQuery.getCriteria());
-        QueryBuilder filter = new CriteriaFilterProcessor()
+        Optional<QueryBuilder> query = new CriteriaQueryProcessor().createQueryFromCriteria(criteriaQuery.getCriteria());
+        Optional<QueryBuilder> filter = new CriteriaFilterProcessor()
                 .createFilterFromCriteria(criteriaQuery.getCriteria());
-        if (query != null) {
-            request.source().query(query);
-        } else {
-            request.source().query(QueryBuilders.matchAllQuery());
-        }
+        request.source().query(query.orElse(QueryBuilders.matchAllQuery()));
         if (criteriaQuery.getSort() != null) {
             criteriaQuery.getSort().forEach(order -> request.source().sort(order.getProperty(), order.getDirection() == Sort.Direction.ASC ? SortOrder.ASC : SortOrder.DESC));
         }
@@ -308,8 +304,8 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
             request.source().minScore(criteriaQuery.getMinScore());
         }
 
-        if (filter != null)
-            request.source().postFilter(filter);
+        if (filter.isPresent())
+            request.source().postFilter(filter.get());
         return request;
     }
 
@@ -392,17 +388,11 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
         assertNotNullTypes(query);
         assertNotNullPageable(query);
 
-        QueryBuilder elasticsearchQuery = new CriteriaQueryProcessor().createQueryFromCriteria(query.getCriteria());
-        QueryBuilder elasticsearchFilter = new CriteriaFilterProcessor().createFilterFromCriteria(query.getCriteria());
-
-        if (elasticsearchQuery != null) {
-            request.source().query(elasticsearchQuery);
-        } else {
-            request.source().query(QueryBuilders.matchAllQuery());
-        }
-
-        if (elasticsearchFilter != null) {
-            request.source().postFilter(elasticsearchFilter);
+        Optional<QueryBuilder> elasticsearchQuery = new CriteriaQueryProcessor().createQueryFromCriteria(query.getCriteria());
+        Optional<QueryBuilder> elasticsearchFilter = new CriteriaFilterProcessor().createFilterFromCriteria(query.getCriteria());
+        request.source().query(elasticsearchQuery.orElse(QueryBuilders.matchAllQuery()));
+        if (elasticsearchFilter.isPresent()) {
+            request.source().postFilter(elasticsearchFilter.get());
         }
         request.source().version(true);
         return request;
@@ -450,7 +440,7 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
      * @return
      */
     protected SearchRequest doCount(SearchRequest searchRequest, SearchQuery query) {
-        return doCount(searchRequest, query.getQuery(), query.getFilter());
+        return doCount(searchRequest, Optional.ofNullable(query.getQuery()), Optional.ofNullable(query.getFilter()));
     }
 
     /**
@@ -459,8 +449,8 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
      * @return
      */
     protected SearchRequest doCount(SearchRequest searchRequest, CriteriaQuery criteriaQuery) {
-        QueryBuilder query = new CriteriaQueryProcessor().createQueryFromCriteria(criteriaQuery.getCriteria());
-        QueryBuilder filter = new CriteriaFilterProcessor()
+        Optional<QueryBuilder> query = new CriteriaQueryProcessor().createQueryFromCriteria(criteriaQuery.getCriteria());
+        Optional<QueryBuilder> filter = new CriteriaFilterProcessor()
                 .createFilterFromCriteria(criteriaQuery.getCriteria());
         return doCount(searchRequest, query, filter);
     }
@@ -472,7 +462,7 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
      * @return
      */
     protected SearchRequest doCount(SearchRequest searchRequest, StringQuery query) {
-        return doCount(searchRequest, wrapperQuery(query.getSource()), null);
+        return doCount(searchRequest, Optional.of(wrapperQuery(query.getSource())), Optional.empty());
     }
 
     /**
@@ -481,14 +471,10 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
      * @param elasticsearchFilter
      * @return
      */
-    private SearchRequest doCount(SearchRequest searchRequest, QueryBuilder elasticsearchQuery, QueryBuilder elasticsearchFilter) {
-        if (elasticsearchQuery != null) {
-            searchRequest.source().query(elasticsearchQuery);
-        } else {
-            searchRequest.source().query(QueryBuilders.matchAllQuery());
-        }
-        if (elasticsearchFilter != null) {
-            searchRequest.source().postFilter(elasticsearchFilter);
+    private SearchRequest doCount(SearchRequest searchRequest, Optional<QueryBuilder> elasticsearchQuery, Optional<QueryBuilder> elasticsearchFilter) {
+        searchRequest.source().query(elasticsearchQuery.orElse(QueryBuilders.matchAllQuery()));
+        if (elasticsearchFilter.isPresent()) {
+            searchRequest.source().postFilter(elasticsearchFilter.get());
         }
         return searchRequest;
     }

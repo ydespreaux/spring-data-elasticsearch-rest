@@ -619,12 +619,12 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
     @Override
     public <T> Mono<Void> delete(CriteriaQuery query, Class<T> clazz) {
         ElasticsearchPersistentEntity<T> persistentEntity = getPersistentEntityFor(clazz);
-        QueryBuilder queryBuilder = new CriteriaQueryProcessor().createQueryFromCriteria(query.getCriteria());
-        QueryBuilder filterBuilder = new CriteriaFilterProcessor().createFilterFromCriteria(query.getCriteria());
+        Optional<QueryBuilder> queryBuilder = new CriteriaQueryProcessor().createQueryFromCriteria(query.getCriteria());
+        Optional<QueryBuilder> filterBuilder = new CriteriaFilterProcessor().createFilterFromCriteria(query.getCriteria());
         if (persistentEntity.isRolloverIndex()) {
-            return deleteByQuery(persistentEntity.getAliasOrIndexWriter(), persistentEntity.getTypeName(), queryBuilder != null ? queryBuilder : filterBuilder);
+            return deleteByQuery(persistentEntity.getAliasOrIndexWriter(), persistentEntity.getTypeName(), queryBuilder.orElse(filterBuilder.orElse(null)));
         } else {
-            return deleteByQuery(persistentEntity.getAliasOrIndexReader(), persistentEntity.getTypeName(), queryBuilder != null ? queryBuilder : filterBuilder);
+            return deleteByQuery(persistentEntity.getAliasOrIndexReader(), persistentEntity.getTypeName(), queryBuilder.orElse(filterBuilder.orElse(null)));
         }
     }
 
