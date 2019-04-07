@@ -16,6 +16,7 @@
         <logstash-encoder.version>5.0</logstash-encoder.version>
         <apache.commons.io.version>2.6</apache.commons.io.version>
         <apache.commons.lang.version>2.6</apache.commons.lang.version>
+        <elasticseach-rest.version>6.5.0</elasticseach-rest.version>
         <github-testcontainers.version>1.1.0</github-testcontainers.version>
         <hamcrest.version>2.1</hamcrest.version>
         <junit.jupiter.version>5.4.1</junit.jupiter.version>
@@ -95,6 +96,20 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-high-level-client</artifactId>
+                <version>${elasticseach-rest.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch</groupId>
+                <artifactId>elasticsearch</artifactId>
+                <version>${elasticseach-rest.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <build>
         <plugins>
             <!-- Add maven compiler plugin -->
