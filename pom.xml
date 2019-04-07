@@ -17,7 +17,7 @@
         <apache.commons.io.version>2.6</apache.commons.io.version>
         <apache.commons.lang.version>2.6</apache.commons.lang.version>
         <elasticseach-rest.version>6.5.0</elasticseach-rest.version>
-        <github-testcontainers.version>1.1.0</github-testcontainers.version>
+        <github-testcontainers.version>1.2.2</github-testcontainers.version>
         <hamcrest.version>2.1</hamcrest.version>
         <junit.jupiter.version>5.4.1</junit.jupiter.version>
         <!-- Sonar configuration -->
