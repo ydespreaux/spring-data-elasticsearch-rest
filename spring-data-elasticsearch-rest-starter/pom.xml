@@ -17,7 +17,6 @@
     <properties>
         <commons-io.version>2.6</commons-io.version>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.github.ydespreaux.spring.data</groupId>

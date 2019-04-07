@@ -16,8 +16,8 @@
         <logstash-encoder.version>5.0</logstash-encoder.version>
         <apache.commons.io.version>2.6</apache.commons.io.version>
         <apache.commons.lang.version>2.6</apache.commons.lang.version>
-        <elasticseach-rest.version>6.5.0</elasticseach-rest.version>
         <github-testcontainers.version>1.2.2</github-testcontainers.version>
+        <elasticsearch-rest.version>6.5.0</elasticsearch-rest.version>
         <hamcrest.version>2.1</hamcrest.version>
         <junit.jupiter.version>5.4.1</junit.jupiter.version>
         <!-- Sonar configuration -->
@@ -102,12 +102,12 @@
             <dependency>
                 <groupId>org.elasticsearch.client</groupId>
                 <artifactId>elasticsearch-rest-high-level-client</artifactId>
-                <version>${elasticseach-rest.version}</version>
+                <version>${elasticsearch-rest.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.elasticsearch</groupId>
                 <artifactId>elasticsearch</artifactId>
-                <version>${elasticseach-rest.version}</version>
+                <version>${elasticsearch-rest.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -149,7 +149,6 @@
                         </goals>
                         <configuration>
                             <destFile>${jacoco.report.ut}</destFile>
-                            <propertyName>surefireArgLine</propertyName>
                         </configuration>
                     </execution>
                     <execution>
@@ -166,7 +165,6 @@
                         </goals>
                         <configuration>
                             <destFile>${jacoco.report.it}</destFile>
-                            <propertyName>failsafeArgLine</propertyName>
                         </configuration>
                     </execution>
                     <execution>
