@@ -26,6 +26,7 @@
         <sonar.junit.reportPaths>${project.build.directory}/surefire-reports</sonar.junit.reportPaths>
         <sonar.jacoco.reportPaths>${jacoco.report.ut},${jacoco.report.it}</sonar.jacoco.reportPaths>
     </properties>
+    
     <scm>
         <connection>scm:git:git://github.com/ydespreaux/spring-data-elasticsearch-rest.git</connection>
         <developerConnection>scm:git:git@github.com:ydespreaux/spring-data-elasticsearch-rest.git</developerConnection>
