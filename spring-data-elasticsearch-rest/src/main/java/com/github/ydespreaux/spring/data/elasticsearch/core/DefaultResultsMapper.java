@@ -86,6 +86,7 @@ public class DefaultResultsMapper implements ResultsMapper {
      * @param clazz    must not be {@literal null}.
      * @return can be {@literal null} if the {@link GetResult#isSourceEmpty() is empty}.
      */
+    @Nullable
     @Override
     public <S extends T, T> S mapResult(GetResponse response, Class<T> clazz) {
         S result = mapEntity(response.getSourceAsString(), clazz);
@@ -102,6 +103,7 @@ public class DefaultResultsMapper implements ResultsMapper {
      * @param type      must not be {@literal null}.
      * @return can be {@literal null} if the {@link SearchHit} does not have {@link SearchHit#hasSource() a source}.
      */
+    @Nullable
     @Override
     public <S extends T, T> S mapEntity(SearchHit hit, Class<T> type) {
         S result = null;
@@ -170,6 +172,7 @@ public class DefaultResultsMapper implements ResultsMapper {
      * @param values
      * @return
      */
+    @Nullable
     private String buildJSONFromFields(Collection<DocumentField> values) {
         JsonFactory nodeFactory = new JsonFactory();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();

@@ -73,18 +73,17 @@ public class CriteriaQueryProcessor {
 
         public void addCriteria(Criteria chainedCriteria) {
             Optional<QueryBuilder> queryFragmentForCriteria = createQueryFragmentForCriteria(chainedCriteria);
-            if (queryFragmentForCriteria.isEmpty()) {
-                return;
-            }
-            if (firstQuery == null) {
-                firstQuery = queryFragmentForCriteria.get();
-                negateFirstQuery = chainedCriteria.isNegating();
-            } else if (chainedCriteria.isOr()) {
-                shouldQueryBuilderList.add(queryFragmentForCriteria.get());
-            } else if (chainedCriteria.isNegating()) {
-                mustNotQueryBuilderList.add(queryFragmentForCriteria.get());
-            } else {
-                mustQueryBuilderList.add(queryFragmentForCriteria.get());
+            if (queryFragmentForCriteria.isPresent()) {
+                if (firstQuery == null) {
+                    firstQuery = queryFragmentForCriteria.get();
+                    negateFirstQuery = chainedCriteria.isNegating();
+                } else if (chainedCriteria.isOr()) {
+                    shouldQueryBuilderList.add(queryFragmentForCriteria.get());
+                } else if (chainedCriteria.isNegating()) {
+                    mustNotQueryBuilderList.add(queryFragmentForCriteria.get());
+                } else {
+                    mustQueryBuilderList.add(queryFragmentForCriteria.get());
+                }
             }
         }
 
@@ -133,7 +132,7 @@ public class CriteriaQueryProcessor {
                     }
                 }
                 if (!((BoolQueryBuilder) query).hasClauses()) {
-                    return null;
+                    return Optional.empty();
                 }
             }
             if (query != null) {
