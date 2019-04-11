@@ -27,6 +27,7 @@ import com.github.ydespreaux.spring.data.elasticsearch.core.converter.serializer
 import com.github.ydespreaux.spring.data.elasticsearch.core.converter.serializer.PersistentEntitySerializer;
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.lang.Nullable;
 
 import java.io.IOException;
 import java.util.*;
@@ -150,6 +151,7 @@ public class EntitySerializerRegistry {
         return childClass;
     }
 
+    @Nullable
     private Class<?> getChildEntityClassByTypeImpl(Class<?> entityClass, String type, Set<Class<?>> discovryClasses) {
         if (relationships.containsKey(entityClass)) {
             Map<String, Class<?>> relationsByEntity = relationships.get(entityClass);

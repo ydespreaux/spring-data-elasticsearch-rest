@@ -24,6 +24,7 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.support.IndicesOptions;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -120,6 +121,7 @@ public interface Query {
      *
      * @return SourceFilter
      */
+    @Nullable
     SourceFilter getSourceFilter();
 
     /**

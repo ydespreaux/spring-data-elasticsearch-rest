@@ -24,6 +24,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.github.ydespreaux.spring.data.elasticsearch.core.geo.GeoShapeOrientation;
+import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -36,6 +37,7 @@ import java.io.IOException;
  */
 public class GeoShapeOrientationDeserializer extends JsonDeserializer<GeoShapeOrientation> {
 
+    @Nullable
     @Override
     public GeoShapeOrientation deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         String orientationName = jsonParser.readValueAs(String.class);

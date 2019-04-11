@@ -28,6 +28,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.repository.query.ParametersParameterAccessor;
 import org.springframework.data.repository.query.parser.PartTree;
+import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -47,6 +48,7 @@ public class ElasticsearchPartQuery extends AbstractElasticsearchRepositoryQuery
         this.mappingContext = elasticsearchOperations.getElasticsearchConverter().getMappingContext();
     }
 
+    @Nullable
     @Override
     public Object execute(Object[] parameters) {
         ParametersParameterAccessor accessor = new ParametersParameterAccessor(queryMethod.getParameters(), parameters);
@@ -77,6 +79,7 @@ public class ElasticsearchPartQuery extends AbstractElasticsearchRepositoryQuery
         return elasticsearchOperations.findOne(query, queryMethod.getEntityInformation().getJavaType());
     }
 
+    @Nullable
     private Object countOrGetDocumentsForDelete(CriteriaQuery query, ParametersParameterAccessor accessor) {
 
         Object result = null;

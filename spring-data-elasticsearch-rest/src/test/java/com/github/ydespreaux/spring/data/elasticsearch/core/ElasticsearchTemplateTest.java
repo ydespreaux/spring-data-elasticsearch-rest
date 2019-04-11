@@ -366,8 +366,8 @@ public class ElasticsearchTemplateTest {
         this.operations.refresh(Article.class);
         this.operations.deleteById(articleIndexed.getDocumentId(), Article.class);
         this.operations.refresh(Article.class);
-        Article response = this.operations.findById(Article.class, articleIndexed.getDocumentId());
-        assertThat(response, is(nullValue()));
+        Optional<Article> response = this.operations.findById(Article.class, articleIndexed.getDocumentId());
+        assertThat(response.isEmpty(), is(true));
     }
 
     @Test
@@ -377,8 +377,8 @@ public class ElasticsearchTemplateTest {
         this.operations.refresh(Article.class);
         this.operations.delete(articleIndexed, Article.class);
         this.operations.refresh(Article.class);
-        Article response = this.operations.findById(Article.class, articleIndexed.getDocumentId());
-        assertThat(response, is(nullValue()));
+        Optional<Article> response = this.operations.findById(Article.class, articleIndexed.getDocumentId());
+        assertThat(response.isEmpty(), is(true));
     }
 
     @Test
@@ -392,8 +392,8 @@ public class ElasticsearchTemplateTest {
         this.operations.deleteAll(articles, Article.class);
         this.operations.refresh(Article.class);
         for (Article articleIndexed : articles) {
-            Article response = this.operations.findById(Article.class, articleIndexed.getDocumentId());
-            assertThat(response, is(nullValue()));
+            Optional<Article> response = this.operations.findById(Article.class, articleIndexed.getDocumentId());
+            assertThat(response.isEmpty(), is(true));
         }
     }
 
@@ -492,8 +492,8 @@ public class ElasticsearchTemplateTest {
         this.operations.refresh(Book.class);
         this.operations.deleteById(bookIndexed.getDocumentId(), Book.class);
         this.operations.refresh(Book.class);
-        Book response = this.operations.findById(Book.class, bookIndexed.getDocumentId());
-        assertThat(response, is(nullValue()));
+        Optional<Book> response = this.operations.findById(Book.class, bookIndexed.getDocumentId());
+        assertThat(response.isEmpty(), is(true));
     }
 
     @Test
@@ -503,8 +503,8 @@ public class ElasticsearchTemplateTest {
         this.operations.refresh(Book.class);
         this.operations.delete(bookIndexed, Book.class);
         this.operations.refresh(Book.class);
-        Book response = this.operations.findById(Book.class, bookIndexed.getDocumentId());
-        assertThat(response, is(nullValue()));
+        Optional<Book> response = this.operations.findById(Book.class, bookIndexed.getDocumentId());
+        assertThat(response.isEmpty(), is(true));
     }
 
     @Test
@@ -522,7 +522,7 @@ public class ElasticsearchTemplateTest {
         this.operations.deleteAll(books, Book.class);
         this.operations.refresh(Book.class);
         for (Book bookIndexed : booksToDelete) {
-            assertThat(this.operations.findById(Book.class, bookIndexed.getDocumentId()), is(nullValue()));
+            assertThat(this.operations.findById(Book.class, bookIndexed.getDocumentId()).isEmpty(), is(true));
         }
     }
 

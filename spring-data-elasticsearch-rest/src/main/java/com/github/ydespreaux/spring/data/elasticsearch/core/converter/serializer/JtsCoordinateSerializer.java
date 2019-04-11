@@ -24,6 +24,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import org.locationtech.jts.geom.Coordinate;
+import org.springframework.lang.Nullable;
 
 import java.io.IOException;
 
@@ -36,7 +37,7 @@ import java.io.IOException;
 public class JtsCoordinateSerializer extends JsonSerializer<Coordinate> {
 
     @Override
-    public void serialize(Coordinate value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+    public void serialize(@Nullable Coordinate value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         if (value == null) {
             return;
         }

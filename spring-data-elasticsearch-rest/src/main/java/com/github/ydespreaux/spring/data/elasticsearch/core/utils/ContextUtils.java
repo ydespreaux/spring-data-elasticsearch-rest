@@ -22,6 +22,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.core.utils;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
+import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 import java.util.regex.Matcher;
@@ -62,7 +63,7 @@ public final class ContextUtils {
      * @param expression the SPel expression
      * @return evaluate the expression
      */
-    public static String getEnvironmentValue(ApplicationContext context, String expression) {
+    public static String getEnvironmentValue(@Nullable ApplicationContext context, String expression) {
         if (context == null) {
             return expression;
         }

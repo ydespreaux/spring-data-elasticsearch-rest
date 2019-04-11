@@ -24,6 +24,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import org.elasticsearch.common.geo.GeoPoint;
+import org.springframework.lang.Nullable;
 
 import java.io.IOException;
 
@@ -36,7 +37,7 @@ import java.io.IOException;
 public class GeoPointSerializer extends JsonSerializer<GeoPoint> {
 
     @Override
-    public void serialize(GeoPoint value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+    public void serialize(@Nullable GeoPoint value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         if (value == null) {
             return;
         }

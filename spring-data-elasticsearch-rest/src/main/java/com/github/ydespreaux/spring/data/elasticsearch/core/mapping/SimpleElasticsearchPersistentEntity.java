@@ -37,6 +37,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.mapping.MappingException;
 import org.springframework.data.mapping.model.BasicPersistentEntity;
 import org.springframework.data.util.TypeInformation;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -55,6 +56,7 @@ import java.util.Set;
 @Getter
 public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntity<T, ElasticsearchPersistentProperty> implements ElasticsearchPersistentEntity<T>, ApplicationContextAware {
 
+    @Nullable
     private ApplicationContext context;
     private Class<T> entityClass;
     private org.elasticsearch.action.admin.indices.alias.Alias alias;
@@ -74,6 +76,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     private Duration scrollTime;
     private RolloverConfig rollover;
 
+    @Nullable
     private JoinDescriptor<T> joinDescriptor;
 
     /**
@@ -95,7 +98,9 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
         } else if (this.entityClass.isAnnotationPresent(RolloverDocument.class)) {
             afterRolloverDocumentPropertySet(this.entityClass.getAnnotation(RolloverDocument.class));
         }
-        this.joinDescriptor = new JoinDescriptorBuilder<>(this.context, this.entityClass).build();
+        if (this.entityClass.isAnnotationPresent(Child.class) || this.entityClass.isAnnotationPresent(Parent.class)) {
+            this.joinDescriptor = new JoinDescriptorBuilder<>(this.context, this.entityClass).build();
+        }
     }
 
     private void afterProjectionDocumentPropertySet(ProjectionDocument document) {
@@ -276,6 +281,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
      * @param source the source
      * @return the document id
      */
+    @Nullable
     @Override
     public String getPersistentEntityId(T source) {
         if (getIdProperty() == null) {
@@ -295,6 +301,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
      * @param source the document
      * @return the document version
      */
+    @Nullable
     @Override
     public Long getPersistentEntityVersion(T source) {
         if (getVersionProperty() == null) {
@@ -314,6 +321,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
      * @param source
      * @return
      */
+    @Nullable
     @Override
     public String getPersistentEntityIndexName(T source) {
         if (getIndexNameProperty() == null) {
@@ -426,6 +434,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
      *
      * @return can be {@literal null}.
      */
+    @Nullable
     @Override
     public Object getParentId(T source) {
         if (this.parentIdProperty == null) {

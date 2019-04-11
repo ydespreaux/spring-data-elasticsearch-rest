@@ -24,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.queryparser.flexible.core.util.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -53,8 +52,8 @@ public class CriteriaQueryProcessor {
      * @param criteria
      * @return
      */
-    public Optional<QueryBuilder> createQueryFromCriteria(@NonNull Criteria criteria) {
-        if (isEmpty(criteria.getCriteriaChain()))
+    public Optional<QueryBuilder> createQueryFromCriteria(@Nullable Criteria criteria) {
+        if (criteria == null || isEmpty(criteria.getCriteriaChain()))
             return Optional.empty();
         ListQueryBuilder builder = new ListQueryBuilder();
         for (Criteria chainedCriteria : criteria.getCriteriaChain()) {

@@ -28,6 +28,7 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.geo.Box;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Point;
+import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -297,11 +298,7 @@ public class Criteria {
      * @param upperBound
      * @return
      */
-    public Criteria between(Object lowerBound, Object upperBound) {
-        if (lowerBound == null && upperBound == null) {
-            throw new InvalidDataAccessApiUsageException("Range [* TO *] is not allowed");
-        }
-
+    public Criteria between(@NonNull Object lowerBound, @NonNull Object upperBound) {
         queryCriteria.add(new CriteriaEntry(OperationKey.BETWEEN, new Object[]{lowerBound, upperBound}));
         return this;
     }
@@ -312,18 +309,12 @@ public class Criteria {
      * @param upperBound
      * @return
      */
-    public Criteria lessThanEqual(Object upperBound) {
-        if (upperBound == null) {
-            throw new InvalidDataAccessApiUsageException("UpperBound can't be null");
-        }
+    public Criteria lessThanEqual(@NonNull Object upperBound) {
         queryCriteria.add(new CriteriaEntry(OperationKey.LESS_EQUAL, upperBound));
         return this;
     }
 
-    public Criteria lessThan(Object upperBound) {
-        if (upperBound == null) {
-            throw new InvalidDataAccessApiUsageException("UpperBound can't be null");
-        }
+    public Criteria lessThan(@NonNull Object upperBound) {
         queryCriteria.add(new CriteriaEntry(OperationKey.LESS, upperBound));
         return this;
     }
@@ -334,18 +325,12 @@ public class Criteria {
      * @param lowerBound
      * @return
      */
-    public Criteria greaterThanEqual(Object lowerBound) {
-        if (lowerBound == null) {
-            throw new InvalidDataAccessApiUsageException("LowerBound can't be null");
-        }
+    public Criteria greaterThanEqual(@NonNull Object lowerBound) {
         queryCriteria.add(new CriteriaEntry(OperationKey.GREATER_EQUAL, lowerBound));
         return this;
     }
 
-    public Criteria greaterThan(Object lowerBound) {
-        if (lowerBound == null) {
-            throw new InvalidDataAccessApiUsageException("LowerBound can't be null");
-        }
+    public Criteria greaterThan(@NonNull Object lowerBound) {
         queryCriteria.add(new CriteriaEntry(OperationKey.GREATER, lowerBound));
         return this;
     }

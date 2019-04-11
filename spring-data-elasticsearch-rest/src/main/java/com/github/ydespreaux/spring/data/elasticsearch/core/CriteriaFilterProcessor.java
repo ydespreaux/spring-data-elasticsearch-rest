@@ -29,6 +29,7 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.util.*;
@@ -122,6 +123,7 @@ final class CriteriaFilterProcessor {
      * @param fieldName
      * @return
      */
+    @Nullable
     private QueryBuilder processCriteriaEntry(Criteria.OperationKey key, @NonNull Object value, String fieldName) {
         if (Criteria.OperationKey.WITHIN == key) {
             return processWithinFilter(value, fieldName);

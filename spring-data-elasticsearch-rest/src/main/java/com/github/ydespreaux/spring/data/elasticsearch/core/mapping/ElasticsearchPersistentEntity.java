@@ -113,18 +113,21 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
      * @param entity the entity
      * @return the document id
      */
+    @Nullable
     String getPersistentEntityId(T entity);
 
     /**
      * @param source the entity
      * @return the version
      */
+    @Nullable
     Long getPersistentEntityVersion(T source);
 
     /**
      * @param entity
      * @return
      */
+    @Nullable
     String getPersistentEntityIndexName(T entity);
 
     /**
@@ -184,6 +187,7 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
     /**
      * @return
      */
+    @Nullable
     SourceFilter getSourceFilter();
 
     /**

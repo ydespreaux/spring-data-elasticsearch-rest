@@ -34,6 +34,7 @@ import org.springframework.data.repository.query.ParameterAccessor;
 import org.springframework.data.repository.query.parser.AbstractQueryCreator;
 import org.springframework.data.repository.query.parser.Part;
 import org.springframework.data.repository.query.parser.PartTree;
+import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -69,7 +70,7 @@ public class ElasticsearchQueryCreator extends AbstractQueryCreator<CriteriaQuer
     }
 
     @Override
-    protected CriteriaQuery and(Part part, CriteriaQuery base, Iterator<Object> iterator) {
+    protected CriteriaQuery and(Part part, @Nullable CriteriaQuery base, Iterator<Object> iterator) {
         if (base == null) {
             return create(part, iterator);
         }
@@ -84,21 +85,17 @@ public class ElasticsearchQueryCreator extends AbstractQueryCreator<CriteriaQuer
         return new CriteriaQuery(base.getCriteria().or(query.getCriteria()));
     }
 
+    @Nullable
     @Override
-    protected CriteriaQuery complete(CriteriaQuery query, Sort sort) {
+    protected CriteriaQuery complete(@Nullable CriteriaQuery query, Sort sort) {
         if (query == null) {
             return null;
         }
         return query.addSort(sort);
     }
 
-    private Criteria from(Part part, Criteria instance, Iterator<?> parameters) {
+    private Criteria from(Part part, Criteria criteria, Iterator<?> parameters) {
         Part.Type type = part.getType();
-
-        Criteria criteria = instance;
-        if (criteria == null) {
-            criteria = new Criteria();
-        }
         switch (type) {
             case TRUE:
                 return criteria.is(true);
@@ -138,9 +135,9 @@ public class ElasticsearchQueryCreator extends AbstractQueryCreator<CriteriaQuer
                 return criteria.notIn(asArray(parameters.next()));
             case SIMPLE_PROPERTY:
             case WITHIN:
-                return withinOrSimplePropertyCriteria(part, instance, parameters);
+                return withinOrSimplePropertyCriteria(part, criteria, parameters);
             case NEAR:
-                return nearCriteria(part, instance, parameters);
+                return nearCriteria(part, criteria, parameters);
             default:
                 throw new InvalidDataAccessApiUsageException(String.format(ILLEGAL_CRITERIA_ERROR, type));
         }

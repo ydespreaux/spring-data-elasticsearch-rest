@@ -24,6 +24,7 @@ import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.elasticsearch.rest.RestStatus;
 import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.lang.Nullable;
 
 import java.net.ConnectException;
 
@@ -33,6 +34,7 @@ import java.net.ConnectException;
  */
 public class ElasticsearchExceptionTranslator {
 
+    @Nullable
     public Throwable translateExceptionIfPossible(RuntimeException ex) {
         if (ex.getCause() instanceof ConnectException) {
             return new DataAccessResourceFailureException(ex.getMessage(), ex);

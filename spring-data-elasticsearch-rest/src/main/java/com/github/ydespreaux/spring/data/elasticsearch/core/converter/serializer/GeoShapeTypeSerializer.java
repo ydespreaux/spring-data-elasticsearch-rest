@@ -24,6 +24,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import org.elasticsearch.common.geo.GeoShapeType;
+import org.springframework.lang.Nullable;
 
 import java.io.IOException;
 
@@ -36,7 +37,7 @@ import java.io.IOException;
 public class GeoShapeTypeSerializer extends JsonSerializer<GeoShapeType> {
 
     @Override
-    public void serialize(GeoShapeType geoShapeType, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+    public void serialize(@Nullable GeoShapeType geoShapeType, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         if (geoShapeType != null) {
             jsonGenerator.writeString(geoShapeType.shapeName());
         } else {

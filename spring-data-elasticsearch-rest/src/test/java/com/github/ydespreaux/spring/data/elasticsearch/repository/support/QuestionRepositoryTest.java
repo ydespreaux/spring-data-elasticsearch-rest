@@ -40,6 +40,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.elasticsearch.index.query.Operator.AND;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -132,7 +133,7 @@ public class QuestionRepositoryTest {
 
     @Test
     void hasParentByCriteriaQueryNull() {
-        assertThrows(NullPointerException.class, () -> questionRepository.hasParentByQuery((Criteria) null));
+        assertThrows(NoSuchElementException.class, () -> questionRepository.hasParentByQuery((Criteria) null));
     }
 
     @Configuration

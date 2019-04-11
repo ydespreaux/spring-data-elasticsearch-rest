@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.lang.Nullable;
 
 /**
  * JoinQuery
@@ -35,6 +36,7 @@ import org.springframework.beans.factory.InitializingBean;
 @Setter
 public abstract class JoinQuery<T extends JoinQuery> extends AbstractQuery implements InitializingBean {
 
+    @Nullable
     private QueryBuilder query;
     private String type;
     private boolean ignoreUnmapped;

@@ -24,6 +24,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.github.ydespreaux.spring.data.elasticsearch.core.geo.GeoShapeOrientation;
+import org.springframework.lang.Nullable;
 
 import java.io.IOException;
 
@@ -36,7 +37,7 @@ import java.io.IOException;
 public class GeoShapeOrientationSerializer extends JsonSerializer<GeoShapeOrientation> {
 
     @Override
-    public void serialize(GeoShapeOrientation orientation, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+    public void serialize(@Nullable GeoShapeOrientation orientation, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         if (orientation != null) {
             jsonGenerator.writeString(orientation.orientationName());
         } else {

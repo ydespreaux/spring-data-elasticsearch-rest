@@ -26,6 +26,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.elasticsearch.common.geo.GeoShapeType;
 import org.locationtech.jts.geom.Coordinate;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -58,30 +59,30 @@ public class PolygonShape extends AbstractShape implements CoordinatesShape<Coor
     public PolygonShape() {
     }
 
-    public PolygonShape(List<Coordinate> outerCoordinates, List<Coordinate> innerCoordinates) {
+    public PolygonShape(List<Coordinate> outerCoordinates, @Nullable List<Coordinate> innerCoordinates) {
         this(outerCoordinates, innerCoordinates, null);
     }
 
-    public PolygonShape(Coordinate[] outerCoordinates, Coordinate[] innerCoordinates) {
+    public PolygonShape(Coordinate[] outerCoordinates, @Nullable Coordinate[] innerCoordinates) {
         this(outerCoordinates, innerCoordinates, null);
     }
 
-    public PolygonShape(Coordinate[] outerCoordinates, Coordinate[] innerCoordinates, GeoShapeOrientation orientation) {
+    public PolygonShape(Coordinate[] outerCoordinates, @Nullable Coordinate[] innerCoordinates, GeoShapeOrientation orientation) {
         this(Arrays.asList(outerCoordinates), innerCoordinates != null ? Arrays.asList(innerCoordinates) : new ArrayList<>(), orientation);
     }
 
-    public PolygonShape(Coordinate[][] coordinates) {
+    public PolygonShape(@Nullable Coordinate[][] coordinates) {
         this(coordinates, null);
     }
 
-    public PolygonShape(Coordinate[][] coordinates, GeoShapeOrientation orientation) {
+    public PolygonShape(@Nullable Coordinate[][] coordinates, GeoShapeOrientation orientation) {
         if (coordinates != null) {
             this.setCoordinates(coordinates);
         }
         this.orientation = orientation;
     }
 
-    public PolygonShape(List<Coordinate> outerCoordinates, List<Coordinate> innerCoordinates, GeoShapeOrientation orientation) {
+    public PolygonShape(List<Coordinate> outerCoordinates, @Nullable List<Coordinate> innerCoordinates, GeoShapeOrientation orientation) {
         Assert.notNull(outerCoordinates, "outerCoordinates must not be null!!");
         this.outerCoordinates = outerCoordinates;
         this.innerCoordinates = innerCoordinates != null ? innerCoordinates : new ArrayList<>();
@@ -106,7 +107,7 @@ public class PolygonShape extends AbstractShape implements CoordinatesShape<Coor
     }
 
     @Override
-    public void setCoordinates(Coordinate[][] coordinates) {
+    public void setCoordinates(@Nullable Coordinate[][] coordinates) {
         if (coordinates == null) {
             outerCoordinates = new ArrayList<>();
             innerCoordinates = new ArrayList<>();

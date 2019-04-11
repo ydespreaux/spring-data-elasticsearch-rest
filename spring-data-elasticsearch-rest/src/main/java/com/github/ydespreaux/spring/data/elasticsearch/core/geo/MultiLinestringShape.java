@@ -26,6 +26,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.elasticsearch.common.geo.GeoShapeType;
 import org.locationtech.jts.geom.Coordinate;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -48,9 +49,10 @@ public class MultiLinestringShape extends AbstractShape implements CoordinatesSh
     private List<LinestringShape> shapes;
 
     public MultiLinestringShape() {
+        this((LinestringShape[]) null);
     }
 
-    public MultiLinestringShape(List<LinestringShape> shapes) {
+    public MultiLinestringShape(@Nullable List<LinestringShape> shapes) {
         if (shapes != null) {
             this.shapes = new ArrayList<>(shapes);
         } else {
@@ -58,7 +60,7 @@ public class MultiLinestringShape extends AbstractShape implements CoordinatesSh
         }
     }
 
-    public MultiLinestringShape(LinestringShape... shapes) {
+    public MultiLinestringShape(@Nullable LinestringShape... shapes) {
         if (shapes != null) {
             this.shapes = Arrays.asList(shapes);
         } else {

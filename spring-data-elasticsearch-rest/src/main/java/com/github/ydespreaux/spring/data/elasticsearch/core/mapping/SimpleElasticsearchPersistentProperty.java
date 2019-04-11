@@ -28,6 +28,7 @@ import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.model.AnnotationBasedPersistentProperty;
 import org.springframework.data.mapping.model.Property;
 import org.springframework.data.mapping.model.SimpleTypeHolder;
+import org.springframework.lang.Nullable;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -110,6 +111,7 @@ public class SimpleElasticsearchPersistentProperty extends
      * (non-Javadoc)
      * @see org.springframework.data.mapping.model.AbstractPersistentProperty#createAssociation()
      */
+    @Nullable
     @Override
     protected Association<ElasticsearchPersistentProperty> createAssociation() {
         return null;

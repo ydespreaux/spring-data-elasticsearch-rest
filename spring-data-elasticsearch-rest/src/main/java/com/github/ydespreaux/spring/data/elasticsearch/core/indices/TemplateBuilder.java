@@ -31,6 +31,8 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import java.io.IOException;
 import java.util.*;
 
+import static org.springframework.util.CollectionUtils.isEmpty;
+
 /**
  * @author Yoann Despréaux
  * @since 1.0.0
@@ -52,6 +54,9 @@ public class TemplateBuilder extends IndiceBuilder<PutIndexTemplateRequest, Temp
     @Override
     public PutIndexTemplateRequest build(PutIndexTemplateRequest request) {
         try {
+            if (isEmpty(this.source())) {
+                return request;
+            }
             Map<String, TreeNode> settings = this.buildJsonElement(this.source());
             // Index patterns
             List<String> indexPatterns = new ArrayList<>();

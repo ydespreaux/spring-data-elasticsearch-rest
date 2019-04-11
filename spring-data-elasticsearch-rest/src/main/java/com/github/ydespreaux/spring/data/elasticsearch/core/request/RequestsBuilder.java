@@ -47,6 +47,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -256,7 +257,7 @@ public class RequestsBuilder {
      * @param query
      * @return
      */
-    public DeleteByQueryRequest deleteBy(String indexName, String typeName, int batchSize, QueryBuilder query) {
+    public DeleteByQueryRequest deleteBy(String indexName, String typeName, int batchSize, @Nullable QueryBuilder query) {
         return new DeleteByQueryRequest(indexName)
                 .setBatchSize(batchSize)
                 .setQuery(query == null ? QueryBuilders.matchAllQuery() : query)

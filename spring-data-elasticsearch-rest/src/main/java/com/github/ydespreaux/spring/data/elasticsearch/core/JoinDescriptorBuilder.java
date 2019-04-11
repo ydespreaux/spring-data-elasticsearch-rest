@@ -25,6 +25,7 @@ import com.github.ydespreaux.spring.data.elasticsearch.annotations.Parent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mapping.MappingException;
+import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 import static com.github.ydespreaux.spring.data.elasticsearch.core.utils.ContextUtils.getEnvironmentValue;
@@ -40,14 +41,16 @@ import static java.lang.String.format;
 public class JoinDescriptorBuilder<T> {
 
 
+    @Nullable
     private final Environment environment;
     private final Class<T> entityClass;
 
-    public JoinDescriptorBuilder(ApplicationContext context, Class<T> entityClass) {
+    public JoinDescriptorBuilder(@Nullable ApplicationContext context, Class<T> entityClass) {
         this.environment = context == null ? null : context.getEnvironment();
         this.entityClass = entityClass;
     }
 
+    @Nullable
     private static <T> Parent findRootParentAnnotation(Class<T> entityClass) {
         Class<? super T> parentClass = entityClass.getSuperclass();
         while (parentClass != null) {
@@ -59,6 +62,7 @@ public class JoinDescriptorBuilder<T> {
         return null;
     }
 
+    @Nullable
     private static <T> Class<? super T> findParentClass(Class<T> entityClass) {
         Class<? super T> parentClass = entityClass.getSuperclass();
         while (parentClass != null) {
@@ -77,7 +81,7 @@ public class JoinDescriptorBuilder<T> {
         } else if (parentClass.isAnnotationPresent(Child.class)) {
             return parentClass.getAnnotation(Child.class).type();
         }
-        return null;
+        throw new MappingException(format("Parent class (%s) must be annotated by Parent or Child", parentClass.getSimpleName()));
     }
 
     /**
@@ -89,7 +93,7 @@ public class JoinDescriptorBuilder<T> {
         } else if (this.entityClass.isAnnotationPresent(Child.class)) {
             return buildChildDescriptor();
         }
-        return null;
+        throw new MappingException(format("Entity (%s) must be annotated by Parent or Child", this.entityClass.getSimpleName()));
     }
 
     /**

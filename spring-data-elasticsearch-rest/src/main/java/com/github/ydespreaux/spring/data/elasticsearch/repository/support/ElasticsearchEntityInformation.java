@@ -22,6 +22,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
 
 import com.github.ydespreaux.spring.data.elasticsearch.core.JoinDescriptor;
 import org.springframework.data.repository.core.EntityInformation;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Yoann Despréaux
@@ -42,6 +43,7 @@ public interface ElasticsearchEntityInformation<T, K> extends EntityInformation<
     /**
      * @return
      */
+    @Nullable
     JoinDescriptor<T> getJoinDescriptor();
 
 }
