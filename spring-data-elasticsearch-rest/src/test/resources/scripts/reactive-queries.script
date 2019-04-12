@@ -61,9 +61,42 @@ PUT:books/book/3:{"title": "Et puis Colette", "description": "Anouk, trentenaire
 PUT:books/book/4:{"title": "Live Is love Double Vinyle", "description": "Thomas s’est pour ce disque mis à nu, sans concession aucune...", "price": 12.20, "publication": "2018-07-10"}
 PUT:books/book/5:{"title": "Zorro - Cicatrices Tome 01 : Zorro", "description": "Zorro est toujours Don Diego de la Vega sous le masque, et il défend toujours la veuve et l’orphelin grâce à son fouet et son épée. Mais il est cette fois aux prises avec l’amour !", "price": 5}
 
+# index cities settings
+PUT:_template/city:@resource(templates/city.template)
+# index cities
+PUT:metropole-se/city/1:{ "name" : "Montpellier", "population": 275318, "region": "SE", "location": { "lat": 43.613712, "lon": 3.872191 } }
+PUT:ville-se/city/2:{ "name" : "Mauguio", "population": 16795, "region": "SE", "location": { "lat": 43.615463, "lon": 4.009743 } }
+PUT:ville-se/city/3:{ "name" : "Castries", "population": 6075, "region": "SE", "location": { "lat": 43.677644, "lon": 3.985277 } }
+PUT:ville-se/city/4:{ "name" : "Vendargues", "population": 6186, "region": "SE", "location": { "lat": 43.656904, "lon": 3.969566 } }
+PUT:ville-se/city/5:{ "name" : "Sommières", "population": 4644, "region": "SE", "location": { "lat": 43.782759, "lon": 4.089557 } }
+
+# index products settings
+PUT:products:@resource(indices/product.index)
+# index products
+PUT:products/product/1:{ "name" : "Sugar", "text": "Cane sugar", "available": false, "price": 1.0, "popularity":2, "categories": ["C1", "C2"] }
+PUT:products/product/2:{ "name" : "Sugar", "text": "Cane sugar", "available": true, "price": 1.2, "popularity":1, "categories": ["C1"] }
+PUT:products/product/3:{ "name" : "Sugar", "text": "Beet sugar", "available": true, "price": 1.1, "popularity":4, "categories": ["C2"] }
+PUT:products/product/4:{ "name" : "Salt", "text": "Rock salt", "available": true, "price": 1.9, "popularity":2, "categories": ["C3", "C4"] }
+PUT:products/product/5:{ "name" : "Salt", "text": "Sea salt", "available": false, "price": 2.1, "popularity":4, "categories": ["C1", "C3"] }
+
 # index music settings
 PUT:music:@resource(indices/music.index)
 # index musics
 PUT:music/album/1:{ "title" : "Nevermind", "suggest": {"input": [ "Nevermind", "Nirvana" ]}}
 PUT:music/album/2:{ "title" : "Thriller", "suggest": {"input": [ "Thriller", "Mickael Jackson" ]}}
 PUT:music/album/3:{ "title" : "Revolution", "suggest": {"input": [ "Revolution", "Muse" ]}}
+
+# index parent-child settings
+PUT:questions:@resource(indices/parent-child.index)
+# index questions
+PUT:questions/_doc/1:{ "description" : "Question 1", "join_field": {"name": "question"}}
+PUT:questions/_doc/2:{ "description" : "Question 2", "join_field": {"name": "question"}}
+PUT:questions/_doc/3:{ "description" : "Question 3", "join_field": {"name": "question"}}
+PUT:questions/_doc/4?routing=1&refresh:{ "description" : "Answer 1 of Question 1", "join_field": {"name": "answer", "parent": "1"}}
+PUT:questions/_doc/5?routing=1&refresh:{ "description" : "Answer 1 of Question 2 with Java", "join_field": {"name": "answer", "parent": "2"}}
+PUT:questions/_doc/6?routing=1&refresh:{ "description" : "Answer 2 of Question 2 with Angular", "join_field": {"name": "answer", "parent": "2"}}
+PUT:questions/_doc/7?routing=1&refresh:{ "description" : "This is a comment for question 1", "join_field": {"name": "comment", "parent": "1"}}
+PUT:questions/_doc/8?routing=1&refresh:{ "description" : "This is another comment for question 1", "join_field": {"name": "comment", "parent": "1"}}
+PUT:questions/_doc/9?routing=1&refresh:{ "description" : "This is a comment for question 3", "join_field": {"name": "comment", "parent": "3"}}
+PUT:questions/_doc/10?routing=1&refresh:{ "stars" : 4, "join_field": {"name": "vote", "parent": "4"}}
+PUT:questions/_doc/11?routing=1&refresh:{ "stars" : 1, "join_field": {"name": "vote", "parent": "6"}}

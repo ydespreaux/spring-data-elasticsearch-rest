@@ -22,6 +22,10 @@
 package com.github.ydespreaux.spring.data.elasticsearch;
 
 import com.github.ydespreaux.spring.data.elasticsearch.core.ReactiveElasticsearchTemplateQueryTest;
+import com.github.ydespreaux.spring.data.elasticsearch.reactive.repository.support.ReactiveAnswerRepositoryTest;
+import com.github.ydespreaux.spring.data.elasticsearch.reactive.repository.support.ReactiveArticleRepositoryTest;
+import com.github.ydespreaux.spring.data.elasticsearch.reactive.repository.support.ReactiveBookRepositoryTest;
+import com.github.ydespreaux.spring.data.elasticsearch.reactive.repository.support.ReactiveProductRepositoryTest;
 import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
@@ -41,4 +45,19 @@ public class ReactiveQuerySuiteTest {
     class ReactiveElasticsearchTemplateQueryNested extends ReactiveElasticsearchTemplateQueryTest {
     }
 
+    @Nested
+    class ReactiveAnswerRepositoryNested extends ReactiveAnswerRepositoryTest {
+    }
+
+    @Nested
+    class ReactiveArticleRepositoryNested extends ReactiveArticleRepositoryTest {
+    }
+
+    @Nested
+    class ReactiveBookRepositoryNested extends ReactiveBookRepositoryTest {
+    }
+
+    @Nested
+    class ReactiveProductRepositoryNested extends ReactiveProductRepositoryTest {
+    }
 }

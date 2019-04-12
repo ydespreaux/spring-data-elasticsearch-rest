@@ -148,7 +148,7 @@ public class ReactiveElasticsearchTemplateQueryTest
 
     @Test
     void existsByIdWithIndexNotFound(){
-        StepVerifier.create(reactiveOperations.existsById(Product.class, "1"))
+        StepVerifier.create(reactiveOperations.existsById(Product.class, "-1"))
                 .expectNext(false)
                 .verifyComplete();
     }

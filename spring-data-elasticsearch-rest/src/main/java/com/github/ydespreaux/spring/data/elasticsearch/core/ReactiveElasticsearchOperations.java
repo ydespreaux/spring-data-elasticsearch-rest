@@ -33,7 +33,6 @@ import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -59,6 +58,11 @@ public interface ReactiveElasticsearchOperations {
      * @return
      */
     TriggerManager getTriggerManager();
+
+    /**
+     * @return
+     */
+    ResultsMapper getResultsMapper();
 
     /**
      * @param callback
@@ -320,7 +324,7 @@ public interface ReactiveElasticsearchOperations {
      * @param clazz    the given clazz.
      * @param <T>      method generic.
      */
-    <T> Mono<Void> deleteAll(Collection<T> entities, Class<T> clazz);
+    <T> Mono<Void> deleteAll(Flux<T> entities, Class<T> clazz);
 
     /**
      * delete the document for the given entity, and clazz

@@ -64,7 +64,10 @@ import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import static org.elasticsearch.client.Requests.refreshRequest;
 
@@ -434,10 +437,17 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
     public <T> Mono<T> findById(String id, Class<T> entityType) {
         Assert.notNull(id, "Id must not be null!");
         ElasticsearchPersistentEntity<T> persistentEntity = getPersistentEntityFor(entityType);
-        return doFindById(id, persistentEntity.getAliasOrIndexReader(), persistentEntity.getTypeName())
-                .filter(GetResponse::isExists)
-                .map(it -> (T) this.getResultsMapper().mapResult(it, entityType))
-                .onErrorResume(IndexNotFoundException.class, ex -> Mono.empty());
+        if (persistentEntity.isIndexTimeBased() || persistentEntity.isRolloverIndex()) {
+            SearchQuery query = new NativeSearchQuery.NativeSearchQueryBuilder()
+                    .withQuery(QueryBuilders.termQuery("_id", id))
+                    .build();
+            return findOne(query, entityType);
+        } else {
+            return doFindById(id, persistentEntity.getAliasOrIndexReader(), persistentEntity.getTypeName())
+                    .filter(GetResponse::isExists)
+                    .map(it -> (T) this.getResultsMapper().mapResult(it, entityType))
+                    .onErrorResume(IndexNotFoundException.class, ex -> Mono.empty());
+        }
     }
 
 
@@ -569,27 +579,22 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
     /**
      * Delete all the {@link List} of entities, for the given clazz.
      *
-     * @param entities the {@link List} of entities.
+     * @param entities the {@link Flux} of entities.
      * @param clazz    the given clazz.
      */
     @Override
-    public <T> Mono<Void> deleteAll(Collection<T> entities, Class<T> clazz) {
+    public <T> Mono<Void> deleteAll(Flux<T> entities, Class<T> clazz) {
         ElasticsearchPersistentEntity<T> persistentEntity = getPersistentEntityFor(clazz);
-        Set<String> ids = new HashSet<>();
-        entities.forEach(entity -> {
-            String id = persistentEntity.getPersistentEntityId(entity);
-            if (id != null) {
-                ids.add(id);
-            }
-        });
-        if (!ids.isEmpty()) {
-            if (persistentEntity.isRolloverIndex()) {
-                return deleteByQuery(persistentEntity.getAliasOrIndexWriter(), persistentEntity.getTypeName(), QueryBuilders.termsQuery("_id", ids));
-            } else {
-                return deleteByQuery(persistentEntity.getAliasOrIndexReader(), persistentEntity.getTypeName(), QueryBuilders.termsQuery("_id", ids));
-            }
-        }
-        return Mono.empty();
+        return entities.map(persistentEntity::getPersistentEntityId)
+                .collectList()
+                .flatMap(ids -> {
+                    if (persistentEntity.isRolloverIndex()) {
+                        return deleteByQuery(persistentEntity.getAliasOrIndexWriter(), persistentEntity.getTypeName(), QueryBuilders.termsQuery("_id", ids));
+                    } else {
+                        return deleteByQuery(persistentEntity.getAliasOrIndexReader(), persistentEntity.getTypeName(), QueryBuilders.termsQuery("_id", ids));
+                    }
+                })
+                .then();
     }
 
     /**

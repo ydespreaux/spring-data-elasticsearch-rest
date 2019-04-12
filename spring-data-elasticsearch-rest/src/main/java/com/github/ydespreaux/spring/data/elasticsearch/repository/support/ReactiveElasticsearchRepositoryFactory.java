@@ -20,16 +20,16 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
 
-import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
-import com.github.ydespreaux.spring.data.elasticsearch.repository.ElasticsearchRepository;
-import com.github.ydespreaux.spring.data.elasticsearch.repository.query.ElasticsearchPartQuery;
-import com.github.ydespreaux.spring.data.elasticsearch.repository.query.ElasticsearchQueryMethod;
-import com.github.ydespreaux.spring.data.elasticsearch.repository.query.ElasticsearchStringQuery;
+import com.github.ydespreaux.spring.data.elasticsearch.core.ReactiveElasticsearchOperations;
+import com.github.ydespreaux.spring.data.elasticsearch.repository.ReactiveElasticsearchRepository;
+import com.github.ydespreaux.spring.data.elasticsearch.repository.query.ReactiveElasticsearchPartQuery;
+import com.github.ydespreaux.spring.data.elasticsearch.repository.query.ReactiveElasticsearchQueryMethod;
+import com.github.ydespreaux.spring.data.elasticsearch.repository.query.ReactiveElasticsearchStringQuery;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.NamedQueries;
 import org.springframework.data.repository.core.RepositoryInformation;
 import org.springframework.data.repository.core.RepositoryMetadata;
-import org.springframework.data.repository.core.support.RepositoryFactorySupport;
+import org.springframework.data.repository.core.support.ReactiveRepositoryFactorySupport;
 import org.springframework.data.repository.query.QueryLookupStrategy;
 import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
 import org.springframework.data.repository.query.RepositoryQuery;
@@ -39,38 +39,38 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 
 /**
- * Factory to create {@link ElasticsearchRepository}
+ * Factory to create {@link ReactiveElasticsearchRepository}
  *
  * @author Yoann Despréaux
  * @since 1.0.0
  */
-public class ElasticsearchRepositoryFactory extends RepositoryFactorySupport {
+public class ReactiveElasticsearchRepositoryFactory extends ReactiveRepositoryFactorySupport {
 
-    private final ElasticsearchOperations elasticsearchOperations;
+    private final ReactiveElasticsearchOperations reactiveElasticsearchOperations;
 
-    public ElasticsearchRepositoryFactory(ElasticsearchOperations elasticsearchOperations) {
+    public ReactiveElasticsearchRepositoryFactory(ReactiveElasticsearchOperations reactiveElasticsearchOperations) {
 
-        Assert.notNull(elasticsearchOperations, "ElasticsearchOperations must not be null!");
+        Assert.notNull(reactiveElasticsearchOperations, "ElasticsearchOperations must not be null!");
 
-        this.elasticsearchOperations = elasticsearchOperations;
+        this.reactiveElasticsearchOperations = reactiveElasticsearchOperations;
     }
 
     @Override
     public <T, K> ElasticsearchEntityInformation<T, K> getEntityInformation(Class<T> domainClass) {
-        return (ElasticsearchEntityInformation<T, K>) this.elasticsearchOperations.getElasticsearchConverter().getRequiredPersistentEntity(domainClass);
+        return (ElasticsearchEntityInformation<T, K>) this.reactiveElasticsearchOperations.getElasticsearchConverter().getRequiredPersistentEntity(domainClass);
     }
 
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     protected Object getTargetRepository(RepositoryInformation metadata) {
         return getTargetRepositoryViaReflection(metadata, getEntityInformation(metadata.getDomainType()),
-                elasticsearchOperations);
+                reactiveElasticsearchOperations);
     }
 
     @Override
     protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
         if (metadata.getIdType() == String.class) {
-            return SimpleElasticsearchRepository.class;
+            return ReactiveSimpleElasticsearchRepository.class;
         } else {
             throw new IllegalArgumentException("Unsupported ID type " + metadata.getIdType());
         }
@@ -92,15 +92,15 @@ public class ElasticsearchRepositoryFactory extends RepositoryFactorySupport {
         public RepositoryQuery resolveQuery(Method method, RepositoryMetadata metadata, ProjectionFactory factory,
                                             NamedQueries namedQueries) {
 
-            ElasticsearchQueryMethod queryMethod = new ElasticsearchQueryMethod(method, metadata, factory);
+            ReactiveElasticsearchQueryMethod queryMethod = new ReactiveElasticsearchQueryMethod(method, metadata, factory);
             String namedQueryName = queryMethod.getNamedQueryName();
             if (namedQueries.hasQuery(namedQueryName)) {
                 String namedQuery = namedQueries.getQuery(namedQueryName);
-                return new ElasticsearchStringQuery(queryMethod, elasticsearchOperations, namedQuery);
+                return new ReactiveElasticsearchStringQuery(queryMethod, reactiveElasticsearchOperations, namedQuery);
             } else if (queryMethod.hasAnnotatedQuery()) {
-                return new ElasticsearchStringQuery(queryMethod, elasticsearchOperations, queryMethod.getAnnotatedQuery());
+                return new ReactiveElasticsearchStringQuery(queryMethod, reactiveElasticsearchOperations, queryMethod.getAnnotatedQuery());
             }
-            return new ElasticsearchPartQuery(queryMethod, elasticsearchOperations);
+            return new ReactiveElasticsearchPartQuery(queryMethod, reactiveElasticsearchOperations);
         }
     }
 
