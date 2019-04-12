@@ -58,6 +58,7 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.reactivestreams.Publisher;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
@@ -127,7 +128,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
     public Mono<Boolean> indexExists(String indexName) {
         Objects.requireNonNull(indexName);
         GetIndexRequest request = this.requestsBuilder().getIndexRequest(indexName);
-        return Mono.from(execute(client -> client.indicesExist(request, RequestOptions.DEFAULT)))
+        return Mono.from(execute(c -> c.indicesExist(request, RequestOptions.DEFAULT)))
                 .onErrorResume(error -> Mono.error(new ElasticsearchException("Failed to get index request: " + request.toString(), error)));
     }
 
@@ -136,7 +137,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
      * @return true if the index name was created
      */
     @Override
-    public Mono<Boolean> createIndex(Alias alias, String indexName) {
+    public Mono<Boolean> createIndex(@Nullable Alias alias, String indexName) {
         Assert.notNull(indexName, "No index defined for Query");
         return doCreateIndex(this.requestsBuilder().createIndexRequest(alias, indexName));
     }
@@ -162,12 +163,12 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
      * @return
      */
     @Override
-    public Mono<Boolean> createRolloverIndex(Alias aliasReader, Alias aliasWriter, String indexName) {
+    public Mono<Boolean> createRolloverIndex(@Nullable Alias aliasReader, Alias aliasWriter, String indexName) {
         return doCreateIndex(this.requestsBuilder().createRolloverIndex(aliasReader, aliasWriter, generateRolloverIndexName(indexName)));
     }
 
     @Override
-    public Mono<Boolean> createIndexWithSettingsAndMapping(Alias alias, String indexName, String indexPath) {
+    public Mono<Boolean> createIndexWithSettingsAndMapping(@Nullable Alias alias, String indexName, String indexPath) {
         return doCreateIndex(this.requestsBuilder().createIndexRequest(alias, indexName, indexPath));
     }
 
@@ -179,7 +180,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
      * @return
      */
     @Override
-    public Mono<Boolean> createRolloverIndexWithSettingsAndMapping(Alias aliasReader, Alias aliasWriter, String indexName, String indexPath) {
+    public Mono<Boolean> createRolloverIndexWithSettingsAndMapping(@Nullable Alias aliasReader, Alias aliasWriter, String indexName, String indexPath) {
         return doCreateIndex(this.requestsBuilder().createRolloverIndex(aliasReader, aliasWriter, generateRolloverIndexName(indexName), indexPath));
     }
 
@@ -188,7 +189,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
      * @return
      */
     private Mono<Boolean> doCreateIndex(CreateIndexRequest request) {
-        return Mono.from(execute(client -> client.createIndex(request, RequestOptions.DEFAULT)))
+        return Mono.from(execute(c -> c.createIndex(request, RequestOptions.DEFAULT)))
                 .map(CreateIndexResponse::isAcknowledged)
                 .onErrorResume(error -> Mono.error(new ElasticsearchException("Failed to create index: " + request.toString(), error)));
     }
@@ -235,13 +236,13 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
                     String newIndexName = persistentEntity.getIndexName();
                     if (persistentEntity.isIndexTimeBased()) {
                         return createRolloverIndex(null, rolloverConfig.getDefaultAlias(), newIndexName)
-                                .doOnSuccess(created -> { startRolloverTrigger(persistentEntity); });
+                                .doOnSuccess(created -> startRolloverTrigger(persistentEntity));
                     } else if (!StringUtils.isEmpty(persistentEntity.getIndexSettingAndMappingPath())) {
                         return createRolloverIndexWithSettingsAndMapping(persistentEntity.getAlias(), rolloverConfig.getDefaultAlias(), newIndexName, persistentEntity.getIndexSettingAndMappingPath())
-                                .doOnSuccess(created -> { startRolloverTrigger(persistentEntity); });
+                                .doOnSuccess(created -> startRolloverTrigger(persistentEntity));
                     } else {
                         return createRolloverIndex(persistentEntity.getAlias(), rolloverConfig.getDefaultAlias(), newIndexName)
-                                .doOnSuccess(created -> { startRolloverTrigger(persistentEntity); });
+                                .doOnSuccess(created -> startRolloverTrigger(persistentEntity));
                     }
                 });
     }
@@ -256,15 +257,14 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
 
     /**
      * @param aliasName
-     * @param newIndexName
      * @param indexPath
      * @param conditions
      * @return
      */
     @Override
-    public Mono<Boolean> rolloverIndex(String aliasName, String newIndexName, String indexPath, RolloverConfig.RolloverConditions conditions) {
-        RolloverRequest request = this.requestsBuilder().rolloverRequest(aliasName, newIndexName, indexPath, conditions);
-        return Mono.from(execute(client -> client.rollover(request, RequestOptions.DEFAULT)))
+    public Mono<Boolean> rolloverIndex(String aliasName, String indexPath, RolloverConfig.RolloverConditions conditions) {
+        RolloverRequest request = this.requestsBuilder().rolloverRequest(aliasName, indexPath, conditions);
+        return Mono.from(execute(c -> c.rollover(request, RequestOptions.DEFAULT)))
                 .map(RolloverResponse::isAcknowledged)
                 .onErrorResume(error -> Mono.error(new ElasticsearchException("Failed to rollover index request: " + request.toString(), error)));
     }
@@ -279,7 +279,6 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
         RolloverConfig rollover = persistentEntity.getRolloverConfig();
         return rolloverIndex(
                 rollover.getAlias().getName(),
-                null,
                 persistentEntity.getIndexSettingAndMappingPath(),
                 rollover.getConditions()
         );
@@ -295,7 +294,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
     public Mono<Boolean> deleteIndexByName(String indexName) {
         Objects.requireNonNull(indexName);
         DeleteIndexRequest request = this.requestsBuilder().deleteIndexRequest(indexName);
-        return Mono.from(execute(client -> client.deleteIndex(request, RequestOptions.DEFAULT)))
+        return Mono.from(execute(c -> c.deleteIndex(request, RequestOptions.DEFAULT)))
                 .map(AcknowledgedResponse::isAcknowledged)
                 .onErrorResume(IndexNotFoundException.class, error -> Mono.just(false))
                 .onErrorResume(error -> Mono.error(buildDeleteException((Exception)error, request)));
@@ -310,7 +309,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
     public Mono<Boolean> deleteIndexByAlias(String aliasName) {
         Objects.requireNonNull(aliasName);
         GetAliasesRequest request = new GetAliasesRequest(aliasName);
-        return Mono.from(execute(client -> client.getAlias(request, RequestOptions.DEFAULT)))
+        return Mono.from(execute(c -> c.getAlias(request, RequestOptions.DEFAULT)))
                 .map(GetAliasesResponse::getAliases)
                 .map(Map::keySet)
                 .flatMapMany(Flux::fromIterable)
@@ -338,7 +337,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
     @Override
     public Mono<Void> refresh(String indexName) {
         Assert.notNull(indexName, "No index defined for refresh()");
-        return Mono.from(execute(client -> client.refresh(refreshRequest(indexName), RequestOptions.DEFAULT)))
+        return Mono.from(execute(c -> c.refresh(refreshRequest(indexName), RequestOptions.DEFAULT)))
                 .onErrorResume(IndexNotFoundException.class, error -> Mono.empty())
                 .onErrorResume(error -> Mono.error(new ElasticsearchException("failed to refresh index: " + indexName, error)))
                 .then();
@@ -380,7 +379,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
                     entities.forEach(entity -> bulkRequest.add(this.requestsBuilder().indexRequest(entity, persistentEntity, this.getResultsMapper())));
                     return bulkRequest;
                 })
-                .flatMap(bulkRequest -> Mono.from(execute(client -> client.bulk(bulkRequest, RequestOptions.DEFAULT))))
+                .flatMap(bulkRequest -> Mono.from(execute(c -> c.bulk(bulkRequest, RequestOptions.DEFAULT))))
                 .flatMapMany(response -> {
                     checkForBulkUpdateFailure(response);
                     BulkItemResponse[] items = response.getItems();
@@ -397,7 +396,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
      * @return the entities indexed
      */
     @Override
-    public Flux<?> bulkIndex(Flux<?> publisher) {
+    public Flux bulkIndex(Flux<?> publisher) {
         return publisher
                 .collectList()
                 .map(entities -> {
@@ -409,7 +408,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
                     });
                     return bulkRequest;
                 })
-                .flatMap(bulkRequest -> Mono.from(execute(client -> client.bulk(bulkRequest, RequestOptions.DEFAULT))))
+                .flatMap(bulkRequest -> Mono.from(execute(c -> c.bulk(bulkRequest, RequestOptions.DEFAULT))))
                 .flatMapMany(response -> {
                     checkForBulkUpdateFailure(response);
                     BulkItemResponse[] items = response.getItems();
@@ -511,7 +510,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
             return existsByQuery(query, clazz);
         } else {
             GetRequest request = this.requestsBuilder().getRequest(persistentEntity.getAliasOrIndexReader(), persistentEntity.getTypeName(), documentId);
-            return Mono.from(execute(client -> client.exists(request, RequestOptions.DEFAULT)))
+            return Mono.from(execute(c -> c.exists(request, RequestOptions.DEFAULT)))
                     .onErrorResume(IndexNotFoundException.class, error -> Mono.just(false))
                     .onErrorResume(error -> Mono.error( new ElasticsearchException("Error for delete index request: " + request.toString(), error)));
         }
@@ -550,13 +549,12 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
             return this.deleteIndexByAlias(persistentEntity.getAliasOrIndexWriter())
                 .flatMap(deleted -> this.rolloverIndex(
                     persistentEntity.getAliasOrIndexWriter(),
-                    persistentEntity.getIndexName(),
                     persistentEntity.getIndexSettingAndMappingPath(),
                     rollover.getConditions()))
                 .then();
         } else if (persistentEntity.isIndexTimeBased()) {
             GetAliasesRequest request = this.requestsBuilder().getAliasesRequest(persistentEntity.getAliasOrIndexReader());
-            return Mono.from(execute(client -> client.getAlias(request, RequestOptions.DEFAULT)))
+            return Mono.from(execute(c -> c.getAlias(request, RequestOptions.DEFAULT)))
                     .map(GetAliasesResponse::getAliases)
                     .map(Map::keySet)
                     .flatMapMany(Flux::fromIterable)
@@ -621,10 +619,11 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
         ElasticsearchPersistentEntity<T> persistentEntity = getPersistentEntityFor(clazz);
         Optional<QueryBuilder> queryBuilder = new CriteriaQueryProcessor().createQueryFromCriteria(query.getCriteria());
         Optional<QueryBuilder> filterBuilder = new CriteriaFilterProcessor().createFilterFromCriteria(query.getCriteria());
+        QueryBuilder deleteQuery = queryBuilder.orElse(filterBuilder.orElse(null));
         if (persistentEntity.isRolloverIndex()) {
-            return deleteByQuery(persistentEntity.getAliasOrIndexWriter(), persistentEntity.getTypeName(), queryBuilder.orElse(filterBuilder.orElse(null)));
+            return deleteByQuery(persistentEntity.getAliasOrIndexWriter(), persistentEntity.getTypeName(), deleteQuery);
         } else {
-            return deleteByQuery(persistentEntity.getAliasOrIndexReader(), persistentEntity.getTypeName(), queryBuilder.orElse(filterBuilder.orElse(null)));
+            return deleteByQuery(persistentEntity.getAliasOrIndexReader(), persistentEntity.getTypeName(), deleteQuery);
         }
     }
 
@@ -644,7 +643,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
         } else {
             String indexName = persistentEntity.isRolloverIndex() ? persistentEntity.getAliasOrIndexWriter() : persistentEntity.getAliasOrIndexReader();
             DeleteRequest request = this.requestsBuilder().deleteRequest(indexName, persistentEntity.getTypeName(), documentId);
-            return Mono.from(execute(client -> client.delete(request, RequestOptions.DEFAULT)))
+            return Mono.from(execute(c -> c.delete(request, RequestOptions.DEFAULT)))
                     .then()
                     .onErrorResume(error -> Mono.error(new ElasticsearchException("Error for delete request: " + request.toString(), error)));
         }
@@ -653,9 +652,9 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
     /**
      * @param query
      */
-    private Mono<Void> deleteByQuery(String indexName, String typeName, QueryBuilder query) {
+    private Mono<Void> deleteByQuery(String indexName, String typeName, @Nullable QueryBuilder query) {
         DeleteByQueryRequest request = this.requestsBuilder().deleteBy(indexName, typeName, query);
-        return Mono.from(execute(client -> client.deleteBy(request)))
+        return Mono.from(execute(c -> c.deleteBy(request)))
                 .then()
                 .onErrorResume(IndexNotFoundException.class, error -> Mono.empty())
                 .onErrorResume(error -> Mono.error(new ElasticsearchException("Error while deleting bulk: " + request.toString(), error)));
@@ -666,7 +665,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
      * @return
      */
     private Mono<Long> executeCount(SearchRequest searchRequest) {
-        return Mono.from(execute(client -> client.search(searchRequest)))
+        return Mono.from(execute(c -> c.search(searchRequest)))
                 .map(searchResponse -> searchResponse.getHits().getTotalHits())
                 .onErrorResume(IndexNotFoundException.class, error -> Mono.just(0L));
     }
@@ -717,7 +716,33 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
     @Override
     public <T> Flux<T> search(SearchQuery query, ResultsExtractor<Flux<T>> resultsExtractor) {
         return executeSearch(doSearch(prepareSearch(query, Optional.of(query.getQuery())), query))
-                .flatMapMany(response -> resultsExtractor.extract(response));
+                .flatMapMany(resultsExtractor::extract);
+    }
+
+    @Override
+    public <T> Flux<T> suggest(SuggestQuery query, ResultsExtractor<Flux<T>> extractor) {
+        return executeSearch(prepareSuggest(query)).flatMapMany(extractor::extract);
+    }
+
+    @Override
+    public <R, T> Flux<R> suggest(SuggestQuery query, Class<T> clazz, ResultsExtractor<Flux<R>> extractor) {
+        return executeSearch(prepareSuggest(query, clazz)).flatMapMany(extractor::extract);
+    }
+
+    @Override
+    public <T> Flux hasChild(HasChildQuery query, Class<T> clazz) {
+        ElasticsearchPersistentEntity<T> persistentEntity = getPersistentEntityFor(clazz);
+        return this.search(prepareHasChildQuery(query, clazz), persistentEntity.getJoinDescriptor().getParentJavaType());
+    }
+
+    @Override
+    public <S extends T, T> Flux<S> hasParent(HasParentQuery query, Class<T> clazz) {
+        return this.search(prepareHasParentQuery(query, clazz), clazz);
+    }
+
+    @Override
+    public <T> Flux<T> hasParentId(ParentIdQuery query, Class<T> clazz) {
+        return this.search(prepareHasParentId(query, clazz), clazz);
     }
 
     /**
@@ -725,7 +750,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
      * @return
      */
     private Mono<SearchResponse> executeSearch(SearchRequest request) {
-        return Mono.from(execute(client -> client.search(request, RequestOptions.DEFAULT)))
+        return Mono.from(execute(c -> c.search(request, RequestOptions.DEFAULT)))
                 .onErrorResume(IndexNotFoundException.class, error -> Mono.just(new SearchResponse(
                         new SearchResponseSections(SearchHits.empty(), null, null, false, true, null, 0),
                         null, 1, 1, 0, 1000, null, null)))
@@ -738,6 +763,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
      * @param builder
      * @return
      */
+    @Override
     protected SearchRequest prepareSearch(Query query, Optional<QueryBuilder> builder) {
         SearchRequest request = super.prepareSearch(query, builder);
         SearchSourceBuilder sourceBuilder = request.source();
@@ -746,141 +772,6 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
     }
 
 
-//    /**
-//     * @param query
-//     * @param clazz
-//     * @return
-//     */
-//    @Override
-//    public <T> Mono<Long> count(SearchQuery query, Class<T> clazz) {
-//        return null;
-//    }
-//
-//    /**
-//     * @param query
-//     * @param clazz
-//     * @return
-//     */
-//    @Override
-//    public <T> Mono<Long> count(CriteriaQuery query, Class<T> clazz) {
-//        return null;
-//    }
-//
-//    /**
-//     * @param clazz      the domain type
-//     * @param documentId the document id.
-//     * @return true if the document corresponding to the id exists
-//     */
-//    @Override
-//    public <T> Mono<Boolean> existsById(Class<T> clazz, String documentId) {
-//        return null;
-//    }
-//
-//    /**
-//     * @param query
-//     * @param javaType
-//     * @return
-//     */
-//    @Override
-//    public <T> Mono<Boolean> existsByQuery(CriteriaQuery query, Class<T> javaType) {
-//        return null;
-//    }
-//
-//    @Override
-//    public <T> Mono<Boolean> existsByQuery(SearchQuery query, Class<T> javaType) {
-//        return null;
-//    }
-//
-//    @Override
-//    public <T> Mono<Boolean> existsByQuery(StringQuery query, Class<T> javaType) {
-//        return null;
-//    }
-//
-//    /**
-//     * Delete all the documents for the given clazz
-//     *
-//     * @param clazz the given clazz.
-//     */
-//    @Override
-//    public <T> Mono<Void> deleteAll(Class<T> clazz) {
-//        return null;
-//    }
-//
-//    /**
-//     * Delete all the {@link List} of entities, for the given clazz.
-//     *
-//     * @param entities the {@link List} of entities.
-//     * @param clazz    the given clazz.
-//     */
-//    @Override
-//    public <T> Mono<Void> deleteAll(List<T> entities, Class<T> clazz) {
-//        return null;
-//    }
-//
-//    /**
-//     * delete the document for the given entity, and clazz
-//     *
-//     * @param entity the given entity.
-//     * @param clazz  the given clazz.
-//     */
-//    @Override
-//    public <T> Mono<Void> delete(T entity, Class<T> clazz) {
-//        return null;
-//    }
-//
-//    /**
-//     * delete the document for the given entity, and clazz
-//     *
-//     * @param query the given query.
-//     * @param clazz the given clazz.
-//     */
-//    @Override
-//    public <T> Mono<Void> delete(CriteriaQuery query, Class<T> clazz) {
-//        return null;
-//    }
-//
-//    /**
-//     * delete the document with the given documentId and clazz.
-//     *
-//     * @param documentId the given documentId.
-//     * @param clazz      the given clazz.
-//     */
-//    @Override
-//    public <T> Mono<Void> deleteById(String documentId, Class<T> clazz) {
-//        return null;
-//    }
-//
-//    /**
-//     * @param suggestion
-//     * @param indices
-//     * @return
-//     */
-//    @Override
-//    public Mono<SearchResponse> suggest(SuggestBuilder suggestion, String... indices) {
-//        return null;
-//    }
-//
-//    /**
-//     * @param suggestion
-//     * @param indices
-//     * @param extractor
-//     * @return
-//     */
-//    @Override
-//    public <R> Flux<R> suggest(SuggestBuilder suggestion, String[] indices, ResultsExtractor<R> extractor) {
-//        return null;
-//    }
-//
-//    /**
-//     * @param suggestion
-//     * @param clazz
-//     * @param extractor
-//     * @return
-//     */
-//    @Override
-//    public <R, T> Flux<R> suggest(SuggestBuilder suggestion, Class<T> clazz, ResultsExtractor<R> extractor) {
-//        return null;
-//    }
 
     /**
      * Customization hook on the actual execution result {@link Publisher}.
@@ -890,7 +781,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
      * @return a {@link Mono} emitting the result of the operation.
      */
     protected Mono<IndexResponse> doIndex(IndexRequest request) {
-        return Mono.from(execute(client -> client.index(request)));
+        return Mono.from(execute(c -> c.index(request)));
     }
 
     private Mono<GetResponse> doFindById(String id, String indexName, String typeName) {
@@ -904,7 +795,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
      * @return a {@link Mono} emitting the result of the operation.
      */
     protected Mono<GetResponse> doFindById(GetRequest request) {
-        return Mono.from(execute(client -> client.get(request)));
+        return Mono.from(execute(c -> c.get(request)));
     }
 
 }

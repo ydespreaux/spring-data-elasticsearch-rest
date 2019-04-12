@@ -23,6 +23,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.core.query;
 import lombok.Getter;
 import lombok.Setter;
 import org.elasticsearch.index.query.InnerHitBuilder;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -36,6 +37,7 @@ import org.springframework.util.Assert;
 public class HasParentQuery extends JoinQuery<HasParentQuery> {
 
     private boolean score;
+    @Nullable
     private InnerHitBuilder innerHitBuilder;
 
     HasParentQuery() {
@@ -78,6 +80,7 @@ public class HasParentQuery extends JoinQuery<HasParentQuery> {
     public static class HasParentQueryBuilder extends JoinQueryBuilder<HasParentQueryBuilder, HasParentQuery> {
 
         private boolean score;
+        @Nullable
         private InnerHitBuilder innerHitBuilder;
 
         /**

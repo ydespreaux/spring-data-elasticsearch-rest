@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.index.query.InnerHitBuilder;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -37,6 +38,7 @@ import org.springframework.util.Assert;
 public class HasChildQuery extends JoinQuery<HasChildQuery> {
 
     private ScoreMode scoreMode;
+    @Nullable
     private InnerHitBuilder innerHitBuilder;
     private int minChildren = 0;
     private int maxChildren = Integer.MAX_VALUE;

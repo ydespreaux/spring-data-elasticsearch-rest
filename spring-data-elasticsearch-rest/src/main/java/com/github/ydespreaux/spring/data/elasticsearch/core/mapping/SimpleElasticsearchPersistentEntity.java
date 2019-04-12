@@ -231,7 +231,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     }
 
     @Override
-    public String getAliasOrIndexWriter(T source) {
+    public String getAliasOrIndexWriter(@Nullable T source) {
         if (this.isRolloverIndex()) {
             return this.rollover.getAlias().getName();
         }

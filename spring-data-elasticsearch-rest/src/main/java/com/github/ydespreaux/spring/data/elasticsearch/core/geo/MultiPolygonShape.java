@@ -26,6 +26,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.elasticsearch.common.geo.GeoShapeType;
 import org.locationtech.jts.geom.Coordinate;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ public class MultiPolygonShape extends AbstractShape implements CoordinatesShape
         this(shapes, null);
     }
 
-    public MultiPolygonShape(List<PolygonShape> shapes, GeoShapeOrientation orientation) {
+    public MultiPolygonShape(List<PolygonShape> shapes, @Nullable GeoShapeOrientation orientation) {
         Assert.notNull(shapes, "shapes must not be null!!");
         this.shapes = shapes;
         this.orientation = orientation;
@@ -65,7 +66,7 @@ public class MultiPolygonShape extends AbstractShape implements CoordinatesShape
         this(coordinates, null);
     }
 
-    public MultiPolygonShape(Coordinate[][][] coordinates, GeoShapeOrientation orientation) {
+    public MultiPolygonShape(Coordinate[][][] coordinates, @Nullable GeoShapeOrientation orientation) {
         this.setCoordinates(coordinates);
         this.orientation = orientation;
     }
@@ -88,7 +89,7 @@ public class MultiPolygonShape extends AbstractShape implements CoordinatesShape
     }
 
     @Override
-    public void setCoordinates(Coordinate[][][] coordinates) {
+    public void setCoordinates(@Nullable Coordinate[][][] coordinates) {
         if (coordinates != null) {
             this.shapes = new ArrayList<>(coordinates.length);
             for (int i = 0; i < coordinates.length; i++) {

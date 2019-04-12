@@ -38,13 +38,12 @@ public class ReactiveRolloverTrigger<T> extends AbstractRolloverTrigger<T> {
 
     @Override
     public Runnable processor() {
-        return () -> {
+        return () ->
             elasticsearchOperations.rolloverIndex(getPersistentEntity().getJavaType()).doOnError(e -> {
                 if (log.isWarnEnabled()) {
                     log.warn("Rollover index {} failed : {}", getPersistentEntity().getAliasOrIndexWriter(), e.getLocalizedMessage());
                 }
             })
             .subscribe();
-        };
     }
 }

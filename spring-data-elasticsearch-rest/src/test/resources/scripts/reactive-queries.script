@@ -60,3 +60,10 @@ PUT:books/book/2:{"title": "Blake et Mortimer - Tome 25 : La vallée des immorte
 PUT:books/book/3:{"title": "Et puis Colette", "description": "Anouk, trentenaire parisienne enfermée dans la routine, vient d’apprendre le décès de sa soeur...", "price": 9.99, "publication": "2017-02-01"}
 PUT:books/book/4:{"title": "Live Is love Double Vinyle", "description": "Thomas s’est pour ce disque mis à nu, sans concession aucune...", "price": 12.20, "publication": "2018-07-10"}
 PUT:books/book/5:{"title": "Zorro - Cicatrices Tome 01 : Zorro", "description": "Zorro est toujours Don Diego de la Vega sous le masque, et il défend toujours la veuve et l’orphelin grâce à son fouet et son épée. Mais il est cette fois aux prises avec l’amour !", "price": 5}
+
+# index music settings
+PUT:music:@resource(indices/music.index)
+# index musics
+PUT:music/album/1:{ "title" : "Nevermind", "suggest": {"input": [ "Nevermind", "Nirvana" ]}}
+PUT:music/album/2:{ "title" : "Thriller", "suggest": {"input": [ "Thriller", "Mickael Jackson" ]}}
+PUT:music/album/3:{ "title" : "Revolution", "suggest": {"input": [ "Revolution", "Muse" ]}}

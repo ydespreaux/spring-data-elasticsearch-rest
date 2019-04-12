@@ -67,7 +67,7 @@ public class PolygonShape extends AbstractShape implements CoordinatesShape<Coor
         this(outerCoordinates, innerCoordinates, null);
     }
 
-    public PolygonShape(Coordinate[] outerCoordinates, @Nullable Coordinate[] innerCoordinates, GeoShapeOrientation orientation) {
+    public PolygonShape(Coordinate[] outerCoordinates, @Nullable Coordinate[] innerCoordinates, @Nullable GeoShapeOrientation orientation) {
         this(Arrays.asList(outerCoordinates), innerCoordinates != null ? Arrays.asList(innerCoordinates) : new ArrayList<>(), orientation);
     }
 
@@ -75,14 +75,14 @@ public class PolygonShape extends AbstractShape implements CoordinatesShape<Coor
         this(coordinates, null);
     }
 
-    public PolygonShape(@Nullable Coordinate[][] coordinates, GeoShapeOrientation orientation) {
+    public PolygonShape(@Nullable Coordinate[][] coordinates, @Nullable GeoShapeOrientation orientation) {
         if (coordinates != null) {
             this.setCoordinates(coordinates);
         }
         this.orientation = orientation;
     }
 
-    public PolygonShape(List<Coordinate> outerCoordinates, @Nullable List<Coordinate> innerCoordinates, GeoShapeOrientation orientation) {
+    public PolygonShape(List<Coordinate> outerCoordinates, @Nullable List<Coordinate> innerCoordinates, @Nullable GeoShapeOrientation orientation) {
         Assert.notNull(outerCoordinates, "outerCoordinates must not be null!!");
         this.outerCoordinates = outerCoordinates;
         this.innerCoordinates = innerCoordinates != null ? innerCoordinates : new ArrayList<>();

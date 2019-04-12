@@ -23,11 +23,17 @@ package com.github.ydespreaux.spring.data.elasticsearch.core;
 
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
 import com.github.ydespreaux.spring.data.elasticsearch.configuration.reactive.ReactiveElasticsearchConfiguration;
+import com.github.ydespreaux.spring.data.elasticsearch.core.completion.reactive.ReactiveStringSuggestExtractor;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.*;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.Article;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.Book;
+import com.github.ydespreaux.spring.data.elasticsearch.entities.Music;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.Product;
+import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.suggest.SuggestBuilder;
+import org.elasticsearch.search.suggest.SuggestBuilders;
+import org.elasticsearch.search.suggest.SuggestionBuilder;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -212,6 +218,26 @@ public class ReactiveElasticsearchTemplateQueryTest
         SearchQuery query = new NativeSearchQuery(QueryBuilders.matchQuery("name", "Article1"));
         StepVerifier.create(reactiveOperations.existsByQuery(query, Product.class))
                 .expectNext(false)
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldFindSuggestionsUsingCompletion() {
+        SuggestionBuilder completionSuggestionFuzzyBuilder = SuggestBuilders.completionSuggestion("suggest").prefix("m", Fuzziness.AUTO);
+        SuggestQuery query = new SuggestQuery(new SuggestBuilder().addSuggestion("test-suggest", completionSuggestionFuzzyBuilder));
+        StepVerifier.create(reactiveOperations.suggest(query, Music.class, new ReactiveStringSuggestExtractor()))
+                .expectNext("Mickael Jackson", "Muse")
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldFindSuggestionsUsingSearch() {
+        SuggestionBuilder completionSuggestionFuzzyBuilder = SuggestBuilders.completionSuggestion("suggest").prefix("m", Fuzziness.AUTO);
+        SuggestQuery query = new SuggestQuery(new SuggestBuilder().addSuggestion("test-suggest", completionSuggestionFuzzyBuilder));
+        query.addIndices("musics");
+        query.addTypes("music");
+        StepVerifier.create(reactiveOperations.suggest(query, new ReactiveStringSuggestExtractor()))
+                .expectNext("Mickael Jackson", "Muse")
                 .verifyComplete();
     }
 

@@ -467,7 +467,7 @@ public class Criteria {
     }
 
     private void assertNoBlankInWildcardedQuery(String searchString, boolean leadingWildcard, boolean trailingWildcard) {
-        if (searchString != null && searchString.contains(CRITERIA_VALUE_SEPARATOR)) {
+        if (searchString.contains(CRITERIA_VALUE_SEPARATOR)) {
             throw new InvalidDataAccessApiUsageException("Cannot constructQuery '" + (leadingWildcard ? "*" : "") + "\""
                     + searchString + "\"" + (trailingWildcard ? "*" : "") + "'. Use expression or multiple clauses instead.");
         }

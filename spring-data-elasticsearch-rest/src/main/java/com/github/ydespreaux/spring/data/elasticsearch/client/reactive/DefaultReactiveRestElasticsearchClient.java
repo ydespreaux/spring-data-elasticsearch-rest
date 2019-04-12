@@ -66,7 +66,9 @@ import org.elasticsearch.action.search.*;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
-import org.elasticsearch.client.*;
+import org.elasticsearch.client.GetAliasesResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.script.mustache.MultiSearchTemplateRequest;
@@ -276,22 +278,6 @@ public class DefaultReactiveRestElasticsearchClient implements ReactiveRestElast
             public void onResponse(T response) {
                 ClientLogger.logResponse(logId, response.toString());
                 sink.success(response);
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                ClientLogger.logFailure(logId, e);
-                sink.error(e);
-            }
-        };
-    }
-
-    private <T> ResponseListener responseListenerToSink(String logId, MonoSink<T> sink) {
-        return new ResponseListener() {
-
-            @Override
-            public void onSuccess(Response response) {
-                sink.success((T)response);
             }
 
             @Override

@@ -45,7 +45,7 @@ public final class ContextUtils {
      * @param expression the SPel expression
      * @return evaluate the expression
      */
-    public static String getEnvironmentValue(Environment environment, String expression) {
+    public static String getEnvironmentValue(@Nullable Environment environment, String expression) {
         if (environment == null || StringUtils.isEmpty(expression)) {
             return expression;
         }

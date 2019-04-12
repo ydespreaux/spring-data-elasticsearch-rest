@@ -23,15 +23,13 @@ package com.github.ydespreaux.spring.data.elasticsearch.core;
 import com.github.ydespreaux.spring.data.elasticsearch.client.reactive.ReactiveRestElasticsearchClient;
 import com.github.ydespreaux.spring.data.elasticsearch.core.converter.ElasticsearchConverter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
-import com.github.ydespreaux.spring.data.elasticsearch.core.query.CriteriaQuery;
-import com.github.ydespreaux.spring.data.elasticsearch.core.query.SearchQuery;
-import com.github.ydespreaux.spring.data.elasticsearch.core.query.StringQuery;
+import com.github.ydespreaux.spring.data.elasticsearch.core.query.*;
 import com.github.ydespreaux.spring.data.elasticsearch.core.request.config.RolloverConfig;
 import com.github.ydespreaux.spring.data.elasticsearch.core.triggers.TriggerManager;
 import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.common.Nullable;
 import org.reactivestreams.Publisher;
+import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -89,7 +87,7 @@ public interface ReactiveElasticsearchOperations {
      * @param indexName
      * @return
      */
-    Mono<Boolean> createIndex(Alias alias, String indexName);
+    Mono<Boolean> createIndex(@Nullable Alias alias, String indexName);
 
     /**
      * @param clazz
@@ -116,7 +114,7 @@ public interface ReactiveElasticsearchOperations {
      * @param indexName
      * @return
      */
-    Mono<Boolean> createRolloverIndex(Alias aliasReader, Alias aliasWriter, String indexName);
+    Mono<Boolean> createRolloverIndex(@Nullable Alias aliasReader, Alias aliasWriter, String indexName);
 
     /**
      * @param indexName the index name
@@ -127,7 +125,7 @@ public interface ReactiveElasticsearchOperations {
         return this.createIndexWithSettingsAndMapping(null, indexName, indexPath);
     }
 
-    Mono<Boolean> createIndexWithSettingsAndMapping(Alias alias, String indexName, String indexPath);
+    Mono<Boolean> createIndexWithSettingsAndMapping(@Nullable Alias alias, String indexName, String indexPath);
 
     /**
      *
@@ -148,16 +146,15 @@ public interface ReactiveElasticsearchOperations {
      * @param indexPath
      * @return
      */
-    Mono<Boolean> createRolloverIndexWithSettingsAndMapping(Alias aliasReader, Alias aliasWriter, String indexName, String indexPath);
+    Mono<Boolean> createRolloverIndexWithSettingsAndMapping(@Nullable Alias aliasReader, Alias aliasWriter, String indexName, String indexPath);
 
     /**
      * @param aliasName
-     * @param newIndexName
      * @param indexPath
      * @param conditions
      * @return
      */
-    Mono<Boolean> rolloverIndex(String aliasName, @Nullable String newIndexName, @Nullable String indexPath, RolloverConfig.RolloverConditions conditions);
+    Mono<Boolean> rolloverIndex(String aliasName, @Nullable String indexPath, RolloverConfig.RolloverConditions conditions);
 
     /**
      *
@@ -235,7 +232,7 @@ public interface ReactiveElasticsearchOperations {
      * @param entities  all entities to index
      * @return the entities indexed
      */
-    default Flux<?> bulkIndex(List<?> entities) {
+    default Flux bulkIndex(List<?> entities) {
         return bulkIndex(Flux.fromIterable(entities));
     }
 
@@ -244,7 +241,7 @@ public interface ReactiveElasticsearchOperations {
      * @param publisher
      * @return
      */
-    Flux<?> bulkIndex(Flux<?> publisher);
+    Flux bulkIndex(Flux<?> publisher);
 
     /**
      * Find an elasticsearch document for the given clazz, and documentId.
@@ -386,31 +383,47 @@ public interface ReactiveElasticsearchOperations {
      */
     <T> Flux<T> search(SearchQuery query, ResultsExtractor<Flux<T>> resultsExtractor);
 
-//    /**
-//     * @param suggestion
-//     * @param indices
-//     * @return
-//     */
-//    Mono<SearchResponse> suggest(SuggestBuilder suggestion, String... indices);
-//
-//    /**
-//     * @param suggestion
-//     * @param indices
-//     * @param extractor
-//     * @param <R>
-//     * @return
-//     */
-//    <R> Flux<R> suggest(SuggestBuilder suggestion, String[] indices, ResultsExtractor<R> extractor);
-//
-//    /**
-//     * @param suggestion
-//     * @param clazz
-//     * @param extractor
-//     * @param <R>
-//     * @param <T>
-//     * @return
-//     */
-//    <R, T> Flux<R> suggest(SuggestBuilder suggestion, Class<T> clazz, ResultsExtractor<R> extractor);
+    /**
+     * @param <T>
+     * @param query
+     * @param extractor
+     * @return
+     */
+    <T> Flux<T> suggest(SuggestQuery query, ResultsExtractor<Flux<T>> extractor);
+
+    /**
+     * @param <R>
+     * @param <T>
+     * @param query
+     * @param clazz
+     * @param extractor
+     * @return
+     */
+    <R, T> Flux<R> suggest(SuggestQuery query, Class<T> clazz, ResultsExtractor<Flux<R>> extractor);
+
+    /**
+     * @param query
+     * @param clazz
+     * @param <T>
+     * @return
+     */
+    <T> Flux hasChild(HasChildQuery query, Class<T> clazz);
+
+    /**
+     * @param query
+     * @param clazz
+     * @param <T>
+     * @return
+     */
+    <S extends T, T> Flux<S> hasParent(HasParentQuery query, Class<T> clazz);
+
+    /**
+     * @param query
+     * @param clazz
+     * @param <T>
+     * @return
+     */
+    <T> Flux<T> hasParentId(ParentIdQuery query, Class<T> clazz);
 
     /**
      * Callback interface to be used with {@link #execute(ClientCallback)} for operating directly on

@@ -82,7 +82,7 @@ public class RequestsBuilder {
      * @param indexName
      * @return
      */
-    public CreateIndexRequest createIndexRequest(Alias alias, String indexName) {
+    public CreateIndexRequest createIndexRequest(@Nullable Alias alias, String indexName) {
         CreateIndexRequest request = Requests.createIndexRequest(indexName);
         if (alias != null) {
             request.alias(alias);
@@ -97,7 +97,7 @@ public class RequestsBuilder {
      * @param indexPath
      * @return
      */
-    public CreateIndexRequest createIndexRequest(Alias alias, String indexName, String indexPath) {
+    public CreateIndexRequest createIndexRequest(@Nullable Alias alias, String indexName, String indexPath) {
 
         CreateIndexRequest indexRequest = new CreateIndexBuilder()
                 .name(indexName)
@@ -116,7 +116,7 @@ public class RequestsBuilder {
      * @param newIndexName
      * @return
      */
-    public CreateIndexRequest createRolloverIndex(Alias aliasReader, Alias aliasWriter, String newIndexName) {
+    public CreateIndexRequest createRolloverIndex(@Nullable Alias aliasReader, Alias aliasWriter, String newIndexName) {
         Assert.notNull(aliasWriter, "alias no defined");
         CreateIndexRequest indexRequest = Requests.createIndexRequest(newIndexName);
         if (aliasReader != null) {
@@ -134,7 +134,7 @@ public class RequestsBuilder {
      * @param indexPath
      * @return
      */
-    public CreateIndexRequest createRolloverIndex(Alias aliasReader, Alias aliasWriter, String newIndexName, String indexPath) {
+    public CreateIndexRequest createRolloverIndex(@Nullable Alias aliasReader, Alias aliasWriter, String newIndexName, String indexPath) {
         Assert.notNull(aliasWriter, "aliasWriter no defined");
         CreateIndexRequest indexRequest = new CreateIndexBuilder()
                 .name(newIndexName)
@@ -180,8 +180,14 @@ public class RequestsBuilder {
         return new DeleteRequest(indexName, typeName, documentId);
     }
 
-    public RolloverRequest rolloverRequest(String aliasName, String newIndexName, String indexPath, RolloverConfig.RolloverConditions conditions) {
-        RolloverRequest request = new RolloverRequest(aliasName, newIndexName);
+    /**
+     * @param aliasName
+     * @param indexPath
+     * @param conditions
+     * @return
+     */
+    public RolloverRequest rolloverRequest(String aliasName, String indexPath, RolloverConfig.RolloverConditions conditions) {
+        RolloverRequest request = new RolloverRequest(aliasName, null);
         if (conditions.getMaxAge() != null) {
             request.addMaxIndexAgeCondition(conditions.getMaxAge());
         }
@@ -245,7 +251,7 @@ public class RequestsBuilder {
      * @param query
      * @return
      */
-    public DeleteByQueryRequest deleteBy(String indexName, String typeName, QueryBuilder query) {
+    public DeleteByQueryRequest deleteBy(String indexName, String typeName, @Nullable QueryBuilder query) {
         return deleteBy(indexName, typeName, 1000, query);
     }
 

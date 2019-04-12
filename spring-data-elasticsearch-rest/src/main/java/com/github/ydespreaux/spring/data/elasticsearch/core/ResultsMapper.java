@@ -24,7 +24,6 @@ import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.springframework.lang.Nullable;
-import org.springframework.util.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -48,6 +47,7 @@ public interface ResultsMapper extends SearchResultMapper, GetResultMapper, Mult
      * @param <T>    generic method
      * @return the entity
      */
+    @Nullable
     <S extends T, T> S mapEntity(Collection<DocumentField> values, Class<T> clazz);
 
     /**
@@ -57,12 +57,11 @@ public interface ResultsMapper extends SearchResultMapper, GetResultMapper, Mult
      * @return the entity
      */
     @Nullable
-    default <S extends T, T> S mapEntity(String source, Class<T> clazz) {
-
-        if (StringUtils.isEmpty(source)) {
-            return null;
+    default <S extends T, T> S mapEntity(@Nullable String source, Class<T> clazz) {
+        if (source != null && !source.isEmpty()) {
+            return getEntityMapper().mapToObject(source, clazz);
         }
-        return getEntityMapper().mapToObject(source, clazz);
+        return null;
     }
 
     /**
@@ -73,6 +72,7 @@ public interface ResultsMapper extends SearchResultMapper, GetResultMapper, Mult
      * @param <T>       generic method
      * @return can be {@literal null} if the {@link SearchHit} does not have {@link SearchHit#hasSource() a source}.
      */
+    @Nullable
     <S extends T, T> S mapEntity(SearchHit searchHit, Class<T> type);
 
     /**

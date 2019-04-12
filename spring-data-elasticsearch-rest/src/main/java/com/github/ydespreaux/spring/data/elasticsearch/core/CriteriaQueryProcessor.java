@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.queryparser.flexible.core.util.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -211,8 +212,8 @@ public class CriteriaQueryProcessor {
          * @param query
          * @param boost
          */
-        private void addBoost(QueryBuilder query, float boost) {
-            if (query == null || Float.isNaN(boost)) {
+        private void addBoost(@NonNull QueryBuilder query, float boost) {
+            if (Float.isNaN(boost)) {
                 return;
             }
             query.boost(boost);

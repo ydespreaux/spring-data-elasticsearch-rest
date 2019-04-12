@@ -32,6 +32,7 @@ import com.github.ydespreaux.spring.data.elasticsearch.core.triggers.TriggerMana
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -55,6 +56,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -585,7 +587,7 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
      * @param sort
      * @param searchSourceBuilder
      */
-    private void doSort(Sort sort, SearchSourceBuilder searchSourceBuilder) {
+    private void doSort(@Nullable Sort sort, SearchSourceBuilder searchSourceBuilder) {
         if (sort != null) {
             for (Sort.Order order : sort) {
                 FieldSortBuilder fieldSortBuilder = SortBuilders.fieldSort(order.getProperty())
@@ -659,6 +661,10 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
 
     protected ElasticsearchException buildClearScrollException(Exception e, ClearScrollRequest request) {
         return new ElasticsearchException("Error for clear scroll request: " + request.toString(), e);
+    }
+
+    protected ElasticsearchException buildGetAliasException(Exception e, GetAliasesRequest request) {
+        return new ElasticsearchException("Error for get aliases request: " + request.toString(), e);
     }
 
     protected <T> void assertChildDocument(ElasticsearchPersistentEntity<T> persistentEntity) {

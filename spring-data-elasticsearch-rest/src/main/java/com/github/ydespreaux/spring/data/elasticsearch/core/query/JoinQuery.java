@@ -66,6 +66,7 @@ public abstract class JoinQuery<T extends JoinQuery> extends AbstractQuery imple
      */
     public abstract static class JoinQueryBuilder<B extends JoinQueryBuilder, T> {
 
+        @Nullable
         protected QueryBuilder query;
         protected String type;
         protected boolean ignoreUnmapped;
@@ -80,7 +81,7 @@ public abstract class JoinQuery<T extends JoinQuery> extends AbstractQuery imple
             return (B) this;
         }
 
-        public B query(QueryBuilder query) {
+        public B query(@Nullable QueryBuilder query) {
             this.query = query;
             return (B) this;
         }

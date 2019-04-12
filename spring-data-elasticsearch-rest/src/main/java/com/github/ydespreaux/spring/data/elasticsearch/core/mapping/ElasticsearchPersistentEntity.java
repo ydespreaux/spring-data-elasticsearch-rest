@@ -72,7 +72,7 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
      * @param source
      * @return
      */
-    String getAliasOrIndexWriter(T source);
+    String getAliasOrIndexWriter(@Nullable T source);
 
     /**
      * Get the current index name for writing operations.
@@ -277,7 +277,7 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
         if (!hasScriptProperty()) {
             return;
         }
-        if (hit.getFields() != null && !hit.getFields().isEmpty() && result != null) {
+        if (hit.getFields() != null && !hit.getFields().isEmpty()) {
             for (ScriptFieldProperty field : getScriptProperties()) {
                 String name = field.getFieldName();
                 DocumentField searchHitField = hit.getFields().get(name);

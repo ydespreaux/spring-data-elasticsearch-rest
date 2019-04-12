@@ -57,6 +57,7 @@ abstract class AbstractQuery implements Query {
     protected IndicesOptions indicesOptions;
     protected boolean trackScores;
 
+    @Nullable
     @Override
     public Sort getSort() {
         return this.sort;

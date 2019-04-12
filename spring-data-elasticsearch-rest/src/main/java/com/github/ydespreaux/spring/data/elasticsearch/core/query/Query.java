@@ -65,6 +65,7 @@ public interface Query {
     /**
      * @return null if not set
      */
+    @Nullable
     Sort getSort();
 
     /**
@@ -164,5 +165,6 @@ public interface Query {
      *
      * @return null if not set
      */
+    @Nullable
     IndicesOptions getIndicesOptions();
 }

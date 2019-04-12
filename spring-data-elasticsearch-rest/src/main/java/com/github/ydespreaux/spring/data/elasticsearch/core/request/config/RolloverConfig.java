@@ -26,6 +26,7 @@ import lombok.Setter;
 import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
+import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 @Getter
@@ -82,8 +83,10 @@ public class RolloverConfig {
     @Setter
     public static class RolloverConditions {
         // Conditions
+        @Nullable
         private TimeValue maxAge;
         private long maxDocs;
+        @Nullable
         private ByteSizeValue maxSize;
 
         public boolean hasConditions() {
