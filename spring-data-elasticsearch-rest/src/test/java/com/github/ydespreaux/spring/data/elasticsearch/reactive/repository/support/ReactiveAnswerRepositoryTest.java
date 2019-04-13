@@ -21,7 +21,7 @@
 package com.github.ydespreaux.spring.data.elasticsearch.reactive.repository.support;
 
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
-import com.github.ydespreaux.spring.data.elasticsearch.configuration.reactive.ReactiveElasticsearchConfiguration;
+import com.github.ydespreaux.spring.data.elasticsearch.configuration.ReactiveElasticsearchConfiguration;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.Criteria;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.Question;
 import com.github.ydespreaux.spring.data.elasticsearch.reactive.repositories.parent.ReactiveAnswerRepository;

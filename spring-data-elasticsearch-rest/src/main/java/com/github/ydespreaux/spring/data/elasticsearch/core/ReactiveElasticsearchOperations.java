@@ -111,6 +111,8 @@ public interface ReactiveElasticsearchOperations {
         return this.createRolloverIndex(null, aliasWriter, indexName);
     }
 
+    <T> Boolean createIndexSync(Class<T> clazz);
+
     /**
      *
      * @param aliasReader

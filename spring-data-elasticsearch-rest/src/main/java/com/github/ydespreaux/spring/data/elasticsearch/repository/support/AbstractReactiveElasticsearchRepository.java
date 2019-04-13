@@ -6,6 +6,7 @@ import com.github.ydespreaux.spring.data.elasticsearch.core.completion.reactive.
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.*;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.ReactiveElasticsearchRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -25,6 +26,7 @@ import reactor.core.publisher.Mono;
 import java.util.Collection;
 import java.util.List;
 
+@Slf4j
 public abstract class AbstractReactiveElasticsearchRepository<T, K> extends AbstractElasticsearchRepositorySupport<T, K> implements ReactiveElasticsearchRepository<T, K> {
 
     protected final ReactiveElasticsearchOperations reactiveElasticsearchOperations;
@@ -41,7 +43,7 @@ public abstract class AbstractReactiveElasticsearchRepository<T, K> extends Abst
         super(metadata);
         //
         this.reactiveElasticsearchOperations = reactiveElasticsearchOperations;
-        this.reactiveElasticsearchOperations.createIndex(getEntityClass()).subscribe();
+        this.reactiveElasticsearchOperations.createIndexSync(getEntityClass());
     }
 
     /**
@@ -378,7 +380,7 @@ public abstract class AbstractReactiveElasticsearchRepository<T, K> extends Abst
      * @return
      */
     @Override
-    public Flux<T> hasParentId(String parentId, QueryBuilder query) {
+    public Flux<T> hasParentId(String parentId, @Nullable QueryBuilder query) {
         assertChildDocument();
         return this.reactiveElasticsearchOperations.hasParentId(
                 ParentIdQuery.builder().type(this.entityInformation.getJoinDescriptor().getType()).parentId(parentId).query(query).build(), this.getEntityClass());

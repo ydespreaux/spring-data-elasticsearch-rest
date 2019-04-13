@@ -21,7 +21,7 @@
 package com.github.ydespreaux.spring.data.elasticsearch.reactive.repository.support;
 
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
-import com.github.ydespreaux.spring.data.elasticsearch.configuration.reactive.ReactiveElasticsearchConfiguration;
+import com.github.ydespreaux.spring.data.elasticsearch.configuration.ReactiveElasticsearchConfiguration;
 import com.github.ydespreaux.spring.data.elasticsearch.reactive.repositories.query.ReactiveProductRepository;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.config.EnableReactiveElasticsearchRepositories;
 import org.junit.jupiter.api.Tag;

@@ -21,7 +21,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.core;
 
 import com.github.ydespreaux.spring.data.elasticsearch.Versions;
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
-import com.github.ydespreaux.spring.data.elasticsearch.configuration.reactive.ReactiveElasticsearchConfiguration;
+import com.github.ydespreaux.spring.data.elasticsearch.configuration.ReactiveElasticsearchConfiguration;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.HasChildQuery;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.HasParentQuery;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.ParentIdQuery;

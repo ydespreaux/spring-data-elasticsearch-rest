@@ -57,6 +57,7 @@ import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.reactivestreams.Publisher;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -77,6 +78,8 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
     private final ReactiveRestElasticsearchClient client;
 
     private final ElasticsearchExceptionTranslator exceptionTranslator;
+
+    private ElasticsearchOperations syncOperations;
 
     /**
      * Construct an instance with the given client and elasticsearchConverter parameters.
@@ -120,6 +123,11 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
         return potentiallyTranslatedException != null ? potentiallyTranslatedException : throwable;
     }
 
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        super.setApplicationContext(applicationContext);
+        this.syncOperations = applicationContext.getBean(ElasticsearchOperations.class);
+    }
 
     /**
      * method checking the existance of the given indexName.
@@ -157,6 +165,11 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
         } else {
             return createIndex(persistentEntity);
         }
+    }
+
+    @Override
+    public <T> Boolean createIndexSync(Class<T> clazz) {
+        return this.syncOperations.createIndex(clazz);
     }
 
     /**

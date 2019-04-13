@@ -21,6 +21,7 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch;
 
+import com.github.ydespreaux.spring.data.elasticsearch.core.ReactiveElasticsearchTemplateCompletionTest;
 import com.github.ydespreaux.spring.data.elasticsearch.core.ReactiveElasticsearchTemplateQueryTest;
 import com.github.ydespreaux.spring.data.elasticsearch.reactive.repository.support.ReactiveAnswerRepositoryTest;
 import com.github.ydespreaux.spring.data.elasticsearch.reactive.repository.support.ReactiveArticleRepositoryTest;
@@ -59,5 +60,9 @@ public class ReactiveQuerySuiteTest {
 
     @Nested
     class ReactiveProductRepositoryNested extends ReactiveProductRepositoryTest {
+    }
+
+    @Nested
+    class ReactiveElasticsearchTemplateCompletionNested extends ReactiveElasticsearchTemplateCompletionTest {
     }
 }
