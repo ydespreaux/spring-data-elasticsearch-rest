@@ -1,14 +1,12 @@
 # Changelog
 
-## [Unreleased]
+## [1.1.0]
 ### Added
 - Dependency spring-boot version from 2.1.0 to 2.1.3
 - Dependency elasticsearch version from 6.4.2 to 6.5.0
 - Reactive repository
 
 ### Changed
-
-- Migration Junit 4 to Junit 5
 
 ### Fixed
 
