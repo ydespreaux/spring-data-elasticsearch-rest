@@ -66,10 +66,6 @@ public class ReactiveElasticsearchTemplateCompletionTest {
         StepVerifier.create(template.suggest(query, Music.class, new ReactiveStringSuggestExtractor()).sort(String::compareTo))
                 .expectNext("Mickael Jackson", "Muse")
                 .verifyComplete();
-//        final List<String> suggestions = template.suggest(query, Music.class, new StringSuggestExtractor());
-//        assertThat(suggestions.size(), is(2));
-//        assertThat(suggestions.get(0), is(equalTo("Mickael Jackson")));
-//        assertThat(suggestions.get(1), is(equalTo("Muse")));
     }
 
     @Test
@@ -81,10 +77,6 @@ public class ReactiveElasticsearchTemplateCompletionTest {
         StepVerifier.create(template.suggest(query, new ReactiveStringSuggestExtractor()).sort(String::compareTo))
                 .expectNext("Mickael Jackson", "Muse")
                 .verifyComplete();
-//        List<String> suggestions = template.suggest(query, new ReactiveStringSuggestExtractor());
-//        assertThat(suggestions.size(), is(2));
-//        assertThat(suggestions.get(0), is(equalTo("Mickael Jackson")));
-//        assertThat(suggestions.get(1), is(equalTo("Muse")));
     }
 
     @Test
@@ -92,11 +84,6 @@ public class ReactiveElasticsearchTemplateCompletionTest {
         StepVerifier.create(this.repository.suggest("m").map(Music::getTitle).sort(String::compareTo))
                 .expectNext("Revolution", "Thriller")
                 .verifyComplete();
-//        List<Music> suggestions = this.repository.suggest("m");
-//        assertThat(suggestions.size(), is(2));
-//        List<String> titles = suggestions.stream().map(Music::getTitle).collect(Collectors.toList());
-//        assertThat(titles.contains("Revolution"), is(true));
-//        assertThat(titles.contains("Thriller"), is(true));
     }
 
     @Test
@@ -104,11 +91,6 @@ public class ReactiveElasticsearchTemplateCompletionTest {
         StepVerifier.create(this.repository.suggest("m", MusicInfo.class).map(MusicInfo::getTitle).sort(String::compareTo))
                 .expectNext("Revolution", "Thriller")
                 .verifyComplete();
-//        List<MusicInfo> suggestions = this.repository.suggest("m", MusicInfo.class);
-//        assertThat(suggestions.size(), is(2));
-//        List<String> titles = suggestions.stream().map(MusicInfo::getTitle).collect(Collectors.toList());
-//        assertThat(titles.contains("Revolution"), is(true));
-//        assertThat(titles.contains("Thriller"), is(true));
     }
 
     @Configuration

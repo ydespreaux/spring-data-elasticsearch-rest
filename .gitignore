@@ -8,4 +8,7 @@ docker/sonarqube
 docker/elasticsearch/data
 docker/elasticsearch/logs
 *.iml
-
+gradle/
+.gradle
+gradlew
+gradlew.bat

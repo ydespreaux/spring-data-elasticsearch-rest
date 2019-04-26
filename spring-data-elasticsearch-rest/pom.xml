@@ -132,20 +132,21 @@
             <plugin>
                 <groupId>org.pitest</groupId>
                 <artifactId>pitest-maven</artifactId>
-                <version>1.4.6</version>
+                <version>1.4.7</version>
+                <executions>
+                    <execution>
+                        <id>pit-report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>mutationCoverage</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
-                    <targetClasses>
-                        <param>com.github.ydespreaux.spring.data.elasticsearch*</param>
-                    </targetClasses>
-                    <targetTests>
-                        <param>com.github.ydespreaux.spring.data.elasticsearch*</param>
-                    </targetTests>
-                    <mutators>
-                        <mutator>CONSTRUCTOR_CALLS</mutator>
-                        <mutator>NON_VOID_METHOD_CALLS</mutator>
-                        <mutator>REMOVE_CONDITIONALS</mutator>
-                        <mutator>NULL_RETURNS</mutator>
-                    </mutators>
+                    <threads>2</threads>
+                    <outputFormats>XML</outputFormats>
+                    <withHistory>true</withHistory>
+                    <verbose>true</verbose>
                 </configuration>
             </plugin>
         </plugins>
