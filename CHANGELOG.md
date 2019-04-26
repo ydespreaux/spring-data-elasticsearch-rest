@@ -14,6 +14,8 @@
 - Dependency elasticsearch version from 6.4.2 to 6.5.0
 - Reactive repository
 
+### Changed
+
 ### Fixed
 
 ## [1.0.2]
