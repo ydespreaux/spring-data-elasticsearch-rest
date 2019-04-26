@@ -1,21 +1,26 @@
 # Changelog
 
-## [Unreleased]
+## [1.1.0]
 ### Added
-- Mapping annotation (o)
+- Dependency spring-boot version from 2.1.0 to 2.1.3
+- Dependency elasticsearch version from 6.4.2 to 6.5.0
+- Reactive repository
 
 ### Changed
 
 ### Fixed
 
-
-## [1.1.0-SNAPSHOT]
+## [1.0.2]
 ### Added
-- Dependency spring-boot version from 2.1.0 to 2.1.2
-- Dependency elasticsearch version from 6.4.2 to 6.4.3
-- Reactive repository (o)
+- Add mapping annotations for parent / child
+- ElasticsearchRepository : Add methods for search parent / child  
+- Added multiple levels of join parent  
+- Added Geo-shape type
+- Script field
 
 ### Changed
+- Externalized @Parent attributes
+- Migrate to JDK 11
 
 ### Fixed
 

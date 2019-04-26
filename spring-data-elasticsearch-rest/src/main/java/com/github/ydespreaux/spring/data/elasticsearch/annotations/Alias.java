@@ -26,6 +26,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Alias
+ *
  * @author Yoann Despréaux
  * @since 1.0.0
  */

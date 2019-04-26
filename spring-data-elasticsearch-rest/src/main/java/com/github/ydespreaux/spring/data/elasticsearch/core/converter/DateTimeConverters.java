@@ -20,6 +20,7 @@
 package com.github.ydespreaux.spring.data.elasticsearch.core.converter;
 
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.Nullable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,8 +39,9 @@ public final class DateTimeConverters {
     public enum LocalDateTimeConverter implements Converter<LocalDateTime, String> {
         INSTANCE;
 
+        @Nullable
         @Override
-        public String convert(LocalDateTime source) {
+        public String convert(@Nullable LocalDateTime source) {
             if (source == null) {
                 return null;
             }
@@ -51,8 +53,9 @@ public final class DateTimeConverters {
     public enum LocalDateConverter implements Converter<LocalDate, String> {
         INSTANCE;
 
+        @Nullable
         @Override
-        public String convert(LocalDate source) {
+        public String convert(@Nullable LocalDate source) {
             if (source == null) {
                 return null;
             }
@@ -64,8 +67,9 @@ public final class DateTimeConverters {
     public enum JavaDateConverter implements Converter<Date, String> {
         INSTANCE;
 
+        @Nullable
         @Override
-        public String convert(Date source) {
+        public String convert(@Nullable Date source) {
             if (source == null) {
                 return null;
             }

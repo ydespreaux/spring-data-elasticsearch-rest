@@ -28,12 +28,11 @@ import org.springframework.data.geo.Box;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -66,7 +65,7 @@ final class CriteriaFilterProcessor {
      * @param criteria
      * @return
      */
-    final QueryBuilder createFilterFromCriteria(Criteria criteria) {
+    final Optional<QueryBuilder> createFilterFromCriteria(Criteria criteria) {
         List<QueryBuilder> fbList = new LinkedList<>();
         criteria.getCriteriaChain().forEach(chainedCriteria -> {
             if (chainedCriteria.isOr()) {
@@ -90,7 +89,7 @@ final class CriteriaFilterProcessor {
                 fbList.forEach(((BoolQueryBuilder) filter)::must);
             }
         }
-        return filter;
+        return Optional.ofNullable(filter);
     }
 
     /**
@@ -124,10 +123,8 @@ final class CriteriaFilterProcessor {
      * @param fieldName
      * @return
      */
-    private QueryBuilder processCriteriaEntry(Criteria.OperationKey key, Object value, String fieldName) {
-        if (value == null) {
-            return null;
-        }
+    @Nullable
+    private QueryBuilder processCriteriaEntry(Criteria.OperationKey key, @NonNull Object value, String fieldName) {
         if (Criteria.OperationKey.WITHIN == key) {
             return processWithinFilter(value, fieldName);
         } else if (Criteria.OperationKey.BOX == key) {

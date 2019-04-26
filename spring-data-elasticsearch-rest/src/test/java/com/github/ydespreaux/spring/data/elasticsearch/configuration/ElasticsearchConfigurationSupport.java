@@ -26,6 +26,7 @@ import com.github.ydespreaux.spring.data.elasticsearch.config.IngestTemplate;
 import com.github.ydespreaux.spring.data.elasticsearch.config.TemplateProperties;
 import com.github.ydespreaux.spring.data.elasticsearch.core.*;
 import com.github.ydespreaux.spring.data.elasticsearch.core.converter.ElasticsearchConverter;
+import com.github.ydespreaux.spring.data.elasticsearch.core.converter.JtsGeomTypeModule;
 import com.github.ydespreaux.spring.data.elasticsearch.core.converter.MappingElasticsearchConverter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.SimpleElasticsearchMappingContext;
 import com.github.ydespreaux.spring.data.elasticsearch.core.triggers.TriggerManager;
@@ -69,8 +70,10 @@ public class ElasticsearchConfigurationSupport {
     }
 
     @Bean
-    EntityMapper entityMapper(JacksonProperties jacksonPropetrties) {
-        return new DefaultEntityMapper(jacksonPropetrties);
+    EntityMapper entityMapper(JacksonProperties jacksonProperties) {
+        DefaultEntityMapper mapper = new DefaultEntityMapper(jacksonProperties);
+        mapper.registerModules(new JtsGeomTypeModule());
+        return mapper;
     }
 
     @Bean

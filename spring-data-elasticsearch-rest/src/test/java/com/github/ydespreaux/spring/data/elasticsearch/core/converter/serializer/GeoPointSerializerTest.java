@@ -24,17 +24,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.ydespreaux.spring.data.elasticsearch.core.DefaultEntityMapper;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.City;
 import org.elasticsearch.common.geo.GeoPoint;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 public class GeoPointSerializerTest {
 
     @Test
-    public void serializeGeoPoint() throws JsonProcessingException {
+    void serializeGeoPoint() throws JsonProcessingException {
         City city = City.builder()
                 .name("Castries")
                 .region(null)

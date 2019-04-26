@@ -20,7 +20,6 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core.mapping;
 
-import com.github.ydespreaux.spring.data.elasticsearch.core.ParentDescriptor;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.SourceFilter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.request.config.RolloverConfig;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.support.ElasticsearchEntityInformation;
@@ -28,11 +27,15 @@ import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.search.SearchHit;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.lang.Nullable;
 
 import java.time.Duration;
+import java.util.Set;
+
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 /**
  * @param <T> generic type
@@ -69,7 +72,7 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
      * @param source
      * @return
      */
-    String getAliasOrIndexWriter(T source);
+    String getAliasOrIndexWriter(@Nullable T source);
 
     /**
      * Get the current index name for writing operations.
@@ -110,18 +113,21 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
      * @param entity the entity
      * @return the document id
      */
+    @Nullable
     String getPersistentEntityId(T entity);
 
     /**
      * @param source the entity
      * @return the version
      */
+    @Nullable
     Long getPersistentEntityVersion(T source);
 
     /**
      * @param entity
      * @return
      */
+    @Nullable
     String getPersistentEntityIndexName(T entity);
 
     /**
@@ -143,25 +149,6 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
      * @return the parent id property
      */
     ElasticsearchPersistentProperty getParentIdProperty();
-
-    /**
-     * Returns the parent Id. Can be {@literal null}.
-     *
-     * @param source the document source
-     * @return can be {@literal null}.
-     */
-    @Nullable
-    Object getParentId(T source);
-
-    /**
-     * @param id
-     */
-    void setParentId(T entity, Object id);
-
-    /**
-     * @return true if the current entity has a parent
-     */
-    boolean hasParent();
 
     /**
      * @return true if the score property is defined
@@ -200,6 +187,7 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
     /**
      * @return
      */
+    @Nullable
     SourceFilter getSourceFilter();
 
     /**
@@ -251,16 +239,63 @@ public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, El
         setPersistentEntityVersion(result, hit.getVersion());
         setPersistentEntityScore(result, hit.getScore());
         setPersistentEntityIndexName(result, hit.getIndex());
+        populateScriptFields(result, hit);
     }
 
     /**
+     * Returns the parent Id. Can be {@literal null}.
      *
-     * @return
+     * @param source the document source
+     * @return can be {@literal null}.
      */
-    boolean isParent();
+    @Nullable
+    Object getParentId(T source);
+
+    /**
+     * @param id
+     */
+    void setParentId(T entity, Object id);
 
     /**
      * @return
      */
-    ParentDescriptor getParentDescriptor();
+    default boolean hasScriptProperty() {
+        return !isEmpty(getScriptProperties());
+    }
+
+    /**
+     * @return
+     */
+    Set<ScriptFieldProperty> getScriptProperties();
+
+
+    /**
+     * @param result
+     * @param hit
+     */
+    default void populateScriptFields(T result, SearchHit hit) {
+        if (!hasScriptProperty()) {
+            return;
+        }
+        if (hit.getFields() != null && !hit.getFields().isEmpty()) {
+            for (ScriptFieldProperty field : getScriptProperties()) {
+                String name = field.getFieldName();
+                DocumentField searchHitField = hit.getFields().get(name);
+                if (searchHitField != null) {
+                    field.setScriptValue(result, searchHitField.getValue());
+                }
+            }
+        }
+    }
+
+    /**
+     * @param <T>
+     */
+    interface ScriptFieldProperty<T> {
+
+        void setScriptValue(T entity, Object value);
+
+        String getFieldName();
+    }
+
 }

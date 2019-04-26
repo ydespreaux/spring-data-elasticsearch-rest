@@ -1,0 +1,14 @@
+# index parent-child settings
+PUT:questions:@resource(indices/parent-child.index)
+# index questions
+PUT:questions/_doc/1:{ "description" : "Question 1", "join_field": {"name": "question"}}
+PUT:questions/_doc/2:{ "description" : "Question 2", "join_field": {"name": "question"}}
+PUT:questions/_doc/3:{ "description" : "Question 3", "join_field": {"name": "question"}}
+PUT:questions/_doc/4?routing=1&refresh:{ "description" : "Answer 1 of Question 1", "join_field": {"name": "answer", "parent": "1"}}
+PUT:questions/_doc/5?routing=1&refresh:{ "description" : "Answer 1 of Question 2 with Java", "join_field": {"name": "answer", "parent": "2"}}
+PUT:questions/_doc/6?routing=1&refresh:{ "description" : "Answer 2 of Question 2 with Angular", "join_field": {"name": "answer", "parent": "2"}}
+PUT:questions/_doc/7?routing=1&refresh:{ "description" : "This is a comment for question 1", "join_field": {"name": "comment", "parent": "1"}}
+PUT:questions/_doc/8?routing=1&refresh:{ "description" : "This is another comment for question 1", "join_field": {"name": "comment", "parent": "1"}}
+PUT:questions/_doc/9?routing=1&refresh:{ "description" : "This is a comment for question 3", "join_field": {"name": "comment", "parent": "3"}}
+PUT:questions/_doc/10?routing=1&refresh:{ "stars" : 4, "join_field": {"name": "vote", "parent": "4"}}
+PUT:questions/_doc/11?routing=1&refresh:{ "stars" : 1, "join_field": {"name": "vote", "parent": "6"}}

@@ -25,6 +25,7 @@ import org.elasticsearch.action.support.IndicesOptions;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ abstract class AbstractQuery implements Query {
     protected IndicesOptions indicesOptions;
     protected boolean trackScores;
 
+    @Nullable
     @Override
     public Sort getSort() {
         return this.sort;
@@ -110,17 +112,19 @@ abstract class AbstractQuery implements Query {
         this.sourceFilter = sourceFilter;
     }
 
-    @Override
-    public SourceFilter getSourceFilter() {
-        return sourceFilter;
+    /*
+
+     */
+    protected static <T> T requireValue(@Nullable T value, String message) {
+        if (value == null) {
+            throw new IllegalArgumentException(message);
+        } else {
+            return value;
+        }
     }
 
     @SuppressWarnings("unchecked")
     public final <T extends Query> T addSort(Sort sort) {
-        if (sort == null) {
-            return (T) this;
-        }
-
         if (this.sort == null) {
             this.sort = sort;
         } else {
@@ -186,5 +190,11 @@ abstract class AbstractQuery implements Query {
      */
     public void setTrackScores(boolean trackScores) {
         this.trackScores = trackScores;
+    }
+
+    @Nullable
+    @Override
+    public SourceFilter getSourceFilter() {
+        return sourceFilter;
     }
 }

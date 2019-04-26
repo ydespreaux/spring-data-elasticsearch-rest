@@ -24,42 +24,25 @@ import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperati
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
-import org.springframework.scheduling.support.CronTrigger;
-import org.springframework.util.StringUtils;
 
 @Slf4j
-public class RolloverTrigger<T> implements Trigger<T> {
-
-    private static final String DEFAULT_CRON_EXPRESSION = "0 */1 * * * *";
+public class RolloverTrigger<T> extends AbstractRolloverTrigger<T> {
 
     private final ElasticsearchOperations elasticsearchOperations;
-    private final ElasticsearchPersistentEntity<T> persistentEntity;
-    private final CronTrigger cronTrigger;
 
     public RolloverTrigger(ElasticsearchOperations elasticsearchOperations, ElasticsearchPersistentEntity<T> persistentEntity, String cronExpression) {
+        super(persistentEntity, cronExpression);
         this.elasticsearchOperations = elasticsearchOperations;
-        this.persistentEntity = persistentEntity;
-        this.cronTrigger = StringUtils.isEmpty(cronExpression) ? new CronTrigger(DEFAULT_CRON_EXPRESSION) : new CronTrigger(cronExpression);
-    }
-
-    @Override
-    public CronTrigger getCronTrigger() {
-        return this.cronTrigger;
-    }
-
-    @Override
-    public ElasticsearchPersistentEntity<T> getPersistentEntity() {
-        return this.persistentEntity;
     }
 
     @Override
     public Runnable processor() {
         return () -> {
             try {
-                elasticsearchOperations.rolloverIndex(persistentEntity.getJavaType());
+                elasticsearchOperations.rolloverIndex(getPersistentEntity().getJavaType());
             } catch (ElasticsearchException e) {
                 if (log.isWarnEnabled()) {
-                    log.warn("Rollover index {} failed : {}", persistentEntity.getAliasOrIndexWriter(), e.getLocalizedMessage());
+                    log.warn("Rollover index {} failed : {}", getPersistentEntity().getAliasOrIndexWriter(), e.getLocalizedMessage());
                 }
             }
         };

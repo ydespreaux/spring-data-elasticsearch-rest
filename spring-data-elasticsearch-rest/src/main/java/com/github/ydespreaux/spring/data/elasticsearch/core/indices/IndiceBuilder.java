@@ -28,6 +28,7 @@ import org.elasticsearch.action.IndicesRequest;
 import org.elasticsearch.common.xcontent.*;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.core.io.Resource;
+import org.springframework.lang.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -117,6 +118,7 @@ public abstract class IndiceBuilder<T extends IndicesRequest, S extends IndiceBu
      * @param scripts the list of scripts
      * @return the map of jeson elements
      */
+    @Nullable
     public Map<String, TreeNode> buildJsonElement(List<Resource> scripts) throws IOException {
         if (scripts.isEmpty()) {
             return null;

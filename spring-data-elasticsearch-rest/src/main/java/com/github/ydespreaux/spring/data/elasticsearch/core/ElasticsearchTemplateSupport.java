@@ -32,16 +32,20 @@ import com.github.ydespreaux.spring.data.elasticsearch.core.triggers.TriggerMana
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.client.Requests;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.reindex.BulkByScrollResponse;
+import org.elasticsearch.join.query.HasChildQueryBuilder;
+import org.elasticsearch.join.query.HasParentQueryBuilder;
+import org.elasticsearch.join.query.JoinQueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
@@ -50,14 +54,19 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.text.MessageFormat;
 import java.time.Duration;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import static org.elasticsearch.index.VersionType.EXTERNAL;
 import static org.elasticsearch.index.query.QueryBuilders.wrapperQuery;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -160,32 +169,6 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
     }
 
     /**
-     * @param source
-     * @return
-     */
-    protected <T> IndexRequest createIndexRequest(T source, Class<?> clazz) {
-        Objects.requireNonNull(source);
-        ElasticsearchPersistentEntity<T> persistentEntity = (ElasticsearchPersistentEntity<T>) getPersistentEntityFor(clazz);
-        String indexName = persistentEntity.getAliasOrIndexWriter(source);
-        String type = persistentEntity.getTypeName();
-        String id = persistentEntity.getPersistentEntityId(source);
-        IndexRequest indexRequest = id != null ? new IndexRequest(indexName, type, id) : new IndexRequest(indexName, type);
-        indexRequest.source(this.getResultsMapper().getEntityMapper().mapToString(source), Requests.INDEX_CONTENT_TYPE);
-        Long version = persistentEntity.getPersistentEntityVersion(source);
-        if (version != null) {
-            indexRequest.version(version);
-            indexRequest.versionType(EXTERNAL);
-        }
-        if (persistentEntity.hasParent()) {
-            Object parentId = persistentEntity.getParentId(source);
-            if (parentId != null) {
-                indexRequest.parent(parentId.toString());
-            }
-        }
-        return indexRequest;
-    }
-
-    /**
      * @param response
      */
     protected void checkForBulkUpdateFailure(BulkResponse response) {
@@ -194,6 +177,20 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
             for (BulkItemResponse item : response.getItems()) {
                 if (item.isFailed())
                     failedDocuments.put(item.getId(), item.getFailureMessage());
+            }
+            throw new ElasticsearchException(
+                    "Bulk indexing has failures. Use ElasticsearchException.getFailedDocuments() for detailed messages ["
+                            + failedDocuments + "]",
+                    failedDocuments);
+        }
+    }
+
+    protected void checkForBulkDeleteFailure(BulkByScrollResponse response) {
+        List<BulkItemResponse.Failure> failures = response.getBulkFailures();
+        if (!failures.isEmpty()) {
+            Map<String, String> failedDocuments = new HashMap<>();
+            for (BulkItemResponse.Failure failure : failures) {
+                failedDocuments.put(failure.getId(), failure.getMessage());
             }
             throw new ElasticsearchException(
                     "Bulk indexing has failures. Use ElasticsearchException.getFailedDocuments() for detailed messages ["
@@ -233,8 +230,6 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
     protected SearchRequest prepareSearch(Query query, Optional<QueryBuilder> builder) {
         assertNotNullIndices(query);
         assertNotNullTypes(query);
-
-        int startRecord = 0;
         SearchRequest request = new SearchRequest(toArray(query.getIndices()));
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         request.types(toArray(query.getTypes()));
@@ -249,13 +244,6 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
             SourceFilter sourceFilter = query.getSourceFilter();
             sourceBuilder.fetchSource(sourceFilter.getIncludes(), sourceFilter.getExcludes());
         }
-
-        if (query.getPageable().isPaged()) {
-            startRecord = query.getPageable().getPageNumber() * query.getPageable().getPageSize();
-            sourceBuilder.size(query.getPageable().getPageSize());
-        }
-        sourceBuilder.from(startRecord);
-
         if (!query.getFields().isEmpty()) {
             sourceBuilder.fetchSource(toArray(query.getFields()), null);
         }
@@ -293,6 +281,11 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
         if (searchQuery.getAggregations() != null) {
             searchQuery.getAggregations().forEach(searchRequest.source()::aggregation);
         }
+        if (!searchQuery.getScriptFields().isEmpty()) {
+            for (ScriptField scriptedField : searchQuery.getScriptFields()) {
+                searchRequest.source().scriptField(scriptedField.getFieldName(), scriptedField.getScript());
+            }
+        }
         return searchRequest;
     }
 
@@ -302,14 +295,10 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
      * @return
      */
     protected SearchRequest doSearch(SearchRequest request, CriteriaQuery criteriaQuery) {
-        QueryBuilder query = new CriteriaQueryProcessor().createQueryFromCriteria(criteriaQuery.getCriteria());
-        QueryBuilder filter = new CriteriaFilterProcessor()
+        Optional<QueryBuilder> query = new CriteriaQueryProcessor().createQueryFromCriteria(criteriaQuery.getCriteria());
+        Optional<QueryBuilder> filter = new CriteriaFilterProcessor()
                 .createFilterFromCriteria(criteriaQuery.getCriteria());
-        if (query != null) {
-            request.source().query(query);
-        } else {
-            request.source().query(QueryBuilders.matchAllQuery());
-        }
+        request.source().query(query.orElse(QueryBuilders.matchAllQuery()));
         if (criteriaQuery.getSort() != null) {
             criteriaQuery.getSort().forEach(order -> request.source().sort(order.getProperty(), order.getDirection() == Sort.Direction.ASC ? SortOrder.ASC : SortOrder.DESC));
         }
@@ -317,8 +306,8 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
             request.source().minScore(criteriaQuery.getMinScore());
         }
 
-        if (filter != null)
-            request.source().postFilter(filter);
+        if (filter.isPresent())
+            request.source().postFilter(filter.get());
         return request;
     }
 
@@ -401,17 +390,11 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
         assertNotNullTypes(query);
         assertNotNullPageable(query);
 
-        QueryBuilder elasticsearchQuery = new CriteriaQueryProcessor().createQueryFromCriteria(query.getCriteria());
-        QueryBuilder elasticsearchFilter = new CriteriaFilterProcessor().createFilterFromCriteria(query.getCriteria());
-
-        if (elasticsearchQuery != null) {
-            request.source().query(elasticsearchQuery);
-        } else {
-            request.source().query(QueryBuilders.matchAllQuery());
-        }
-
-        if (elasticsearchFilter != null) {
-            request.source().postFilter(elasticsearchFilter);
+        Optional<QueryBuilder> elasticsearchQuery = new CriteriaQueryProcessor().createQueryFromCriteria(query.getCriteria());
+        Optional<QueryBuilder> elasticsearchFilter = new CriteriaFilterProcessor().createFilterFromCriteria(query.getCriteria());
+        request.source().query(elasticsearchQuery.orElse(QueryBuilders.matchAllQuery()));
+        if (elasticsearchFilter.isPresent()) {
+            request.source().postFilter(elasticsearchFilter.get());
         }
         request.source().version(true);
         return request;
@@ -448,6 +431,8 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
         if (!isEmpty(query.getTypes())) {
             countRequestBuilder.types(toArray(query.getTypes()));
         }
+        // Fix size at 0
+        countRequestBuilder.source().size(0);
         return countRequestBuilder;
     }
 
@@ -457,7 +442,7 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
      * @return
      */
     protected SearchRequest doCount(SearchRequest searchRequest, SearchQuery query) {
-        return doCount(searchRequest, query.getQuery(), query.getFilter());
+        return doCount(searchRequest, Optional.ofNullable(query.getQuery()), Optional.ofNullable(query.getFilter()));
     }
 
     /**
@@ -466,10 +451,20 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
      * @return
      */
     protected SearchRequest doCount(SearchRequest searchRequest, CriteriaQuery criteriaQuery) {
-        QueryBuilder query = new CriteriaQueryProcessor().createQueryFromCriteria(criteriaQuery.getCriteria());
-        QueryBuilder filter = new CriteriaFilterProcessor()
+        Optional<QueryBuilder> query = new CriteriaQueryProcessor().createQueryFromCriteria(criteriaQuery.getCriteria());
+        Optional<QueryBuilder> filter = new CriteriaFilterProcessor()
                 .createFilterFromCriteria(criteriaQuery.getCriteria());
         return doCount(searchRequest, query, filter);
+    }
+
+    /**
+     *
+     * @param searchRequest
+     * @param query
+     * @return
+     */
+    protected SearchRequest doCount(SearchRequest searchRequest, StringQuery query) {
+        return doCount(searchRequest, Optional.of(wrapperQuery(query.getSource())), Optional.empty());
     }
 
     /**
@@ -478,14 +473,10 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
      * @param elasticsearchFilter
      * @return
      */
-    private SearchRequest doCount(SearchRequest searchRequest, QueryBuilder elasticsearchQuery, QueryBuilder elasticsearchFilter) {
-        if (elasticsearchQuery != null) {
-            searchRequest.source().query(elasticsearchQuery);
-        } else {
-            searchRequest.source().query(QueryBuilders.matchAllQuery());
-        }
-        if (elasticsearchFilter != null) {
-            searchRequest.source().postFilter(elasticsearchFilter);
+    private SearchRequest doCount(SearchRequest searchRequest, Optional<QueryBuilder> elasticsearchQuery, Optional<QueryBuilder> elasticsearchFilter) {
+        searchRequest.source().query(elasticsearchQuery.orElse(QueryBuilders.matchAllQuery()));
+        if (elasticsearchFilter.isPresent()) {
+            searchRequest.source().postFilter(elasticsearchFilter.get());
         }
         return searchRequest;
     }
@@ -522,11 +513,81 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
     }
 
 
+    protected <T> SearchQuery prepareHasChildQuery(HasChildQuery query, Class<T> clazz) {
+        assertNotNull(query);
+        setPersistentEntityJoinType(query, clazz, false);
+        return prepareHasChildQuery(query);
+    }
+
+    protected SearchQuery prepareHasChildQuery(HasChildQuery query) {
+        assertNotNull(query);
+        HasChildQueryBuilder childQueryBuilder = JoinQueryBuilders.hasChildQuery(query.getType(), query.getQuery(), query.getScoreMode())
+                .ignoreUnmapped(query.isIgnoreUnmapped())
+                .minMaxChildren(query.getMinChildren(), query.getMaxChildren());
+        if (query.getInnerHitBuilder() != null) {
+            childQueryBuilder.innerHit(query.getInnerHitBuilder());
+        }
+        return new NativeSearchQuery(childQueryBuilder);
+    }
+
+    protected <T> SearchQuery prepareHasParentQuery(HasParentQuery query, Class<T> entityClass) {
+        assertNotNull(query);
+        setPersistentEntityJoinType(query, entityClass, true);
+        return prepareHasParentQuery(query);
+    }
+
+    protected SearchQuery prepareHasParentQuery(HasParentQuery query) {
+        assertNotNull(query);
+        HasParentQueryBuilder parentQueryBuilder = JoinQueryBuilders.hasParentQuery(query.getType(), query.getQuery(), false)
+                .ignoreUnmapped(query.isIgnoreUnmapped());
+        if (query.getInnerHitBuilder() != null) {
+            parentQueryBuilder.innerHit(query.getInnerHitBuilder());
+        }
+        return new NativeSearchQuery(parentQueryBuilder);
+    }
+
+    protected <T> SearchQuery prepareHasParentId(ParentIdQuery query, Class<T> entityClass) {
+        assertNotNull(query);
+        setPersistentEntityJoinType(query, entityClass, false);
+        return prepareHasParentId(query);
+    }
+
+    protected SearchQuery prepareHasParentId(ParentIdQuery query) {
+        assertNotNull(query);
+        QueryBuilder completedQuery = null;
+        QueryBuilder parentIdQueryBuilder = JoinQueryBuilders.parentId(query.getType(), query.getParentId()).ignoreUnmapped(query.isIgnoreUnmapped());
+        QueryBuilder originalQuery = query.getQuery();
+        if (originalQuery != null) {
+            if (originalQuery instanceof BoolQueryBuilder) {
+                completedQuery = ((BoolQueryBuilder) originalQuery).must(parentIdQueryBuilder);
+            } else {
+                completedQuery = QueryBuilders.boolQuery()
+                        .must(originalQuery)
+                        .must(parentIdQueryBuilder);
+            }
+        } else {
+            completedQuery = parentIdQueryBuilder;
+        }
+        return new NativeSearchQuery(completedQuery);
+    }
+
+    private <T> void setPersistentEntityJoinType(JoinQuery<?> query, Class<T> clazz, boolean mustBeParentDocument) {
+        ElasticsearchPersistentEntity<T> persistentEntity = getPersistentEntityFor(clazz);
+        if (mustBeParentDocument) {
+            assertParentDocument(persistentEntity);
+        } else {
+            assertChildDocument(persistentEntity);
+        }
+        if (StringUtils.isEmpty(query.getType())) {
+            query.setType(persistentEntity.getJoinDescriptor().getType());
+        }
+    }
+
     /**
      * @param sort
      * @param searchSourceBuilder
      */
-    private void doSort(Sort sort, SearchSourceBuilder searchSourceBuilder) {
+    private void doSort(@Nullable Sort sort, SearchSourceBuilder searchSourceBuilder) {
         if (sort != null) {
             for (Sort.Order order : sort) {
                 FieldSortBuilder fieldSortBuilder = SortBuilders.fieldSort(order.getProperty())
@@ -540,6 +601,7 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
             }
         }
     }
+
 
     /**
      * @param query
@@ -580,6 +642,10 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
         Assert.notNull(query.getPageable(), "Query.pageable is required for scan & scroll");
     }
 
+    private void assertNotNull(Query query) {
+        Assert.notNull(query, "Query is required");
+    }
+
     /**
      * @param e
      * @param request
@@ -596,4 +662,21 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
     protected ElasticsearchException buildClearScrollException(Exception e, ClearScrollRequest request) {
         return new ElasticsearchException("Error for clear scroll request: " + request.toString(), e);
     }
+
+    protected ElasticsearchException buildGetAliasException(Exception e, GetAliasesRequest request) {
+        return new ElasticsearchException("Error for get aliases request: " + request.toString(), e);
+    }
+
+    protected <T> void assertChildDocument(ElasticsearchPersistentEntity<T> persistentEntity) {
+        if (!persistentEntity.isChildDocument()) {
+            throw new InvalidDataAccessApiUsageException("The document must be a child document !!!");
+        }
+    }
+
+    protected <T> void assertParentDocument(ElasticsearchPersistentEntity<T> persistentEntity) {
+        if (!persistentEntity.isParentDocument()) {
+            throw new InvalidDataAccessApiUsageException("The document must be a parent document !!!");
+        }
+    }
+
 }

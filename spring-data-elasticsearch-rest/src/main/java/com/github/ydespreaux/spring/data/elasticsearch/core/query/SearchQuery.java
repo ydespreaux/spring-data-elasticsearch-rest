@@ -24,6 +24,7 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
 
@@ -35,19 +36,29 @@ import java.util.List;
  */
 public interface SearchQuery extends Query {
 
+    @Nullable
     QueryBuilder getQuery();
 
+    @Nullable
     QueryBuilder getFilter();
 
+    @Nullable
     List<SortBuilder> getElasticsearchSorts();
 
+    @Nullable
     List<AbstractAggregationBuilder> getAggregations();
 
+    @Nullable
     HighlightBuilder getHighlightBuilder();
 
+    @Nullable
     HighlightBuilder.Field[] getHighlightFields();
 
+    @Nullable
     List<IndexBoost> getIndicesBoost();
+
+    @Nullable
+    List<ScriptField> getScriptFields();
 
     default boolean hasHighlight() {
         return getHighlightBuilder() != null || getHighlightFields() != null;

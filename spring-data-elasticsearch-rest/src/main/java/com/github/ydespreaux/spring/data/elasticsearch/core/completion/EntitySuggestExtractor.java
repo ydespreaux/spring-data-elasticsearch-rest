@@ -57,7 +57,7 @@ public class EntitySuggestExtractor<T> implements ResultsExtractor<List<T>> {
                         entry.getOptions().stream()
                                 .filter(option -> option instanceof CompletionSuggestion.Entry.Option)
                                 .map(CompletionSuggestion.Entry.Option.class::cast)
-                                .map(option -> mapper.mapEntity(option.getHit(), entityType))
+                                .map(option -> (T) mapper.mapEntity(option.getHit(), entityType))
                                 .collect(Collectors.toList()))
                 ));
         return values;

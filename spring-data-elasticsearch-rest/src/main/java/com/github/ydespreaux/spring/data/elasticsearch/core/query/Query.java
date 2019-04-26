@@ -24,6 +24,7 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.support.IndicesOptions;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -64,6 +65,7 @@ public interface Query {
     /**
      * @return null if not set
      */
+    @Nullable
     Sort getSort();
 
     /**
@@ -120,6 +122,7 @@ public interface Query {
      *
      * @return SourceFilter
      */
+    @Nullable
     SourceFilter getSourceFilter();
 
     /**
@@ -130,9 +133,9 @@ public interface Query {
     float getMinScore();
 
     /**
-     * Get if scores will be computed and tracked, regardless of whether sorting on a field. Defaults to <tt>false</tt>.
+     * Get if scores will be computed and tracked, regardless of whether sorting on a field. Defaults to false.
      *
-     * @return Get if scores will be computed and tracked, regardless of whether sorting on a field. Defaults to <tt>false</tt>.
+     * @return Get if scores will be computed and tracked, regardless of whether sorting on a field. Defaults to false.
      */
     boolean getTrackScores();
 
@@ -162,5 +165,6 @@ public interface Query {
      *
      * @return null if not set
      */
+    @Nullable
     IndicesOptions getIndicesOptions();
 }

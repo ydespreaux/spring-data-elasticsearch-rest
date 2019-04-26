@@ -24,14 +24,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.queryparser.flexible.core.util.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.elasticsearch.index.query.Operator.AND;
 import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 /**
  * CriteriaQueryProcessor generate query-related queries for a {@link Criteria} object
@@ -40,7 +44,7 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
  * @since 1.0.0
  */
 @Slf4j
-class CriteriaQueryProcessor {
+public class CriteriaQueryProcessor {
 
 
     /**
@@ -49,9 +53,9 @@ class CriteriaQueryProcessor {
      * @param criteria
      * @return
      */
-    QueryBuilder createQueryFromCriteria(Criteria criteria) {
-        if (criteria == null)
-            return null;
+    public Optional<QueryBuilder> createQueryFromCriteria(@Nullable Criteria criteria) {
+        if (criteria == null || isEmpty(criteria.getCriteriaChain()))
+            return Optional.empty();
         ListQueryBuilder builder = new ListQueryBuilder();
         for (Criteria chainedCriteria : criteria.getCriteriaChain()) {
             builder.addCriteria(chainedCriteria);
@@ -68,23 +72,22 @@ class CriteriaQueryProcessor {
         private boolean negateFirstQuery = false;
 
         public void addCriteria(Criteria chainedCriteria) {
-            QueryBuilder queryFragmentForCriteria = createQueryFragmentForCriteria(chainedCriteria);
-            if (queryFragmentForCriteria == null) {
-                return;
-            }
-            if (firstQuery == null) {
-                firstQuery = queryFragmentForCriteria;
-                negateFirstQuery = chainedCriteria.isNegating();
-            } else if (chainedCriteria.isOr()) {
-                shouldQueryBuilderList.add(queryFragmentForCriteria);
-            } else if (chainedCriteria.isNegating()) {
-                mustNotQueryBuilderList.add(queryFragmentForCriteria);
-            } else {
-                mustQueryBuilderList.add(queryFragmentForCriteria);
+            Optional<QueryBuilder> queryFragmentForCriteria = createQueryFragmentForCriteria(chainedCriteria);
+            if (queryFragmentForCriteria.isPresent()) {
+                if (firstQuery == null) {
+                    firstQuery = queryFragmentForCriteria.get();
+                    negateFirstQuery = chainedCriteria.isNegating();
+                } else if (chainedCriteria.isOr()) {
+                    shouldQueryBuilderList.add(queryFragmentForCriteria.get());
+                } else if (chainedCriteria.isNegating()) {
+                    mustNotQueryBuilderList.add(queryFragmentForCriteria.get());
+                } else {
+                    mustQueryBuilderList.add(queryFragmentForCriteria.get());
+                }
             }
         }
 
-        public QueryBuilder build() {
+        public Optional<QueryBuilder> build() {
             if (firstQuery != null) {
                 if (!shouldQueryBuilderList.isEmpty() && mustNotQueryBuilderList.isEmpty() && mustQueryBuilderList.isEmpty()) {
                     shouldQueryBuilderList.add(0, firstQuery);
@@ -98,23 +101,23 @@ class CriteriaQueryProcessor {
             shouldQueryBuilderList.forEach(query::should);
             mustNotQueryBuilderList.forEach(query::mustNot);
             mustQueryBuilderList.forEach(query::must);
-            return query.hasClauses() ? query : null;
+            return query.hasClauses() ? Optional.of(query) : Optional.empty();
         }
 
         /**
          * @param chainedCriteria
          * @return
          */
-        private QueryBuilder createQueryFragmentForCriteria(Criteria chainedCriteria) {
+        private Optional<QueryBuilder> createQueryFragmentForCriteria(Criteria chainedCriteria) {
             if (chainedCriteria.getQueryCriteriaEntries().isEmpty())
-                return null;
+                return Optional.empty();
 
             String fieldName = chainedCriteria.getField().getName();
             Assert.notNull(fieldName, "Unknown field");
 
             List<Criteria.CriteriaEntry> entries = new ArrayList<>(chainedCriteria.getQueryCriteriaEntries());
             if (entries.isEmpty()) {
-                return null;
+                return Optional.empty();
             }
 
             QueryBuilder query = null;
@@ -129,11 +132,13 @@ class CriteriaQueryProcessor {
                     }
                 }
                 if (!((BoolQueryBuilder) query).hasClauses()) {
-                    return null;
+                    return Optional.empty();
                 }
             }
-            addBoost(query, chainedCriteria.getBoost());
-            return query;
+            if (query != null) {
+                addBoost(query, chainedCriteria.getBoost());
+            }
+            return Optional.ofNullable(query);
         }
 
         /**
@@ -141,11 +146,9 @@ class CriteriaQueryProcessor {
          * @param fieldName
          * @return
          */
+        @Nullable
         private QueryBuilder processCriteriaEntry(Criteria.CriteriaEntry entry, String fieldName) {
             Object value = entry.getValue();
-            if (value == null) {
-                return null;
-            }
             Criteria.OperationKey key = entry.getKey();
             String searchText = StringUtils.toString(value);
             QueryBuilder query = null;
@@ -209,8 +212,8 @@ class CriteriaQueryProcessor {
          * @param query
          * @param boost
          */
-        private void addBoost(QueryBuilder query, float boost) {
-            if (query == null || Float.isNaN(boost)) {
+        private void addBoost(@NonNull QueryBuilder query, float boost) {
+            if (Float.isNaN(boost)) {
                 return;
             }
             query.boost(boost);

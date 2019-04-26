@@ -21,8 +21,12 @@
 package com.github.ydespreaux.spring.data.elasticsearch.core.converter;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.github.ydespreaux.spring.data.elasticsearch.core.converter.serializer.GeoPointSerializer;
+import com.github.ydespreaux.spring.data.elasticsearch.core.converter.serializer.*;
+import com.github.ydespreaux.spring.data.elasticsearch.core.geo.GeoShapeOrientation;
+import com.github.ydespreaux.spring.data.elasticsearch.core.geo.Shape;
 import org.elasticsearch.common.geo.GeoPoint;
+import org.elasticsearch.common.geo.GeoShapeType;
+import org.elasticsearch.common.unit.DistanceUnit;
 
 /**
  * ElasticsearchTypeModule
@@ -33,6 +37,17 @@ import org.elasticsearch.common.geo.GeoPoint;
 public class ElasticsearchTypeModule extends SimpleModule {
 
     public ElasticsearchTypeModule() {
+
         this.addSerializer(GeoPoint.class, new GeoPointSerializer());
+        this.addSerializer(GeoShapeType.class, new GeoShapeTypeSerializer());
+        this.addSerializer(DistanceUnit.Distance.class, new DistanceSerializer());
+        this.addSerializer(GeoShapeOrientation.class, new GeoShapeOrientationSerializer());
+
+        this.addDeserializer(GeoShapeType.class, new GeoShapeTypeDeserializer());
+        this.addDeserializer(DistanceUnit.Distance.class, new DistanceDeserializer());
+        this.addDeserializer(GeoShapeOrientation.class, new GeoShapeOrientationDeserializer());
+
+        this.addDeserializer(Shape.class, new ShapeDeserializer());
+
     }
 }

@@ -23,27 +23,29 @@ package com.github.ydespreaux.spring.data.elasticsearch.core.mapping;
 import com.github.ydespreaux.spring.data.elasticsearch.annotations.*;
 import com.github.ydespreaux.spring.data.elasticsearch.core.IndexTimeBasedParameter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.IndexTimeBasedSupport;
-import com.github.ydespreaux.spring.data.elasticsearch.core.ParentDescriptor;
+import com.github.ydespreaux.spring.data.elasticsearch.core.JoinDescriptor;
+import com.github.ydespreaux.spring.data.elasticsearch.core.JoinDescriptorBuilder;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.FetchSourceFilter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.SourceFilter;
 import com.github.ydespreaux.spring.data.elasticsearch.core.request.config.RolloverConfig;
+import com.github.ydespreaux.spring.data.elasticsearch.core.utils.ContextUtils;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.env.Environment;
 import org.springframework.data.mapping.MappingException;
 import org.springframework.data.mapping.model.BasicPersistentEntity;
 import org.springframework.data.util.TypeInformation;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @param <T> generic type
@@ -54,8 +56,7 @@ import java.util.regex.Pattern;
 @Getter
 public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntity<T, ElasticsearchPersistentProperty> implements ElasticsearchPersistentEntity<T>, ApplicationContextAware {
 
-    private static final Pattern pattern = Pattern.compile("\\Q${\\E(.+?)\\Q}\\E");
-
+    @Nullable
     private ApplicationContext context;
     private Class<T> entityClass;
     private org.elasticsearch.action.admin.indices.alias.Alias alias;
@@ -70,12 +71,13 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     private ElasticsearchPersistentProperty scoreProperty;
     private ElasticsearchPersistentProperty indexNameProperty;
     private ElasticsearchPersistentProperty completionProperty;
+    private Set<ScriptFieldProperty> scriptProperties = new HashSet<>();
     private SourceFilter sourceFilter;
     private Duration scrollTime;
     private RolloverConfig rollover;
 
-    private boolean parent = false;
-    private ParentDescriptor parentDescriptor;
+    @Nullable
+    private JoinDescriptor<T> joinDescriptor;
 
     /**
      * @param typeInformation a {@link TypeInformation} parameter
@@ -96,14 +98,8 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
         } else if (this.entityClass.isAnnotationPresent(RolloverDocument.class)) {
             afterRolloverDocumentPropertySet(this.entityClass.getAnnotation(RolloverDocument.class));
         }
-
-        if (this.entityClass.isAnnotationPresent(Parent.class)) {
-            Parent parentAnnotation = this.entityClass.getAnnotation(Parent.class);
-            this.parentDescriptor = ParentDescriptor.builder()
-                    .name(parentAnnotation.name())
-                    .type(parentAnnotation.type())
-                    .build();
-            this.parent = true;
+        if (this.entityClass.isAnnotationPresent(Child.class) || this.entityClass.isAnnotationPresent(Parent.class)) {
+            this.joinDescriptor = new JoinDescriptorBuilder<>(this.context, this.entityClass).build();
         }
     }
 
@@ -161,7 +157,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
         this.indexTimeBased = StringUtils.hasText(this.indexPattern);
         if (this.indexTimeBased) {
             try {
-                this.indexSupport = indexAnnotation.indexTimeBasedSupport().newInstance();
+                this.indexSupport = indexAnnotation.indexTimeBasedSupport().getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw new ElasticsearchException(e);
             }
@@ -214,8 +210,11 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
             addPersistentIndexNameProperty(property);
         } else if (property.isCompletionProperty()) {
             addPersistentCompletionProperty(property);
+        } else if (property.isScriptProperty()) {
+            addPersistentScriptProperty(property);
         }
     }
+
 
     @Override
     public String getIndexName() {
@@ -232,7 +231,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     }
 
     @Override
-    public String getAliasOrIndexWriter(T source) {
+    public String getAliasOrIndexWriter(@Nullable T source) {
         if (this.isRolloverIndex()) {
             return this.rollover.getAlias().getName();
         }
@@ -282,6 +281,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
      * @param source the source
      * @return the document id
      */
+    @Nullable
     @Override
     public String getPersistentEntityId(T source) {
         if (getIdProperty() == null) {
@@ -301,6 +301,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
      * @param source the document
      * @return the document version
      */
+    @Nullable
     @Override
     public Long getPersistentEntityVersion(T source) {
         if (getVersionProperty() == null) {
@@ -320,6 +321,7 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
      * @param source
      * @return
      */
+    @Nullable
     @Override
     public String getPersistentEntityIndexName(T source) {
         if (getIndexNameProperty() == null) {
@@ -428,10 +430,11 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     }
 
     /**
-     * Returns the parent Id. Can be {@literal null}.
+     * Returns the parentDocument Id. Can be {@literal null}.
      *
      * @return can be {@literal null}.
      */
+    @Nullable
     @Override
     public Object getParentId(T source) {
         if (this.parentIdProperty == null) {
@@ -453,37 +456,29 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
      */
     @Override
     public void setParentId(T entity, Object id) {
-        if (!this.hasParent()) {
+        if (!this.isChildDocument()) {
             return;
         }
         getPropertyAccessor(entity).setProperty(getParentIdProperty(), id);
     }
 
-    /**
-     * @return true if the current document have a parent
-     */
     @Override
-    public boolean hasParent() {
-        return this.parentIdProperty != null;
+    public boolean isParentDocument() {
+        return this.joinDescriptor != null && this.joinDescriptor.isParentDocument();
     }
+
+    @Override
+    public boolean isChildDocument() {
+        return this.joinDescriptor != null && this.joinDescriptor.isChildDocument();
+    }
+
 
     /**
      * @param expression  the SPel expression
      * @return evaluate the expression
      */
     private String getEnvironmentValue(String expression) {
-        if (this.context == null) {
-            return expression;
-        }
-        Environment environment = context.getEnvironment();
-        String value = null;
-        // Create the matcher
-        Matcher matcher = pattern.matcher(expression);
-        // If the matching is there, then add it to the map and return the value
-        if (matcher.find()) {
-            value = environment.getProperty(matcher.group(1));
-        }
-        return value == null ? expression : value;
+        return ContextUtils.getEnvironmentValue(this.context, expression);
     }
 
     @Override
@@ -510,24 +505,10 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     private void addPersistentParentProperty(ElasticsearchPersistentProperty property) {
         if (this.parentIdProperty != null) {
             throw new MappingException(
-                    String.format("Attempt to add parent property %s but already have property %s registered "
-                            + "as parent property. Check your mapping configuration!", property.getField(), parentIdProperty.getField()));
-        }
-        if (this.parentDescriptor != null) {
-            throw new MappingException(
-                    String.format("Attempt to add parent property %s but the bean %s is already defined as parent. Check your mapping configuration!", property.getField(), this.getJavaType().getSimpleName()));
-        }
-        Parent parentAnnotation = property.findAnnotation(Parent.class);
-        if (StringUtils.isEmpty(parentAnnotation.routing())) {
-            throw new MappingException(
-                    String.format("Attempt to add parent property %s but the routing attribute of annotation Parent is mandatory. Check your mapping configuration!", property.getField()));
+                    String.format("Attempt to add parentDocument property %s but already have property %s registered "
+                            + "as parentDocument property. Check your mapping configuration!", property.getField(), parentIdProperty.getField()));
         }
         this.parentIdProperty = property;
-        this.parentDescriptor = ParentDescriptor.builder()
-                .name(parentAnnotation.name())
-                .type(parentAnnotation.type())
-                .routing(parentAnnotation.routing())
-                .build();
     }
 
     private void addPersistentScoreProperty(ElasticsearchPersistentProperty property) {
@@ -555,5 +536,34 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
                             + "as completion property. Check your mapping configuration!", property.getField(), completionProperty.getField()));
         }
         this.completionProperty = property;
+    }
+
+    private void addPersistentScriptProperty(ElasticsearchPersistentProperty property) {
+        this.scriptProperties.add(new ScriptFieldPropertyImpl(property));
+    }
+
+    /**
+     *
+     */
+    public class ScriptFieldPropertyImpl implements ScriptFieldProperty<T> {
+
+        private final String fieldName;
+        private final ElasticsearchPersistentProperty property;
+
+        public ScriptFieldPropertyImpl(ElasticsearchPersistentProperty property) {
+            this.property = property;
+            String name = property.findAnnotation(ScriptedField.class).name();
+            this.fieldName = StringUtils.isEmpty(name) ? property.getFieldName() : name;
+        }
+
+        @Override
+        public void setScriptValue(T entity, Object value) {
+            getPropertyAccessor(entity).setProperty(property, value);
+        }
+
+
+        public String getFieldName() {
+            return this.fieldName;
+        }
     }
 }

@@ -30,9 +30,8 @@ import java.lang.annotation.*;
  */
 
 @Documented
-@Inherited
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
+@Target({ElementType.TYPE})
 public @interface Parent {
 
     /**
@@ -45,8 +44,4 @@ public @interface Parent {
      */
     String type();
 
-    /**
-     * @return
-     */
-    String routing() default "";
 }

@@ -51,7 +51,7 @@ public @interface Index {
      *
      * @return the type name
      */
-    String type();
+    String type() default "_doc";
 
     /**
      * @return

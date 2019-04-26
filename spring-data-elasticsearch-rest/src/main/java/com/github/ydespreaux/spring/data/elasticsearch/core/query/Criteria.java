@@ -19,12 +19,16 @@
  */
 package com.github.ydespreaux.spring.data.elasticsearch.core.query;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.index.query.Operator;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.geo.Box;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Point;
+import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -294,11 +298,7 @@ public class Criteria {
      * @param upperBound
      * @return
      */
-    public Criteria between(Object lowerBound, Object upperBound) {
-        if (lowerBound == null && upperBound == null) {
-            throw new InvalidDataAccessApiUsageException("Range [* TO *] is not allowed");
-        }
-
+    public Criteria between(@NonNull Object lowerBound, @NonNull Object upperBound) {
         queryCriteria.add(new CriteriaEntry(OperationKey.BETWEEN, new Object[]{lowerBound, upperBound}));
         return this;
     }
@@ -309,18 +309,12 @@ public class Criteria {
      * @param upperBound
      * @return
      */
-    public Criteria lessThanEqual(Object upperBound) {
-        if (upperBound == null) {
-            throw new InvalidDataAccessApiUsageException("UpperBound can't be null");
-        }
+    public Criteria lessThanEqual(@NonNull Object upperBound) {
         queryCriteria.add(new CriteriaEntry(OperationKey.LESS_EQUAL, upperBound));
         return this;
     }
 
-    public Criteria lessThan(Object upperBound) {
-        if (upperBound == null) {
-            throw new InvalidDataAccessApiUsageException("UpperBound can't be null");
-        }
+    public Criteria lessThan(@NonNull Object upperBound) {
         queryCriteria.add(new CriteriaEntry(OperationKey.LESS, upperBound));
         return this;
     }
@@ -331,18 +325,12 @@ public class Criteria {
      * @param lowerBound
      * @return
      */
-    public Criteria greaterThanEqual(Object lowerBound) {
-        if (lowerBound == null) {
-            throw new InvalidDataAccessApiUsageException("LowerBound can't be null");
-        }
+    public Criteria greaterThanEqual(@NonNull Object lowerBound) {
         queryCriteria.add(new CriteriaEntry(OperationKey.GREATER_EQUAL, lowerBound));
         return this;
     }
 
-    public Criteria greaterThan(Object lowerBound) {
-        if (lowerBound == null) {
-            throw new InvalidDataAccessApiUsageException("LowerBound can't be null");
-        }
+    public Criteria greaterThan(@NonNull Object lowerBound) {
         queryCriteria.add(new CriteriaEntry(OperationKey.GREATER, lowerBound));
         return this;
     }
@@ -479,7 +467,7 @@ public class Criteria {
     }
 
     private void assertNoBlankInWildcardedQuery(String searchString, boolean leadingWildcard, boolean trailingWildcard) {
-        if (searchString != null && searchString.contains(CRITERIA_VALUE_SEPARATOR)) {
+        if (searchString.contains(CRITERIA_VALUE_SEPARATOR)) {
             throw new InvalidDataAccessApiUsageException("Cannot constructQuery '" + (leadingWildcard ? "*" : "") + "\""
                     + searchString + "\"" + (trailingWildcard ? "*" : "") + "'. Use expression or multiple clauses instead.");
         }
@@ -539,7 +527,21 @@ public class Criteria {
      *
      */
     public enum OperationKey {
-        EQUALS, CONTAINS, STARTS_WITH, ENDS_WITH, EXPRESSION, BETWEEN, FUZZY, IN, NOT_IN, WITHIN, BOX, LESS, LESS_EQUAL, GREATER, GREATER_EQUAL;
+        EQUALS,
+        CONTAINS,
+        STARTS_WITH,
+        ENDS_WITH,
+        EXPRESSION,
+        BETWEEN,
+        FUZZY,
+        IN,
+        NOT_IN,
+        WITHIN,
+        BOX,
+        LESS,
+        LESS_EQUAL,
+        GREATER,
+        GREATER_EQUAL
     }
 
     /**
@@ -585,5 +587,15 @@ public class Criteria {
                     ", value=" + value +
                     '}';
         }
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class ParentEntry {
+        private String type;
+        private Criteria criteria;
+        private String parentId;
+
     }
 }

@@ -3,21 +3,28 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.ydespreaux.spring.data</groupId>
     <artifactId>spring-data-elasticsearch-rest-build</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>1.1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>spring-data-elasticsearch-rest-build</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <scm.url>scm:git:https://github.com/ydespreaux/spring-data-elasticsearch-rest.git</scm.url>
         <logstash-encoder.version>5.0</logstash-encoder.version>
         <apache.commons.io.version>2.6</apache.commons.io.version>
         <apache.commons.lang.version>2.6</apache.commons.lang.version>
+        <github-testcontainers.version>1.2.2</github-testcontainers.version>
         <elasticsearch-rest.version>6.5.0</elasticsearch-rest.version>
-        <github-testcontainers.version>1.1.0</github-testcontainers.version>
-        <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
-        <maven-failsafe-plugin.version>2.22.0</maven-failsafe-plugin.version>
+        <hamcrest.version>2.1</hamcrest.version>
+        <junit.jupiter.version>5.4.1</junit.jupiter.version>
+        <!-- Sonar configuration -->
+        <jacoco.report.ut>${project.build.directory}/jacoco-ut.exec</jacoco.report.ut>
+        <jacoco.report.it>${project.build.directory}/jacoco-it.exec</jacoco.report.it>
+        <sonar.junit.reportPaths>${project.build.directory}/surefire-reports</sonar.junit.reportPaths>
+        <sonar.jacoco.reportPaths>${jacoco.report.ut},${jacoco.report.it}</sonar.jacoco.reportPaths>
     </properties>
     <scm>
         <connection>scm:git:git://github.com/ydespreaux/spring-data-elasticsearch-rest.git</connection>
@@ -28,7 +35,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.2.RELEASE</version>
+        <version>2.1.3.RELEASE</version>
     </parent>
     <developers>
         <developer>
@@ -55,6 +62,31 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>junit</artifactId>
+                    <groupId>junit</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Provide JUnit 5 API -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <version>${junit.jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>1.11.1</version>
+            <scope>test</scope>
         </dependency>
         <!-- APACHE -->
         <dependency>
@@ -64,6 +96,20 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-high-level-client</artifactId>
+                <version>${elasticsearch-rest.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch</groupId>
+                <artifactId>elasticsearch</artifactId>
+                <version>${elasticsearch-rest.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <build>
         <plugins>
             <!-- Add maven compiler plugin -->
@@ -71,9 +117,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <compilerArgs>
-                        <arg>-parameters</arg>
-                    </compilerArgs>
+                    <release>${java.version}</release>
                 </configuration>
             </plugin>
             <plugin>
@@ -92,13 +136,16 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.9</version>
+                <version>0.8.3</version>
                 <executions>
                     <execution>
                         <id>pre-unit-agent</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
+                        <configuration>
+                            <destFile>${jacoco.report.ut}</destFile>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>post-unit-test</id>
@@ -112,6 +159,9 @@
                         <goals>
                             <goal>prepare-agent-integration</goal>
                         </goals>
+                        <configuration>
+                            <destFile>${jacoco.report.it}</destFile>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>post-integration-test</id>
@@ -125,23 +175,18 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <!-- Excludes integration tests when unit tests are run. -->
-                    <excludes>
-                        <exclude>**/IT*.java</exclude>
-                    </excludes>
+                    <excludedGroups>integration,integration-nested</excludedGroups>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>integration-tests</id>
-                        <goals>
-                            <goal>integration-test</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <configuration>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                    <groups>integration</groups>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -239,7 +284,7 @@
                 <sonar.projectKey>${project.artifactId}:${project.version}</sonar.projectKey>
                 <sonar.projectName>${project.name}</sonar.projectName>
                 <sonar.host.url>http://localhost:9000</sonar.host.url>
-                <sonar.login>7bdd2185095bd0e85d8288d77d4d88eba1b0602b</sonar.login>
+                <sonar.login>1b10fa61745b4d0e44176ea1e93c5a6869df54e1</sonar.login>
             </properties>
         </profile>
     </profiles>

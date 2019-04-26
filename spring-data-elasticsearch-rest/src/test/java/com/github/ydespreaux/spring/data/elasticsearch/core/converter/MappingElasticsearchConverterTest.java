@@ -22,12 +22,13 @@ package com.github.ydespreaux.spring.data.elasticsearch.core.converter;
 
 import com.github.ydespreaux.spring.data.elasticsearch.core.DefaultEntityMapper;
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.SimpleElasticsearchMappingContext;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.data.mapping.context.MappingContext;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Yoann Despréaux
@@ -35,14 +36,13 @@ import static org.junit.Assert.assertThat;
  */
 public class MappingElasticsearchConverterTest {
 
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldFailToInitializeGivenMappingContextIsNull() {
-        // given
-        new MappingElasticsearchConverter(null, new DefaultEntityMapper(new JacksonProperties()));
+    @Test
+    void shouldFailToInitializeGivenMappingContextIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> new MappingElasticsearchConverter(null, new DefaultEntityMapper(new JacksonProperties())));
     }
 
     @Test
-    public void shouldReturnMappingContextWithWhichItWasInitialized() {
+    void shouldReturnMappingContextWithWhichItWasInitialized() {
         // given
         MappingContext mappingContext = new SimpleElasticsearchMappingContext();
         MappingElasticsearchConverter converter = new MappingElasticsearchConverter(mappingContext, new DefaultEntityMapper(new JacksonProperties()));

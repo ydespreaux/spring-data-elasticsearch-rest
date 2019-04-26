@@ -27,12 +27,10 @@ import org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRespons
 import org.elasticsearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.elasticsearch.action.admin.cluster.settings.ClusterUpdateSettingsResponse;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
-import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.action.admin.indices.mapping.get.GetFieldMappingsRequest;
@@ -40,7 +38,6 @@ import org.elasticsearch.action.admin.indices.mapping.get.GetFieldMappingsRespon
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshResponse;
 import org.elasticsearch.action.admin.indices.rollover.RolloverRequest;
@@ -48,11 +45,9 @@ import org.elasticsearch.action.admin.indices.rollover.RolloverResponse;
 import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
 import org.elasticsearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
-import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsResponse;
 import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesRequest;
 import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesResponse;
 import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRequest;
-import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -64,11 +59,14 @@ import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.*;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.GetAliasesResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.reindex.BulkByScrollResponse;
+import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.script.mustache.MultiSearchTemplateRequest;
 import org.elasticsearch.script.mustache.MultiSearchTemplateResponse;
 import org.elasticsearch.script.mustache.SearchTemplateRequest;
@@ -109,11 +107,11 @@ public interface ReactiveRestElasticsearchClient {
         return indicesExist(request, getDefaultRequestOptions());
     }
 
-    default Mono<UpdateSettingsResponse> indexPutSettings(UpdateSettingsRequest request) {
+    default Mono<AcknowledgedResponse> indexPutSettings(UpdateSettingsRequest request) {
         return indexPutSettings(request, getDefaultRequestOptions());
     }
 
-    default Mono<PutIndexTemplateResponse> putTemplate(PutIndexTemplateRequest request) {
+    default Mono<AcknowledgedResponse> putTemplate(PutIndexTemplateRequest request) {
         return putTemplate(request, getDefaultRequestOptions());
     }
 
@@ -125,11 +123,11 @@ public interface ReactiveRestElasticsearchClient {
         return createIndex(request, getDefaultRequestOptions());
     }
 
-    default Mono<DeleteIndexResponse> deleteIndex(DeleteIndexRequest request) {
+    default Mono<AcknowledgedResponse> deleteIndex(DeleteIndexRequest request) {
         return deleteIndex(request, getDefaultRequestOptions());
     }
 
-    default Mono<IndicesAliasesResponse> updateAliases(IndicesAliasesRequest request) {
+    default Mono<AcknowledgedResponse> updateAliases(IndicesAliasesRequest request) {
         return updateAliases(request, getDefaultRequestOptions());
     }
 
@@ -141,7 +139,7 @@ public interface ReactiveRestElasticsearchClient {
         return getFieldMapping(request, getDefaultRequestOptions());
     }
 
-    default Mono<PutMappingResponse> putMapping(PutMappingRequest request) {
+    default Mono<AcknowledgedResponse> putMapping(PutMappingRequest request) {
         return putMapping(request, getDefaultRequestOptions());
     }
 
@@ -185,6 +183,10 @@ public interface ReactiveRestElasticsearchClient {
         return delete(request, getDefaultRequestOptions());
     }
 
+    default Mono<BulkByScrollResponse> deleteBy(DeleteByQueryRequest request) {
+        return deleteBy(request, getDefaultRequestOptions());
+    }
+
     default Mono<GetResponse> get(GetRequest request) {
         return get(request, getDefaultRequestOptions());
     }
@@ -224,23 +226,23 @@ public interface ReactiveRestElasticsearchClient {
 
     Mono<Boolean> indicesExist(GetIndexRequest request, RequestOptions options);
 
-    Mono<UpdateSettingsResponse> indexPutSettings(UpdateSettingsRequest request, RequestOptions options);
+    Mono<AcknowledgedResponse> indexPutSettings(UpdateSettingsRequest request, RequestOptions options);
 
-    Mono<PutIndexTemplateResponse> putTemplate(PutIndexTemplateRequest request, RequestOptions options);
+    Mono<AcknowledgedResponse> putTemplate(PutIndexTemplateRequest request, RequestOptions options);
 
     Mono<GetIndexTemplatesResponse> getTemplates(GetIndexTemplatesRequest request, RequestOptions options);
 
     Mono<CreateIndexResponse> createIndex(CreateIndexRequest request, RequestOptions options);
 
-    Mono<DeleteIndexResponse> deleteIndex(DeleteIndexRequest request, RequestOptions options);
+    Mono<AcknowledgedResponse> deleteIndex(DeleteIndexRequest request, RequestOptions options);
 
-    Mono<IndicesAliasesResponse> updateAliases(IndicesAliasesRequest request, RequestOptions options);
+    Mono<AcknowledgedResponse> updateAliases(IndicesAliasesRequest request, RequestOptions options);
 
     Mono<GetMappingsResponse> getMappings(GetMappingsRequest request, RequestOptions options);
 
     Mono<GetFieldMappingsResponse> getFieldMapping(GetFieldMappingsRequest request, RequestOptions options);
 
-    Mono<PutMappingResponse> putMapping(PutMappingRequest request, RequestOptions options);
+    Mono<AcknowledgedResponse> putMapping(PutMappingRequest request, RequestOptions options);
 
     Mono<RefreshResponse> refresh(RefreshRequest request, RequestOptions options);
 
@@ -263,6 +265,8 @@ public interface ReactiveRestElasticsearchClient {
     Mono<UpdateResponse> update(UpdateRequest request, RequestOptions options);
 
     Mono<DeleteResponse> delete(DeleteRequest request, RequestOptions options);
+
+    Mono<BulkByScrollResponse> deleteBy(DeleteByQueryRequest request, RequestOptions options);
 
     Mono<GetResponse> get(GetRequest request, RequestOptions options);
 

@@ -22,7 +22,6 @@ package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
 
 import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.ElasticsearchRepository;
-import com.github.ydespreaux.spring.data.elasticsearch.repository.SimpleElasticsearchRepository;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.query.ElasticsearchPartQuery;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.query.ElasticsearchQueryMethod;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.query.ElasticsearchStringQuery;

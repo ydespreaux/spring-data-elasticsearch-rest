@@ -22,6 +22,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.core;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.lang.Nullable;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -54,7 +55,7 @@ public class IndexTimeBasedParameter<T> {
      * @param timeEvent
      * @param document
      */
-    private IndexTimeBasedParameter(String indexPattern, LocalDate timeEvent, T document) {
+    private IndexTimeBasedParameter(String indexPattern, @Nullable LocalDate timeEvent, @Nullable T document) {
         Objects.requireNonNull(indexPattern, "indexPattern paramater canno't be null !");
         this.setIndexPattern(indexPattern);
         this.setTimeEvent(timeEvent);
@@ -68,7 +69,7 @@ public class IndexTimeBasedParameter<T> {
      * @param <T>          generic type
      * @return a new {@link IndexTimeBasedParameter}
      */
-    public static <T> IndexTimeBasedParameter<T> of(String indexPattern, LocalDate timeEvent, T document) {
+    public static <T> IndexTimeBasedParameter<T> of(String indexPattern, LocalDate timeEvent, @Nullable T document) {
         return new IndexTimeBasedParameter<>(indexPattern, timeEvent, document);
     }
 

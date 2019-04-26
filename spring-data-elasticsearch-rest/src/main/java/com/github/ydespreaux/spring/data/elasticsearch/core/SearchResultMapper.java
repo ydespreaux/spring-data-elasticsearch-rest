@@ -20,8 +20,8 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core;
 
-import com.github.ydespreaux.spring.data.elasticsearch.core.scroll.ScrolledPage;
 import org.elasticsearch.action.search.SearchResponse;
+import org.springframework.data.domain.Page;
 
 /**
  * @author Yoann Despréaux
@@ -33,7 +33,7 @@ public interface SearchResultMapper {
      * @param response the response
      * @param clazz    the entity class
      * @param <T>      the generic type
-     * @return a new {@link ScrolledPage}
+     * @return a new {@link Page}
      */
-    <T> ScrolledPage<T> mapResults(SearchResponse response, Class<T> clazz);
+    <S extends T, T> Page<S> mapResults(SearchResponse response, Class<T> clazz);
 }

@@ -20,10 +20,7 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core.mapping;
 
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.CompletionField;
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.IndexName;
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Parent;
-import com.github.ydespreaux.spring.data.elasticsearch.annotations.Score;
+import com.github.ydespreaux.spring.data.elasticsearch.annotations.*;
 import com.github.ydespreaux.spring.data.elasticsearch.core.completion.Completion;
 import org.springframework.data.mapping.Association;
 import org.springframework.data.mapping.MappingException;
@@ -31,6 +28,7 @@ import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.model.AnnotationBasedPersistentProperty;
 import org.springframework.data.mapping.model.Property;
 import org.springframework.data.mapping.model.SimpleTypeHolder;
+import org.springframework.lang.Nullable;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -53,6 +51,7 @@ public class SimpleElasticsearchPersistentProperty extends
     private final boolean isId;
     private final boolean isIndexName;
     private final boolean isCompletion;
+    private final boolean isScript;
 
     public SimpleElasticsearchPersistentProperty(Property property,
                                                  PersistentEntity<?, ElasticsearchPersistentProperty> owner,
@@ -62,9 +61,10 @@ public class SimpleElasticsearchPersistentProperty extends
 
         this.isId = super.isIdProperty() || SUPPORTED_ID_PROPERTY_NAMES.contains(getFieldName());
         this.isScore = isAnnotationPresent(Score.class);
-        this.isParent = isAnnotationPresent(Parent.class);
+        this.isParent = isAnnotationPresent(ParentId.class);
         this.isIndexName = isAnnotationPresent(IndexName.class);
         this.isCompletion = isAnnotationPresent(CompletionField.class);
+        this.isScript = isAnnotationPresent(ScriptedField.class);
 
         if (isVersionProperty() && getType() != Long.class) {
             throw new MappingException(String.format("Version property %s must be of type Long!", property.getName()));
@@ -111,6 +111,7 @@ public class SimpleElasticsearchPersistentProperty extends
      * (non-Javadoc)
      * @see org.springframework.data.mapping.model.AbstractPersistentProperty#createAssociation()
      */
+    @Nullable
     @Override
     protected Association<ElasticsearchPersistentProperty> createAssociation() {
         return null;
@@ -159,6 +160,14 @@ public class SimpleElasticsearchPersistentProperty extends
         return this.isCompletion;
     }
 
+    /**
+     * @return
+     */
+    @Override
+    public boolean isScriptProperty() {
+        return this.isScript;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -167,11 +176,14 @@ public class SimpleElasticsearchPersistentProperty extends
         SimpleElasticsearchPersistentProperty that = (SimpleElasticsearchPersistentProperty) o;
         return isScore == that.isScore &&
                 isParent == that.isParent &&
-                isId == that.isId;
+                isId == that.isId &&
+                isCompletion == that.isCompletion &&
+                isIndexName == that.isIndexName &&
+                isScript == that.isScript;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), isScore, isParent, isId);
+        return Objects.hash(super.hashCode(), isScore, isParent, isId, isCompletion, isIndexName, isScript);
     }
 }

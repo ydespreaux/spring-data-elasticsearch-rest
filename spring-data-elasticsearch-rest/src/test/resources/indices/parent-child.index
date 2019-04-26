@@ -1,20 +1,24 @@
 {
     "settings" : {
         "number_of_shards" : 1,
-        "refresh_interval" : "1s",
         "number_of_replicas" : 1,
+        "refresh_interval" : "1s",
         "store.type": "fs"
     },
     "mappings": {
-      "parent-child": {
+      "_doc": {
         "properties": {
-          "name": {
+          "description": {
             "type": "text"
           },
-          "relation": {
+          "stars": {
+            "type": "integer"
+          },
+          "join_field": {
             "type": "join",
             "relations": {
-                "question": "answer"
+                "question": ["answer", "comment"],
+                "answer": "vote"
             }
           }
         }
