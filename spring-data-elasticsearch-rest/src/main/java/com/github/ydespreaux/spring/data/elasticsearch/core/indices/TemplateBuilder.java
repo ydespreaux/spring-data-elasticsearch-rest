@@ -24,7 +24,7 @@ import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRequest;
+import org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 
@@ -48,7 +48,7 @@ public class TemplateBuilder extends IndiceBuilder<PutIndexTemplateRequest, Temp
      */
     @Override
     public PutIndexTemplateRequest build() {
-        return build(new PutIndexTemplateRequest().name(this.name()));
+        return build(new PutIndexTemplateRequest(this.name()));
     }
 
     @Override
@@ -79,7 +79,9 @@ public class TemplateBuilder extends IndiceBuilder<PutIndexTemplateRequest, Temp
             // Mappings
             if (settings.containsKey(MAPPINGS_CONFIG)) {
                 TreeNode mappingsElement = settings.get(MAPPINGS_CONFIG);
-                mappingsElement.fieldNames().forEachRemaining(field -> request.mapping(field, xContentBuilder(mappingsElement.get(field))));
+                if (mappingsElement.fieldNames().hasNext()) {
+                    request.mapping(xContentBuilder(mappingsElement.get(mappingsElement.fieldNames().next())));
+                }
             }
             // Order
             if (settings.containsKey(ORDER_CONFIG)) {

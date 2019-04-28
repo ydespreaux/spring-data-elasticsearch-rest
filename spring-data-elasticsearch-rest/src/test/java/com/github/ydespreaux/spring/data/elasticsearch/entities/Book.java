@@ -43,7 +43,6 @@ import java.util.Objects;
 @IndexedDocument(
         index = @Index(
                 name = "books",
-                type = "book",
                 settingsAndMappingPath = "classpath:indices/book.index"
         )
 )

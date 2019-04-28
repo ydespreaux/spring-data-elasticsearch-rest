@@ -20,7 +20,7 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.core.indices;
 
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
+import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
@@ -28,8 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 public class IndexBuilderTest {
 
@@ -44,7 +43,7 @@ public class IndexBuilderTest {
         assertThat(request.settings().get("refresh_interval"), is(equalTo("1s")));
         assertThat(request.settings().get("number_of_replicas"), is(equalTo("1")));
         assertThat(request.settings().get("store.type"), is(equalTo("fs")));
-        assertThat(request.mappings().containsKey("album"), is(true));
+        assertThat(request.mappings(), is(notNullValue()));
     }
 
     @Test
@@ -54,6 +53,6 @@ public class IndexBuilderTest {
         CreateIndexRequest request = builder.build();
         assertThat(request.aliases().isEmpty(), is(true));
         assertThat(request.settings().isEmpty(), is(true));
-        assertThat(request.mappings().isEmpty(), is(true));
+        assertThat(request.mappings(), is(nullValue()));
     }
 }

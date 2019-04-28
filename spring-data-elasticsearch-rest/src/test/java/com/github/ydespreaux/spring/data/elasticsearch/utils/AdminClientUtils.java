@@ -20,11 +20,11 @@
 
 package com.github.ydespreaux.spring.data.elasticsearch.utils;
 
-import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesRequest;
-import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.cluster.metadata.IndexTemplateMetaData;
+import org.elasticsearch.client.indices.GetIndexTemplatesRequest;
+import org.elasticsearch.client.indices.GetIndexTemplatesResponse;
+import org.elasticsearch.client.indices.IndexTemplateMetaData;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,7 +42,7 @@ public final class AdminClientUtils {
      */
     public static IndexTemplateMetaData getTemplate(RestHighLevelClient client, String templateName) throws IOException {
         GetIndexTemplatesRequest request = new GetIndexTemplatesRequest(templateName);
-        GetIndexTemplatesResponse response = client.indices().getTemplate(request, RequestOptions.DEFAULT);
+        GetIndexTemplatesResponse response = client.indices().getIndexTemplate(request, RequestOptions.DEFAULT);
         List<IndexTemplateMetaData> templates = response.getIndexTemplates();
         if (templates.isEmpty()) {
             return null;

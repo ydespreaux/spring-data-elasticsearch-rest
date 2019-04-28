@@ -62,7 +62,6 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     private org.elasticsearch.action.admin.indices.alias.Alias alias;
     private String indexName;
     private String indexPattern;
-    private String typeName;
     private IndexTimeBasedSupport<T> indexSupport;
     private Boolean createIndex;
     private Boolean indexTimeBased;
@@ -150,7 +149,6 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
             throw new IllegalArgumentException("Index name or index pattern no defined");
         }
         this.createIndex = indexAnnotation.createIndex();
-        this.typeName = getEnvironmentValue(indexAnnotation.type());
         this.indexName = getEnvironmentValue(indexAnnotation.name());
         this.indexPattern = getEnvironmentValue(indexAnnotation.indexPattern());
         this.indexPath = getEnvironmentValue(indexAnnotation.settingsAndMappingPath());
@@ -396,6 +394,16 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     @Override
     public Boolean createIndex() {
         return this.createIndex;
+    }
+
+    /**
+     * Retourne le type de document de l'entité courante.
+     *
+     * @return the type name
+     */
+    @Override
+    public String getTypeName() {
+        return Index.type;
     }
 
     @Override

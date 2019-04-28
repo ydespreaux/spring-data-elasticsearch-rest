@@ -35,7 +35,6 @@ import java.util.List;
 @IndexedDocument(
         index = @Index(
                 name = "products",
-                type = "product",
                 settingsAndMappingPath = "classpath:indices/product.index"
         )
 )

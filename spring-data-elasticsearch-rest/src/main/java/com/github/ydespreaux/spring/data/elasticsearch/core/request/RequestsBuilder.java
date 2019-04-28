@@ -29,11 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
-import org.elasticsearch.action.admin.indices.rollover.RolloverRequest;
-import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.index.IndexRequest;
@@ -41,6 +38,9 @@ import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Requests;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.PutIndexTemplateRequest;
+import org.elasticsearch.client.indices.rollover.RolloverRequest;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -83,7 +83,7 @@ public class RequestsBuilder {
      * @return
      */
     public CreateIndexRequest createIndexRequest(@Nullable Alias alias, String indexName) {
-        CreateIndexRequest request = Requests.createIndexRequest(indexName);
+        CreateIndexRequest request = new CreateIndexRequest(indexName);
         if (alias != null) {
             request.alias(alias);
         }
@@ -118,7 +118,7 @@ public class RequestsBuilder {
      */
     public CreateIndexRequest createRolloverIndex(@Nullable Alias aliasReader, Alias aliasWriter, String newIndexName) {
         Assert.notNull(aliasWriter, "alias no defined");
-        CreateIndexRequest indexRequest = Requests.createIndexRequest(newIndexName);
+        CreateIndexRequest indexRequest = new CreateIndexRequest(newIndexName);
         if (aliasReader != null) {
             indexRequest.alias(aliasReader);
         }

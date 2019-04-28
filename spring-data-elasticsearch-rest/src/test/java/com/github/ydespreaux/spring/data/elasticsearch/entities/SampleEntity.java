@@ -34,7 +34,7 @@ import org.springframework.data.annotation.Version;
 @AllArgsConstructor
 @Builder
 @ToString
-@IndexedDocument(index = @Index(name = "sample-entity-index", type = "sample-type"))
+@IndexedDocument(index = @Index(name = "sample-entity-index"))
 public class SampleEntity {
 
     @Id

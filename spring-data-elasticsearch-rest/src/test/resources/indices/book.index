@@ -23,7 +23,7 @@
         }
     },
     "mappings": {
-      "book": {
+      "_doc": {
         "properties": {
           "title": {
             "type": "keyword"

@@ -24,11 +24,11 @@ import com.github.ydespreaux.spring.data.elasticsearch.client.reactive.ReactiveR
 import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperations;
 import com.github.ydespreaux.spring.data.elasticsearch.core.ReactiveElasticsearchOperations;
 import com.github.ydespreaux.testcontainers.elasticsearch.ElasticsearchContainer;
-import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesRequest;
-import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.cluster.metadata.IndexTemplateMetaData;
+import org.elasticsearch.client.indices.GetIndexTemplatesRequest;
+import org.elasticsearch.client.indices.GetIndexTemplatesResponse;
+import org.elasticsearch.client.indices.IndexTemplateMetaData;
 import org.elasticsearch.common.settings.Settings;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
@@ -76,17 +76,17 @@ public class ElasticsearchStarterTest {
 
             IndexTemplateMetaData template = getTemplate(client, "article");
             assertThat(template, is(notNullValue()));
-            assertThat(template.getName(), is(equalTo("article")));
-            assertThat(template.getPatterns().size(), is(equalTo(1)));
-            assertThat(template.getPatterns().get(0), is(equalTo("article-*")));
-            Settings settings = template.getSettings();
+            assertThat(template.name(), is(equalTo("article")));
+            assertThat(template.patterns().size(), is(equalTo(1)));
+            assertThat(template.patterns().get(0), is(equalTo("article-*")));
+            Settings settings = template.settings();
             assertThat(settings, is(notNullValue()));
             assertThat(settings.get("index.refresh_interval"), is(equalTo("1s")));
             assertThat(settings.get("index.number_of_shards"), is(equalTo("1")));
             assertThat(settings.get("index.number_of_replicas"), is(equalTo("1")));
             assertThat(settings.get("index.store.type"), is(equalTo("fs")));
-            assertThat(template.getAliases().containsKey("articles"), is(true));
-            assertThat(template.getMappings().containsKey("article"), is(true));
+            assertThat(template.aliases().containsKey("articles"), is(true));
+            assertThat(template.mappings().type(), is(equalTo("_doc")));
         }
 
         /**
@@ -95,7 +95,7 @@ public class ElasticsearchStarterTest {
          * @throws IOException
          */
         private IndexTemplateMetaData getTemplate(RestHighLevelClient client, String templateName) throws IOException {
-            GetIndexTemplatesResponse response = client.indices().getTemplate(new GetIndexTemplatesRequest(templateName), RequestOptions.DEFAULT);
+            GetIndexTemplatesResponse response = client.indices().getIndexTemplate(new GetIndexTemplatesRequest(templateName), RequestOptions.DEFAULT);
             List<IndexTemplateMetaData> templates = response.getIndexTemplates();
             if (templates.isEmpty()) {
                 return null;

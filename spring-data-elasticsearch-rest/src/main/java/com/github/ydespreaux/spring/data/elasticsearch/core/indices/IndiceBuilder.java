@@ -24,7 +24,6 @@ import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.IndicesRequest;
 import org.elasticsearch.common.xcontent.*;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.core.io.Resource;
@@ -43,7 +42,7 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
  * @author Yoann Despréaux
  * @since 1.0.0
  */
-public abstract class IndiceBuilder<T extends IndicesRequest, S extends IndiceBuilder> {
+public abstract class IndiceBuilder<T, S extends IndiceBuilder> {
 
     public static final String INDEX_PATTERNS_CONFIG = "index_patterns";
     public static final String SETTINGS_CONFIG = "settings";

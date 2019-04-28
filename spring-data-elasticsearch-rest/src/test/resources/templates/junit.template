@@ -11,7 +11,7 @@
         "junit-alias" : {}
     },
     "mappings": {
-      "tweet": {
+      "_doc": {
         "properties": {
           "channel": {
             "type": "text",

@@ -31,12 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
-import org.elasticsearch.action.admin.indices.rollover.RolloverRequest;
-import org.elasticsearch.action.admin.indices.rollover.RolloverResponse;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -50,6 +46,8 @@ import org.elasticsearch.action.search.SearchResponseSections;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.GetAliasesResponse;
 import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.indices.rollover.RolloverRequest;
+import org.elasticsearch.client.indices.rollover.RolloverResponse;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -204,9 +202,9 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
      * @param request
      * @return
      */
-    private Mono<Boolean> doCreateIndex(CreateIndexRequest request) {
+    private Mono<Boolean> doCreateIndex(org.elasticsearch.client.indices.CreateIndexRequest request) {
         return Mono.from(execute(c -> c.createIndex(request, RequestOptions.DEFAULT)))
-                .map(CreateIndexResponse::isAcknowledged)
+                .map(org.elasticsearch.client.indices.CreateIndexResponse::isAcknowledged)
                 .onErrorResume(error -> Mono.error(new ElasticsearchException("Failed to create index: " + request.toString(), error)));
     }
 

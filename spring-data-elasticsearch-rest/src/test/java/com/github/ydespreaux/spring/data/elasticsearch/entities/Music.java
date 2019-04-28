@@ -37,7 +37,6 @@ import org.springframework.data.annotation.Id;
         alias = @Alias(name = "musics"),
         index = @Index(
                 name = "music",
-                type = "album",
                 settingsAndMappingPath = "classpath:indices/music.index"
         )
 )

@@ -22,5 +22,5 @@ package com.github.ydespreaux.spring.data.elasticsearch;
 
 public class Versions {
 
-    public static final String ELASTICSEARCH_VERSION = "6.5.0";
+    public static final String ELASTICSEARCH_VERSION = "6.7.0";
 }

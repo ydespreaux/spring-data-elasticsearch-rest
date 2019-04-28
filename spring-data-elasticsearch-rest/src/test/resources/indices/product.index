@@ -6,7 +6,7 @@
         "store.type": "fs"
     },
     "mappings": {
-      "product": {
+      "_doc": {
         "properties": {
           "description": {
             "type": "text"

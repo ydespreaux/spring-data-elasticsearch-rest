@@ -42,7 +42,6 @@ import java.time.LocalDateTime;
         alias = @Alias(name = "search-vehicles-alias"),
         index = @Index(
                 name = "vehicles-event",
-                type = "position",
                 settingsAndMappingPath = "classpath:indices/vehicles-event.index"
         ),
         rollover = @Rollover(

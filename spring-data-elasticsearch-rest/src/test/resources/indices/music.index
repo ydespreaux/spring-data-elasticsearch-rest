@@ -9,7 +9,7 @@
         "musics" : {}
     },
     "mappings": {
-      "album": {
+      "_doc": {
         "properties": {
           "suggest": {
             "type": "completion"

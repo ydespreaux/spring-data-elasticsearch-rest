@@ -36,6 +36,8 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Index {
 
+    String type = "_doc";
+
     /**
      * Création de l'index si ce dernier n'existe pas.
      * La création de l'index se base sur le template correspondant pour la configuration, le mapping etc...
@@ -45,13 +47,6 @@ public @interface Index {
     String name() default "";
 
     String settingsAndMappingPath() default "";
-
-    /**
-     * Type du document à indexer
-     *
-     * @return the type name
-     */
-    String type() default "_doc";
 
     /**
      * @return

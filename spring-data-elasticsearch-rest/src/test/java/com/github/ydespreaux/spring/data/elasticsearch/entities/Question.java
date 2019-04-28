@@ -34,11 +34,10 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 @ToString
 @Parent(name = "join_field", type = "question")
-@IndexedDocument(index = @Index(name = Question.INDEX, type = Question.TYPE, settingsAndMappingPath = "classpath:indices/parent-child.index"))
+@IndexedDocument(index = @Index(name = Question.INDEX, settingsAndMappingPath = "classpath:indices/parent-child.index"))
 public class Question {
 
     public static final String INDEX = "questions";
-    public static final String TYPE = "_doc";
 
     @Id
     private String id;

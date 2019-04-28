@@ -35,7 +35,6 @@ import org.springframework.data.annotation.Id;
 @IndexedDocument(
         alias = @Alias(name = "plots"),
         index = @Index(
-                type = "_doc",
                 indexPattern = "'plot-'yyyy"
         )
 )

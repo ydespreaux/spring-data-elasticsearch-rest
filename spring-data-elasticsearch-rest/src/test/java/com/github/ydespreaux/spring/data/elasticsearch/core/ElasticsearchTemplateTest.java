@@ -39,7 +39,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.cluster.metadata.IndexTemplateMetaData;
+import org.elasticsearch.client.indices.IndexTemplateMetaData;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.settings.Settings;
@@ -117,18 +117,18 @@ public class ElasticsearchTemplateTest {
 
         IndexTemplateMetaData template = AdminClientUtils.getTemplate(client, DEFAULT_TEMPLATE_NAME);
         assertThat(template, is(notNullValue()));
-        assertThat(template.getName(), is(equalTo("junit-template")));
-        assertThat(template.getPatterns().size(), is(equalTo(1)));
-        assertThat(template.getPatterns().get(0), is(equalTo("junit-*")));
-        Settings settings = template.getSettings();
+        assertThat(template.name(), is(equalTo("junit-template")));
+        assertThat(template.patterns().size(), is(equalTo(1)));
+        assertThat(template.patterns().get(0), is(equalTo("junit-*")));
+        Settings settings = template.settings();
         assertThat(settings, is(notNullValue()));
         assertThat(settings.get("index.refresh_interval"), is(equalTo("1s")));
         assertThat(settings.get("index.number_of_shards"), is(equalTo("1")));
         assertThat(settings.get("index.number_of_replicas"), is(equalTo("1")));
         assertThat(settings.get("index.store.type"), is(equalTo("fs")));
-        assertThat(template.getAliases().containsKey("junit-alias"), is(true));
-        assertThat(template.getMappings().containsKey("tweet"), is(true));
-        assertThat(template.getOrder(), is(equalTo(0)));
+        assertThat(template.aliases().containsKey("junit-alias"), is(true));
+        assertThat(template.mappings().type(), is(equalTo("_doc")));
+        assertThat(template.order(), is(equalTo(0)));
     }
 
     @Test
@@ -137,34 +137,34 @@ public class ElasticsearchTemplateTest {
         this.operations.createTemplate(DEFAULT_TEMPLATE_NAME, DEFAULT_TEMPLATE_URL, false);
         IndexTemplateMetaData templateInserted = AdminClientUtils.getTemplate(client, DEFAULT_TEMPLATE_NAME);
         assertThat(templateInserted, is(notNullValue()));
-        assertThat(templateInserted.getName(), is(equalTo("junit-template")));
-        assertThat(templateInserted.getPatterns().size(), is(equalTo(1)));
-        assertThat(templateInserted.getPatterns().get(0), is(equalTo("junit-*")));
-        Settings settings = templateInserted.getSettings();
+        assertThat(templateInserted.name(), is(equalTo("junit-template")));
+        assertThat(templateInserted.patterns().size(), is(equalTo(1)));
+        assertThat(templateInserted.patterns().get(0), is(equalTo("junit-*")));
+        Settings settings = templateInserted.settings();
         assertThat(settings, is(notNullValue()));
         assertThat(settings.get("index.refresh_interval"), is(equalTo("1s")));
         assertThat(settings.get("index.number_of_shards"), is(equalTo("1")));
         assertThat(settings.get("index.number_of_replicas"), is(equalTo("1")));
         assertThat(settings.get("index.store.type"), is(equalTo("fs")));
-        assertThat(templateInserted.getAliases().containsKey("junit-alias"), is(true));
-        assertThat(templateInserted.getMappings().containsKey("tweet"), is(true));
+        assertThat(templateInserted.aliases().containsKey("junit-alias"), is(true));
+        assertThat(templateInserted.mappings().type(), is(equalTo("_doc")));
 
         // Update template
         this.operations.createTemplate(DEFAULT_TEMPLATE_NAME, UPDATE_TEMPLATE_URL, true);
 
         IndexTemplateMetaData templateUpdated = AdminClientUtils.getTemplate(client, DEFAULT_TEMPLATE_NAME);
         assertThat(templateUpdated, is(notNullValue()));
-        assertThat(templateUpdated.getName(), is(equalTo("junit-template")));
-        assertThat(templateUpdated.getPatterns().size(), is(equalTo(1)));
-        assertThat(templateUpdated.getPatterns().get(0), is(equalTo("junit-*")));
-        settings = templateUpdated.getSettings();
+        assertThat(templateUpdated.name(), is(equalTo("junit-template")));
+        assertThat(templateUpdated.patterns().size(), is(equalTo(1)));
+        assertThat(templateUpdated.patterns().get(0), is(equalTo("junit-*")));
+        settings = templateUpdated.settings();
         assertThat(settings, is(notNullValue()));
         assertThat(settings.get("index.refresh_interval"), is(equalTo("1s")));
         assertThat(settings.get("index.number_of_shards"), is(equalTo("1")));
         assertThat(settings.get("index.number_of_replicas"), is(equalTo("1")));
         assertThat(settings.get("index.store.type"), is(equalTo("fs")));
-        assertThat(templateUpdated.getAliases().containsKey("junit-alias"), is(true));
-        assertThat(templateUpdated.getMappings().containsKey("tweet"), is(true));
+        assertThat(templateUpdated.aliases().containsKey("junit-alias"), is(true));
+        assertThat(templateInserted.mappings().type(), is(equalTo("_doc")));
     }
 
     @Test
@@ -173,33 +173,33 @@ public class ElasticsearchTemplateTest {
         this.operations.createTemplate(DEFAULT_TEMPLATE_NAME, DEFAULT_TEMPLATE_URL, false);
         IndexTemplateMetaData templateInserted = AdminClientUtils.getTemplate(client, DEFAULT_TEMPLATE_NAME);
         assertThat(templateInserted, is(notNullValue()));
-        assertThat(templateInserted.getName(), is(equalTo("junit-template")));
-        assertThat(templateInserted.getPatterns().size(), is(equalTo(1)));
-        assertThat(templateInserted.getPatterns().get(0), is(equalTo("junit-*")));
-        Settings settings = templateInserted.getSettings();
+        assertThat(templateInserted.name(), is(equalTo("junit-template")));
+        assertThat(templateInserted.patterns().size(), is(equalTo(1)));
+        assertThat(templateInserted.patterns().get(0), is(equalTo("junit-*")));
+        Settings settings = templateInserted.settings();
         assertThat(settings, is(notNullValue()));
         assertThat(settings.get("index.refresh_interval"), is(equalTo("1s")));
         assertThat(settings.get("index.number_of_shards"), is(equalTo("1")));
         assertThat(settings.get("index.number_of_replicas"), is(equalTo("1")));
         assertThat(settings.get("index.store.type"), is(equalTo("fs")));
-        assertThat(templateInserted.getAliases().containsKey("junit-alias"), is(true));
-        assertThat(templateInserted.getMappings().containsKey("tweet"), is(true));
+        assertThat(templateInserted.aliases().containsKey("junit-alias"), is(true));
+        assertThat(templateInserted.mappings().type(), is(equalTo("_doc")));
 
         // Update template
         this.operations.createTemplate(DEFAULT_TEMPLATE_NAME, UPDATE_TEMPLATE_URL, false);
         IndexTemplateMetaData templateUpdated = AdminClientUtils.getTemplate(client, DEFAULT_TEMPLATE_NAME);
         assertThat(templateUpdated, is(notNullValue()));
-        assertThat(templateUpdated.getName(), is(equalTo("junit-template")));
-        assertThat(templateUpdated.getPatterns().size(), is(equalTo(1)));
-        assertThat(templateUpdated.getPatterns().get(0), is(equalTo("junit-*")));
-        settings = templateUpdated.getSettings();
+        assertThat(templateUpdated.name(), is(equalTo("junit-template")));
+        assertThat(templateUpdated.patterns().size(), is(equalTo(1)));
+        assertThat(templateUpdated.patterns().get(0), is(equalTo("junit-*")));
+        settings = templateUpdated.settings();
         assertThat(settings, is(notNullValue()));
         assertThat(settings.get("index.refresh_interval"), is(equalTo("1s")));
         assertThat(settings.get("index.number_of_shards"), is(equalTo("2")));
         assertThat(settings.get("index.number_of_replicas"), is(equalTo("1")));
         assertThat(settings.get("index.store.type"), is(equalTo("fs")));
-        assertThat(templateUpdated.getAliases().containsKey("junit-alias"), is(true));
-        assertThat(templateUpdated.getMappings().containsKey("tweet"), is(true));
+        assertThat(templateUpdated.aliases().containsKey("junit-alias"), is(true));
+        assertThat(templateInserted.mappings().type(), is(equalTo("_doc")));
     }
 
     @Test
@@ -229,7 +229,7 @@ public class ElasticsearchTemplateTest {
         GetMappingsResponse response = this.client.indices().getMapping(mappingsRequest, RequestOptions.DEFAULT);
         assertThat(response.getMappings().containsKey(INDEX_BOOK_NAME), is(true));
         ImmutableOpenMap<String, MappingMetaData> indexMapping = response.getMappings().get(INDEX_BOOK_NAME);
-        assertThat(indexMapping.containsKey("book"), is(true));
+        assertThat(indexMapping.containsKey("_doc"), is(true));
 
         GetSettingsRequest settingsRequest = new GetSettingsRequest()
                 .indices(INDEX_BOOK_NAME);
@@ -304,7 +304,7 @@ public class ElasticsearchTemplateTest {
         SearchQuery searchQuery = new NativeSearchQuery.NativeSearchQueryBuilder()
                 .withQuery(matchAllQuery())
                 .withSearchType(SearchType.DEFAULT)
-                .withIndices("articles").withTypes("article")
+                .withIndices("articles").withTypes("_doc")
                 .addAggregation(terms("entrepots").field("entrepot.keyword"))
                 .build();
         // when

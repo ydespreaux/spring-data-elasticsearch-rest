@@ -33,7 +33,7 @@ import org.springframework.data.annotation.Version;
 @ToString
 @IndexedDocument(
         alias = @Alias(name = "search-sample-entity"),
-        index = @Index(name = "sample-entity-alias-index", type = "sample-type")
+        index = @Index(name = "sample-entity-alias-index")
 )
 public class SampleEntityWithAlias {
 

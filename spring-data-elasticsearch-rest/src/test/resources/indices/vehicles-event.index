@@ -15,7 +15,7 @@
         "write-vehicles-alias" : {}
     },
     "mappings": {
-      "position": {
+      "_doc": {
         "properties": {
           "vehicleId": {
             "type": "keyword"

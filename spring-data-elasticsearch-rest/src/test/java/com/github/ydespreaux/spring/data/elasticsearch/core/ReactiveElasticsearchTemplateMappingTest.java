@@ -35,7 +35,7 @@ import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
 import org.elasticsearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.cluster.metadata.IndexTemplateMetaData;
+import org.elasticsearch.client.indices.IndexTemplateMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.settings.Settings;
 import org.hamcrest.Matchers;
@@ -83,17 +83,17 @@ public class ReactiveElasticsearchTemplateMappingTest {
 
         IndexTemplateMetaData template = AdminClientUtils.getTemplate(client, "article");
         assertThat(template, Matchers.is(notNullValue()));
-        assertThat(template.getName(), Matchers.is(equalTo("article")));
-        assertThat(template.getPatterns().size(), Matchers.is(equalTo(1)));
-        assertThat(template.getPatterns().get(0), Matchers.is(equalTo("article-*")));
-        Settings settings = template.getSettings();
+        assertThat(template.name(), Matchers.is(equalTo("article")));
+        assertThat(template.patterns().size(), Matchers.is(equalTo(1)));
+        assertThat(template.patterns().get(0), Matchers.is(equalTo("article-*")));
+        Settings settings = template.settings();
         assertThat(settings, Matchers.is(notNullValue()));
         assertThat(settings.get("index.refresh_interval"), Matchers.is(equalTo("1s")));
         assertThat(settings.get("index.number_of_shards"), Matchers.is(equalTo("1")));
         assertThat(settings.get("index.number_of_replicas"), Matchers.is(equalTo("1")));
         assertThat(settings.get("index.store.type"), Matchers.is(equalTo("fs")));
-        assertThat(template.getAliases().containsKey("articles"), Matchers.is(true));
-        assertThat(template.getMappings().containsKey("article"), Matchers.is(true));
+        assertThat(template.aliases().containsKey("articles"), Matchers.is(true));
+        assertThat(template.mappings().type(), Matchers.is(equalTo("_doc")));
         //
         ArticleTimeBasedSupport timeBased = new ArticleTimeBasedSupport();
         String indexName = timeBased.buildIndex(IndexTimeBasedParameter.of("'article-%s-'yyyy", LocalDate.now(Clock.systemUTC())));
@@ -105,18 +105,18 @@ public class ReactiveElasticsearchTemplateMappingTest {
 
         IndexTemplateMetaData template = AdminClientUtils.getTemplate(client, "city");
         assertThat(template, Matchers.is(notNullValue()));
-        assertThat(template.getName(), Matchers.is(equalTo("city")));
-        assertThat(template.getPatterns().size(), Matchers.is(equalTo(2)));
-        assertThat(template.getPatterns().get(0), Matchers.is(equalTo("ville-*")));
-        assertThat(template.getPatterns().get(1), Matchers.is(equalTo("metropole-*")));
-        Settings settings = template.getSettings();
+        assertThat(template.name(), Matchers.is(equalTo("city")));
+        assertThat(template.patterns().size(), Matchers.is(equalTo(2)));
+        assertThat(template.patterns().get(0), Matchers.is(equalTo("ville-*")));
+        assertThat(template.patterns().get(1), Matchers.is(equalTo("metropole-*")));
+        Settings settings = template.settings();
         assertThat(settings, Matchers.is(notNullValue()));
         assertThat(settings.get("index.refresh_interval"), Matchers.is(equalTo("1s")));
         assertThat(settings.get("index.number_of_shards"), Matchers.is(equalTo("1")));
         assertThat(settings.get("index.number_of_replicas"), Matchers.is(equalTo("1")));
         assertThat(settings.get("index.store.type"), Matchers.is(equalTo("fs")));
-        assertThat(template.getAliases().containsKey("cities"), Matchers.is(true));
-        assertThat(template.getMappings().containsKey("city"), Matchers.is(true));
+        assertThat(template.aliases().containsKey("cities"), Matchers.is(true));
+        assertThat(template.mappings().type(), Matchers.is(equalTo("_doc")));
         //
         CityTimeBasedSupport timeBased = new CityTimeBasedSupport();
         String indexName = timeBased.buildIndex(IndexTimeBasedParameter.of("%s-%s", (City) null));
@@ -131,7 +131,7 @@ public class ReactiveElasticsearchTemplateMappingTest {
                 .indices(INDEX_BOOK_NAME);
         GetMappingsResponse response = this.client.indices().getMapping(mappingsRequest, RequestOptions.DEFAULT);
         assertThat(response.getMappings().containsKey(INDEX_BOOK_NAME), is(true));
-        assertThat(response.getMappings().get(INDEX_BOOK_NAME).containsKey("book"), is(true));
+        assertThat(response.getMappings().get(INDEX_BOOK_NAME).containsKey("_doc"), is(true));
 
         GetSettingsRequest settingsRequest = new GetSettingsRequest()
                 .indices(INDEX_BOOK_NAME);

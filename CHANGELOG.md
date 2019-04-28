@@ -5,6 +5,10 @@
 
 ### Changed
 
+- Dependency elasticsearch version from 6.5.0 to 6.7.0
+- Changes break:
+    - Annotation @Index : remove type attribut (index type fixed to '_doc')
+
 ### Fixed
 
 

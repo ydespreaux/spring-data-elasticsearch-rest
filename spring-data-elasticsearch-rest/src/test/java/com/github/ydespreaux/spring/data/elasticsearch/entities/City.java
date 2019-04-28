@@ -35,7 +35,6 @@ import org.springframework.data.annotation.Id;
 @IndexedDocument(
         alias = @Alias(name = "${spring.elasticsearch.aliases.city}"),
         index = @Index(
-                type = "city",
                 indexPattern = "%s-%s",
                 indexTimeBasedSupport = CityTimeBasedSupport.class
         )
