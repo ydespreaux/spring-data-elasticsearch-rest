@@ -72,7 +72,7 @@ public class ReactiveElasticsearchRepositoryFactory extends ReactiveRepositoryFa
         if (metadata.getIdType() == String.class) {
             return ReactiveSimpleElasticsearchRepository.class;
         } else {
-            throw new IllegalArgumentException("Unsupported ID type " + metadata.getIdType());
+            throw new IllegalArgumentException("Unsupported ID TYPE " + metadata.getIdType());
         }
     }
 

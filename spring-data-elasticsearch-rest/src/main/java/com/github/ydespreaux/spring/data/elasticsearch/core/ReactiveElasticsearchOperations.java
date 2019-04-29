@@ -291,7 +291,7 @@ public interface ReactiveElasticsearchOperations {
     <T> Mono<Long> count(StringQuery query, Class<T> clazz);
 
     /**
-     * @param clazz         the domain type
+     * @param clazz         the domain TYPE
      * @param documentId    the document id.
      * @param <T>           method generic.
      * @return true if the document corresponding to the id exists
@@ -361,7 +361,7 @@ public interface ReactiveElasticsearchOperations {
      * @param search the given {@link SearchRequest} instance.
      * @param clazz  the given clazz.
      * @param <T>    generic method.
-     * @return a {@link List} of the method generic type.
+     * @return a {@link List} of the method generic TYPE.
      */
     <S extends T, T> Flux<S> search(SearchQuery search, Class<T> clazz);
 

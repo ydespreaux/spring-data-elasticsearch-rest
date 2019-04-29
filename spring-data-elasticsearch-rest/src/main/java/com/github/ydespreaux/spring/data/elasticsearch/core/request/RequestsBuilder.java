@@ -30,7 +30,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.index.IndexRequest;
@@ -39,6 +38,7 @@ import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.elasticsearch.client.indices.rollover.RolloverRequest;
 import org.elasticsearch.common.unit.TimeValue;
@@ -75,7 +75,7 @@ public class RequestsBuilder {
      * @return
      */
     public GetIndexRequest getIndexRequest(String... indices) {
-        return new GetIndexRequest().indices(indices);
+        return new GetIndexRequest(indices);
     }
 
     /**

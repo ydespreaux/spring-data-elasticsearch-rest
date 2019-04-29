@@ -32,7 +32,6 @@ import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -46,6 +45,7 @@ import org.elasticsearch.action.search.SearchResponseSections;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.GetAliasesResponse;
 import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.rollover.RolloverRequest;
 import org.elasticsearch.client.indices.rollover.RolloverResponse;
 import org.elasticsearch.index.IndexNotFoundException;
@@ -512,7 +512,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
     }
 
     /**
-     * @param clazz      the domain type
+     * @param clazz      the domain TYPE
      * @param documentId the document id.
      * @return true if the document corresponding to the id exists
      */
@@ -691,7 +691,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
      *
      * @param query the given {@link SearchRequest} instance.
      * @param clazz  the given clazz.
-     * @return a {@link List} of the method generic type.
+     * @return a {@link List} of the method generic TYPE.
      */
     @Override
     public <S extends T, T> Flux<S> search(SearchQuery query, Class<T> clazz) {

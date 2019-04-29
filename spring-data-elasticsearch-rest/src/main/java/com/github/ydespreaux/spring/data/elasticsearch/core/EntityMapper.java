@@ -39,7 +39,7 @@ public interface EntityMapper {
     /**
      * @param source the json source
      * @param clazz  the item class
-     * @param <T>    generic type
+     * @param <T>    generic TYPE
      * @return the object corresponding to json source
      */
     <S extends T, T> S mapToObject(String source, Class<T> clazz);

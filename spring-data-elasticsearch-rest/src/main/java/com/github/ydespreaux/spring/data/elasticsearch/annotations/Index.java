@@ -36,7 +36,7 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Index {
 
-    String type = "_doc";
+    String TYPE = "_doc";
 
     /**
      * Création de l'index si ce dernier n'existe pas.

@@ -22,7 +22,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.core;
 
 import com.github.ydespreaux.spring.data.elasticsearch.client.ClientLoggerAspect;
 import com.github.ydespreaux.spring.data.elasticsearch.configuration.ReactiveElasticsearchConfiguration;
-import com.github.ydespreaux.spring.data.elasticsearch.core.completion.reactive.ReactiveStringSuggestExtractor;
+import com.github.ydespreaux.spring.data.elasticsearch.core.completion.ReactiveStringSuggestExtractor;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.SuggestQuery;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.Music;
 import com.github.ydespreaux.spring.data.elasticsearch.entities.MusicInfo;

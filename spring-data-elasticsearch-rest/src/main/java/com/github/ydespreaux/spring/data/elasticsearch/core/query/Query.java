@@ -48,7 +48,7 @@ public interface Query {
      * restrict result to entries on given page. Corresponds to the 'start' and 'rows' parameter in elasticsearch
      *
      * @param pageable the pageable
-     * @param <T>      generic type
+     * @param <T>      generic TYPE
      * @return the current object
      */
     <T extends Query> T setPageable(Pageable pageable);
@@ -57,7 +57,7 @@ public interface Query {
      * Add {@link org.springframework.data.domain.Sort} to query
      *
      * @param sort the given sort
-     * @param <T>  generic type
+     * @param <T>  generic TYPE
      * @return the current object
      */
     <T extends Query> T addSort(Sort sort);
@@ -156,7 +156,7 @@ public interface Query {
     /**
      * Type of continueScroll
      *
-     * @return continueScroll type
+     * @return continueScroll TYPE
      */
     SearchType getSearchType();
 

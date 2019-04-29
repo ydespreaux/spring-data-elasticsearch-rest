@@ -360,7 +360,7 @@ public class Criteria {
     private List<Object> toCollection(Object... values) {
         if (values.length == 0 || (values.length > 1 && values[1] instanceof Collection)) {
             throw new InvalidDataAccessApiUsageException("At least one element "
-                    + (values.length > 0 ? ("of argument of type " + values[1].getClass().getName()) : "")
+                    + (values.length > 0 ? ("of argument of TYPE " + values[1].getClass().getName()) : "")
                     + " has to be present.");
         }
         return Arrays.asList(values);

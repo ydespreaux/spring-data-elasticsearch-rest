@@ -148,7 +148,7 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
 
     /**
      * @param clazz the entity class
-     * @param <T>   generic type
+     * @param <T>   generic TYPE
      * @return the {@link ElasticsearchPersistentEntity}
      * @see ElasticsearchOperations#getPersistentEntityFor(Class)  method
      */
@@ -635,7 +635,7 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
     }
 
     private void assertNotNullTypes(Query query) {
-        Assert.notNull(query.getTypes(), "No type defined for Query");
+        Assert.notNull(query.getTypes(), "No TYPE defined for Query");
     }
 
     private void assertNotNullPageable(Query query) {

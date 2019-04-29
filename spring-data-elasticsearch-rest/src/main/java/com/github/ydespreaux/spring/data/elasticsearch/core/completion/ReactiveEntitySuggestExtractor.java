@@ -19,7 +19,7 @@
  *
  */
 
-package com.github.ydespreaux.spring.data.elasticsearch.core.completion.reactive;
+package com.github.ydespreaux.spring.data.elasticsearch.core.completion;
 
 import com.github.ydespreaux.spring.data.elasticsearch.core.ResultsExtractor;
 import com.github.ydespreaux.spring.data.elasticsearch.core.ResultsMapper;

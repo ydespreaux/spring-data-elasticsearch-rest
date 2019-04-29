@@ -146,7 +146,7 @@ public class EntitySerializerRegistry {
     private <S extends T, T> Class<S> getEntityClassByType(Class<T> entityClass, String type) {
         Class<S> childClass = (Class<S>) getChildEntityClassByTypeImpl(entityClass, type, new HashSet<>());
         if (childClass == null) {
-            throw new InvalidDataAccessApiUsageException(format("No entity found with type %s for the parent document %s", type, entityClass.getSimpleName()));
+            throw new InvalidDataAccessApiUsageException(format("No entity found with TYPE %s for the parent document %s", type, entityClass.getSimpleName()));
         }
         return childClass;
     }

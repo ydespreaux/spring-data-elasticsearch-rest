@@ -2,7 +2,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
 
 import com.github.ydespreaux.spring.data.elasticsearch.core.CriteriaQueryProcessor;
 import com.github.ydespreaux.spring.data.elasticsearch.core.ReactiveElasticsearchOperations;
-import com.github.ydespreaux.spring.data.elasticsearch.core.completion.reactive.ReactiveEntitySuggestExtractor;
+import com.github.ydespreaux.spring.data.elasticsearch.core.completion.ReactiveEntitySuggestExtractor;
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.*;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.ReactiveElasticsearchRepository;

@@ -125,7 +125,7 @@ public class ElasticsearchTemplateTest {
         assertThat(settings.get("index.refresh_interval"), is(equalTo("1s")));
         assertThat(settings.get("index.number_of_shards"), is(equalTo("1")));
         assertThat(settings.get("index.number_of_replicas"), is(equalTo("1")));
-        assertThat(settings.get("index.store.type"), is(equalTo("fs")));
+        assertThat(settings.get("index.store.TYPE"), is(equalTo("fs")));
         assertThat(template.aliases().containsKey("junit-alias"), is(true));
         assertThat(template.mappings().type(), is(equalTo("_doc")));
         assertThat(template.order(), is(equalTo(0)));
@@ -145,7 +145,7 @@ public class ElasticsearchTemplateTest {
         assertThat(settings.get("index.refresh_interval"), is(equalTo("1s")));
         assertThat(settings.get("index.number_of_shards"), is(equalTo("1")));
         assertThat(settings.get("index.number_of_replicas"), is(equalTo("1")));
-        assertThat(settings.get("index.store.type"), is(equalTo("fs")));
+        assertThat(settings.get("index.store.TYPE"), is(equalTo("fs")));
         assertThat(templateInserted.aliases().containsKey("junit-alias"), is(true));
         assertThat(templateInserted.mappings().type(), is(equalTo("_doc")));
 
@@ -162,7 +162,7 @@ public class ElasticsearchTemplateTest {
         assertThat(settings.get("index.refresh_interval"), is(equalTo("1s")));
         assertThat(settings.get("index.number_of_shards"), is(equalTo("1")));
         assertThat(settings.get("index.number_of_replicas"), is(equalTo("1")));
-        assertThat(settings.get("index.store.type"), is(equalTo("fs")));
+        assertThat(settings.get("index.store.TYPE"), is(equalTo("fs")));
         assertThat(templateUpdated.aliases().containsKey("junit-alias"), is(true));
         assertThat(templateInserted.mappings().type(), is(equalTo("_doc")));
     }
@@ -181,7 +181,7 @@ public class ElasticsearchTemplateTest {
         assertThat(settings.get("index.refresh_interval"), is(equalTo("1s")));
         assertThat(settings.get("index.number_of_shards"), is(equalTo("1")));
         assertThat(settings.get("index.number_of_replicas"), is(equalTo("1")));
-        assertThat(settings.get("index.store.type"), is(equalTo("fs")));
+        assertThat(settings.get("index.store.TYPE"), is(equalTo("fs")));
         assertThat(templateInserted.aliases().containsKey("junit-alias"), is(true));
         assertThat(templateInserted.mappings().type(), is(equalTo("_doc")));
 
@@ -197,7 +197,7 @@ public class ElasticsearchTemplateTest {
         assertThat(settings.get("index.refresh_interval"), is(equalTo("1s")));
         assertThat(settings.get("index.number_of_shards"), is(equalTo("2")));
         assertThat(settings.get("index.number_of_replicas"), is(equalTo("1")));
-        assertThat(settings.get("index.store.type"), is(equalTo("fs")));
+        assertThat(settings.get("index.store.TYPE"), is(equalTo("fs")));
         assertThat(templateUpdated.aliases().containsKey("junit-alias"), is(true));
         assertThat(templateInserted.mappings().type(), is(equalTo("_doc")));
     }
@@ -242,7 +242,7 @@ public class ElasticsearchTemplateTest {
         assertThat(settings.get("index.refresh_interval"), is(equalTo("1s")));
         assertThat(settings.get("index.number_of_shards"), is(equalTo("1")));
         assertThat(settings.get("index.number_of_replicas"), is(equalTo("1")));
-        assertThat(settings.get("index.store.type"), is(equalTo("fs")));
+        assertThat(settings.get("index.store.TYPE"), is(equalTo("fs")));
     }
 
     @Test

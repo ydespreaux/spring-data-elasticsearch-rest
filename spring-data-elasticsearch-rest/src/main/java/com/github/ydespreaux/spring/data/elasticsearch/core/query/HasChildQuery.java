@@ -91,7 +91,7 @@ public class HasChildQuery extends JoinQuery<HasChildQuery> {
 
     @Override
     public void afterPropertiesSet() {
-        Assert.notNull(this.getType(), "[has_child] requires 'type' field");
+        Assert.notNull(this.getType(), "[has_child] requires 'TYPE' field");
         Assert.notNull(this.getQuery(), "[has_child] requires 'query' field");
         Assert.notNull(this.getScoreMode(), "[has_child] requires 'score_mode' field");
     }

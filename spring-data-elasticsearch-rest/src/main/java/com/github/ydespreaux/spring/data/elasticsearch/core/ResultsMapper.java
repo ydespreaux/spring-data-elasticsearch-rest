@@ -53,7 +53,7 @@ public interface ResultsMapper extends SearchResultMapper, GetResultMapper, Mult
     /**
      * @param source the json source
      * @param clazz  the entity class
-     * @param <T>    generic type
+     * @param <T>    generic TYPE
      * @return the entity
      */
     @Nullable
@@ -65,7 +65,7 @@ public interface ResultsMapper extends SearchResultMapper, GetResultMapper, Mult
     }
 
     /**
-     * Map a single {@link SearchHit} to an instance of the given type.
+     * Map a single {@link SearchHit} to an instance of the given TYPE.
      *
      * @param searchHit must not be {@literal null}.
      * @param type      must not be {@literal null}.

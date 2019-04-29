@@ -54,7 +54,7 @@ public @interface EnableElasticsearchRepositories {
 
     /**
      * Base packages to scan for annotated components. {@link #value()} is an alias for (and mutually exclusive with) this
-     * attribute. Use {@link #basePackageClasses()} for a type-safe alternative to text-based package names.
+     * attribute. Use {@link #basePackageClasses()} for a TYPE-safe alternative to text-based package names.
      *
      * @return base packages
      */

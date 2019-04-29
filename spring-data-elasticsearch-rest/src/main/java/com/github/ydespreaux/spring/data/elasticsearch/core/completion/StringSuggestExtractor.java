@@ -21,13 +21,13 @@
 package com.github.ydespreaux.spring.data.elasticsearch.core.completion;
 
 import com.github.ydespreaux.spring.data.elasticsearch.core.ResultsExtractor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.suggest.Suggest;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -54,37 +54,6 @@ public class StringSuggestExtractor implements ResultsExtractor<List<String>> {
                 .sorted()
                 .map(SuggestItem::getItem)
                 .collect(Collectors.toList());
-    }
-
-    @Getter
-    @Setter
-    @Builder
-    private static class SuggestItem implements Comparable<SuggestItem> {
-        private String item;
-        private Float score;
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof SuggestItem)) return false;
-            SuggestItem that = (SuggestItem) o;
-            return Objects.equals(getItem(), that.getItem()) &&
-                    Objects.equals(getScore(), that.getScore());
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(getItem(), getScore());
-        }
-
-        @Override
-        public int compareTo(SuggestItem other) {
-            int scoreCompare = this.score.compareTo(other.getScore());
-            if (scoreCompare == 0) {
-                return this.item.compareTo(other.getItem());
-            }
-            return scoreCompare;
-        }
     }
 
 }

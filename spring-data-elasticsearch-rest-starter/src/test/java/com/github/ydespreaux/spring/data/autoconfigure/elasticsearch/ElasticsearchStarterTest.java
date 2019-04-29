@@ -84,7 +84,7 @@ public class ElasticsearchStarterTest {
             assertThat(settings.get("index.refresh_interval"), is(equalTo("1s")));
             assertThat(settings.get("index.number_of_shards"), is(equalTo("1")));
             assertThat(settings.get("index.number_of_replicas"), is(equalTo("1")));
-            assertThat(settings.get("index.store.type"), is(equalTo("fs")));
+            assertThat(settings.get("index.store.TYPE"), is(equalTo("fs")));
             assertThat(template.aliases().containsKey("articles"), is(true));
             assertThat(template.mappings().type(), is(equalTo("_doc")));
         }

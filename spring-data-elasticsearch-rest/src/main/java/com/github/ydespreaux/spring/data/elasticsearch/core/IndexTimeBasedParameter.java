@@ -29,7 +29,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 /**
- * @param <T> generic type
+ * @param <T> generic TYPE
  * @author Yoann Despréaux
  * @since 1.0.0
  */
@@ -66,7 +66,7 @@ public class IndexTimeBasedParameter<T> {
      * @param indexPattern the index pattern
      * @param timeEvent    the time event
      * @param document     the elasticsearch document
-     * @param <T>          generic type
+     * @param <T>          generic TYPE
      * @return a new {@link IndexTimeBasedParameter}
      */
     public static <T> IndexTimeBasedParameter<T> of(String indexPattern, LocalDate timeEvent, @Nullable T document) {
@@ -76,7 +76,7 @@ public class IndexTimeBasedParameter<T> {
     /**
      * @param indexPattern the index pattern
      * @param timeEvent    the time event
-     * @param <T>          generic type
+     * @param <T>          generic TYPE
      * @return a new {@link IndexTimeBasedParameter}
      */
     public static <T> IndexTimeBasedParameter<T> of(String indexPattern, LocalDate timeEvent) {
@@ -86,7 +86,7 @@ public class IndexTimeBasedParameter<T> {
     /**
      * @param indexPattern the index pattern
      * @param document     the elasticsearch document
-     * @param <T>          generic type
+     * @param <T>          generic TYPE
      * @return a new {@link IndexTimeBasedParameter}
      */
     public static <T> IndexTimeBasedParameter<T> of(String indexPattern, T document) {

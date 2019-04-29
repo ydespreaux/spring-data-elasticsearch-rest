@@ -33,13 +33,6 @@ import org.elasticsearch.action.admin.cluster.settings.ClusterUpdateSettingsResp
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
-import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
-import org.elasticsearch.action.admin.indices.mapping.get.GetFieldMappingsRequest;
-import org.elasticsearch.action.admin.indices.mapping.get.GetFieldMappingsResponse;
-import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
-import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshResponse;
 import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
@@ -62,9 +55,8 @@ import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.GetAliasesResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.CreateIndexResponse;
-import org.elasticsearch.client.indices.PutIndexTemplateRequest;
+import org.elasticsearch.client.Validatable;
+import org.elasticsearch.client.indices.*;
 import org.elasticsearch.client.indices.rollover.RolloverRequest;
 import org.elasticsearch.client.indices.rollover.RolloverResponse;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
@@ -145,12 +137,12 @@ public class DefaultReactiveRestElasticsearchClient implements ReactiveRestElast
 
     @Override
     public Mono<org.elasticsearch.client.indices.GetIndexTemplatesResponse> getTemplates(org.elasticsearch.client.indices.GetIndexTemplatesRequest request, RequestOptions options) {
-        return Mono.create(sink -> this.client.indices().getIndexTemplateAsync(request, options, listenerToSink(sink)));
+        return Mono.create(sink -> this.client.indices().getIndexTemplateAsync(request, options, listenerToSink(logRequest(request), sink)));
     }
 
     @Override
     public Mono<CreateIndexResponse> createIndex(CreateIndexRequest request, RequestOptions options) {
-        return Mono.create(sink -> this.client.indices().createAsync(request, options, listenerToSink(sink)));
+        return Mono.create(sink -> this.client.indices().createAsync(request, options, listenerToSink(logRequest(request), sink)));
     }
 
     @Override
@@ -195,7 +187,7 @@ public class DefaultReactiveRestElasticsearchClient implements ReactiveRestElast
 
     @Override
     public Mono<RolloverResponse> rollover(RolloverRequest request, RequestOptions options) {
-        return Mono.create(sink -> this.client.indices().rolloverAsync(request, options, listenerToSink(sink)));
+        return Mono.create(sink -> this.client.indices().rolloverAsync(request, options, listenerToSink(logRequest(request), sink)));
     }
 
     @Override
@@ -265,9 +257,6 @@ public class DefaultReactiveRestElasticsearchClient implements ReactiveRestElast
         return Mono.create(sink -> this.client.msearchAsync(request, options, listenerToSink(logRequest(request), sink)));
     }
 
-    private <T> ActionListener<T> listenerToSink(MonoSink<T> sink) {
-        return listenerToSink(null, sink);
-    }
     /**
      * @param sink
      * @param <T>
@@ -287,6 +276,12 @@ public class DefaultReactiveRestElasticsearchClient implements ReactiveRestElast
                 sink.error(e);
             }
         };
+    }
+
+    private String logRequest(Validatable request) {
+        String logId = ClientLogger.newLogId();
+        ClientLogger.logRequest(logId, request);
+        return logId;
     }
 
     private String logRequest(ActionRequest request){

@@ -30,9 +30,9 @@ public class RolloverConfigTest {
 //        Rollover annotation = new Rollover() {
 //
 //            /**
-//             * Returns the annotation type of this annotation.
+//             * Returns the annotation TYPE of this annotation.
 //             *
-//             * @return the annotation type of this annotation
+//             * @return the annotation TYPE of this annotation
 //             */
 //            @Override
 //            public Class<? extends Annotation> annotationType() {
@@ -44,9 +44,9 @@ public class RolloverConfigTest {
 //                return new Alias() {
 //
 //                    /**
-//                     * Returns the annotation type of this annotation.
+//                     * Returns the annotation TYPE of this annotation.
 //                     *
-//                     * @return the annotation type of this annotation
+//                     * @return the annotation TYPE of this annotation
 //                     */
 //                    @Override
 //                    public Class<? extends Annotation> annotationType() {
@@ -107,9 +107,9 @@ public class RolloverConfigTest {
 //                return new Trigger() {
 //
 //                    /**
-//                     * Returns the annotation type of this annotation.
+//                     * Returns the annotation TYPE of this annotation.
 //                     *
-//                     * @return the annotation type of this annotation
+//                     * @return the annotation TYPE of this annotation
 //                     */
 //                    @Override
 //                    public Class<? extends Annotation> annotationType() {

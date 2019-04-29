@@ -21,6 +21,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.client;
 
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.client.Validatable;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -48,6 +49,12 @@ public final class ClientLogger {
 
 
     public static void logRequest(String logId, ActionRequest request) {
+        if (isEnabled()) {
+            log.trace("[{}] Sending request : {}", logId, request.toString());
+        }
+    }
+
+    public static void logRequest(String logId, Validatable request) {
         if (isEnabled()) {
             log.trace("[{}] Sending request : {}", logId, request.toString());
         }

@@ -33,7 +33,7 @@ public interface MultiGetResultMapper {
     /**
      * @param responses the response
      * @param clazz     the entity class
-     * @param <T>       the generic type
+     * @param <T>       the generic TYPE
      * @return the map of results
      */
     <T> List<T> mapResults(MultiGetResponse responses, Class<T> clazz);
