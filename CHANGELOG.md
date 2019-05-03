@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.0.3]
 ### Added
 - Add mapping annotations for parent / child
 - ElasticsearchRepository : Add methods for search parent / child  
