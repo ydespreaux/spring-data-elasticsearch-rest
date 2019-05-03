@@ -8,9 +8,9 @@
 ### Fixed
 
 
-## [1.1.0]
+## [1.1.1]
 ### Added
-- Dependency spring-boot version from 2.1.0 to 2.1.3
+- Dependency spring-boot version from 2.1.0 to 2.1.4
 - Dependency elasticsearch version from 6.4.2 to 6.5.0
 - Reactive repository
 
