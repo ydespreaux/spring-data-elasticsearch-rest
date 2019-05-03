@@ -367,7 +367,7 @@ public class ElasticsearchTemplateTest {
         this.operations.deleteById(articleIndexed.getDocumentId(), Article.class);
         this.operations.refresh(Article.class);
         Optional<Article> response = this.operations.findById(Article.class, articleIndexed.getDocumentId());
-        assertThat(response.isPresent(), is(true));
+        assertThat(response.isPresent(), is(false));
     }
 
     @Test
@@ -378,7 +378,7 @@ public class ElasticsearchTemplateTest {
         this.operations.delete(articleIndexed, Article.class);
         this.operations.refresh(Article.class);
         Optional<Article> response = this.operations.findById(Article.class, articleIndexed.getDocumentId());
-        assertThat(response.isPresent(), is(true));
+        assertThat(response.isPresent(), is(false));
     }
 
     @Test
@@ -393,7 +393,7 @@ public class ElasticsearchTemplateTest {
         this.operations.refresh(Article.class);
         for (Article articleIndexed : articles) {
             Optional<Article> response = this.operations.findById(Article.class, articleIndexed.getDocumentId());
-            assertThat(response.isPresent(), is(true));
+            assertThat(response.isPresent(), is(false));
         }
     }
 
@@ -493,7 +493,7 @@ public class ElasticsearchTemplateTest {
         this.operations.deleteById(bookIndexed.getDocumentId(), Book.class);
         this.operations.refresh(Book.class);
         Optional<Book> response = this.operations.findById(Book.class, bookIndexed.getDocumentId());
-        assertThat(response.isPresent(), is(true));
+        assertThat(response.isPresent(), is(false));
     }
 
     @Test
@@ -504,7 +504,7 @@ public class ElasticsearchTemplateTest {
         this.operations.delete(bookIndexed, Book.class);
         this.operations.refresh(Book.class);
         Optional<Book> response = this.operations.findById(Book.class, bookIndexed.getDocumentId());
-        assertThat(response.isPresent(), is(true));
+        assertThat(response.isPresent(), is(false));
     }
 
     @Test
@@ -522,7 +522,7 @@ public class ElasticsearchTemplateTest {
         this.operations.deleteAll(books, Book.class);
         this.operations.refresh(Book.class);
         for (Book bookIndexed : booksToDelete) {
-            assertThat(this.operations.findById(Book.class, bookIndexed.getDocumentId()).isPresent(), is(true));
+            assertThat(this.operations.findById(Book.class, bookIndexed.getDocumentId()).isPresent(), is(false));
         }
     }
 
