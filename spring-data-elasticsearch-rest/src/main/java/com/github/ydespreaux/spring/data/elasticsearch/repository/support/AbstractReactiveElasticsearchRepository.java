@@ -25,6 +25,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Slf4j
 public abstract class AbstractReactiveElasticsearchRepository<T, K> extends AbstractElasticsearchRepositorySupport<T, K> implements ReactiveElasticsearchRepository<T, K> {
@@ -313,7 +314,7 @@ public abstract class AbstractReactiveElasticsearchRepository<T, K> extends Abst
      */
     @Override
     public Flux hasChildByQuery(Criteria criteria) {
-        return hasChildByQuery(new CriteriaQueryProcessor().createQueryFromCriteria(criteria).orElseThrow());
+        return hasChildByQuery(new CriteriaQueryProcessor().createQueryFromCriteria(criteria).orElseThrow(NoSuchElementException::new));
     }
 
     /**
@@ -346,7 +347,7 @@ public abstract class AbstractReactiveElasticsearchRepository<T, K> extends Abst
      */
     @Override
     public <S extends T> Flux<S> hasParentByQuery(Criteria criteria) {
-        return hasParentByQuery(new CriteriaQueryProcessor().createQueryFromCriteria(criteria).orElseThrow());
+        return hasParentByQuery(new CriteriaQueryProcessor().createQueryFromCriteria(criteria).orElseThrow(NoSuchElementException::new));
     }
 
     /**
@@ -369,7 +370,7 @@ public abstract class AbstractReactiveElasticsearchRepository<T, K> extends Abst
      */
     @Override
     public Flux<T> hasParentId(String parentId, Criteria criteria) {
-        return hasParentId(parentId, new CriteriaQueryProcessor().createQueryFromCriteria(criteria).orElseThrow());
+        return hasParentId(parentId, new CriteriaQueryProcessor().createQueryFromCriteria(criteria).orElseThrow(NoSuchElementException::new));
     }
 
     /**

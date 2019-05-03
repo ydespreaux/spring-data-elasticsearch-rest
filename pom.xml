@@ -16,7 +16,7 @@
         <logstash-encoder.version>5.0</logstash-encoder.version>
         <apache.commons.io.version>2.6</apache.commons.io.version>
         <apache.commons.lang.version>2.6</apache.commons.lang.version>
-        <github-testcontainers.version>1.2.2</github-testcontainers.version>
+        <github-testcontainers.version>1.2.3</github-testcontainers.version>
         <elasticsearch-rest.version>6.5.0</elasticsearch-rest.version>
         <junit.jupiter.version>5.4.2</junit.jupiter.version>
     </properties>
