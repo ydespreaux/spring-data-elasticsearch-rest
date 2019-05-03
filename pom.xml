@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.ydespreaux.spring.data</groupId>
     <artifactId>spring-data-elasticsearch-rest-build</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>spring-data-elasticsearch-rest-build</name>
     <properties>
@@ -24,7 +24,7 @@
         <connection>scm:git:git://github.com/ydespreaux/spring-data-elasticsearch-rest.git</connection>
         <developerConnection>scm:git:git@github.com:ydespreaux/spring-data-elasticsearch-rest.git</developerConnection>
         <url>https://github.com/ydespreaux/spring-data-elasticsearch-rest</url>
-        <tag>1.1.1</tag>
+        <tag>HEAD</tag>
     </scm>
     <parent>
         <groupId>org.springframework.boot</groupId>
