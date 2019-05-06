@@ -5,9 +5,8 @@
 ### Added
 
 ### Changed
-- Pageable : Modified default value of parameter page.size to 10000 
-
 - Dependency elasticsearch version from 6.5.0 to 6.7.0
+- Pageable : Modified default value of parameter page.size to 10000 
 - Changes break:
     - Annotation @Index : remove type attribut (index type fixed to '_doc')
 
