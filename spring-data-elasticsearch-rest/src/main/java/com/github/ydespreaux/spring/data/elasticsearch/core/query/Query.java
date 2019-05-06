@@ -36,6 +36,8 @@ import java.util.List;
  */
 public interface Query {
 
+    int MAX_PAGE_SIZE = 10000;
+
     /**
      * Get page settings if defined
      *

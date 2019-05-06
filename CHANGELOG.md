@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+    
+### Changed
+- Pageable : Modified default value of parameter page.size to 10000 
+
+### Fixed
+
 ## [1.0.3]
 
 ### Added
