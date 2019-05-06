@@ -19,10 +19,8 @@ The library supports the following types of indexes:
 
 |   spring-data-elasticsearch-rest   |   spring-boot    |   elasticsearch  |
 |:----------------------------------:|:----------------:|:----------------:|
-|   1.1.0                            |       2.1.x      |       6.5.x      |
-|   1.0.2                            |       2.1.x      |       6.4.2      |
-|   1.0.1                            |       2.1.x      |       6.4.2      |
-|   1.0.0                            |       2.1.x      |       6.4.2      |
+|   1.1.2                            |       2.1.x      |       6.5.x      |
+|   1.0.3                            |       2.1.x      |       6.4.2      |
 
 ## Maven dependency
 
