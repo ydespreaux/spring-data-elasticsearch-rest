@@ -164,12 +164,21 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <!-- Excludes integration tests when unit tests are run. -->
                     <excludedGroups>integration,integration-nested</excludedGroups>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>integration-tests</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
                     <includes>
                         <include>**/*.java</include>
@@ -276,7 +285,7 @@
                 <sonar.projectKey>${project.artifactId}:${project.version}</sonar.projectKey>
                 <sonar.projectName>${project.name}</sonar.projectName>
                 <sonar.host.url>http://localhost:9000</sonar.host.url>
-                <sonar.login>1b10fa61745b4d0e44176ea1e93c5a6869df54e1</sonar.login>
+                <sonar.login>5549f3d3f080584a31490f039b4aa9a5cad572a6</sonar.login>
             </properties>
         </profile>
     </profiles>

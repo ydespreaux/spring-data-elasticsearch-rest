@@ -1,9 +1,11 @@
 # Changelog
 
 ## [Unreleased]
+
 ### Added
 
 ### Changed
+- Pageable : Modified default value of parameter page.size to 10000 
 
 ### Fixed
 
@@ -13,9 +15,6 @@
 - Dependency spring-boot version from 2.1.0 to 2.1.4
 - Dependency elasticsearch version from 6.4.2 to 6.5.0
 - Reactive repository
-
-### Changed
-
 ### Fixed
 
 ## [1.0.3]
