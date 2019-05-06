@@ -78,7 +78,7 @@ public class EnvelopeShape extends AbstractShape implements CoordinatesShape<Coo
     public void setCoordinates(Coordinate[] coordinates) {
         Assert.notNull(coordinates, "coordinates must not be null !!");
         if (coordinates.length != 2) {
-            throw new IllegalArgumentException("Envelope TYPE must contains two points.");
+            throw new IllegalArgumentException("Envelope type must contains two points.");
         }
         this.upperLeft = coordinates[0];
         this.lowerRight = coordinates[1];

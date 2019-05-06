@@ -67,25 +67,25 @@ public class SimpleElasticsearchPersistentProperty extends
         this.isScript = isAnnotationPresent(ScriptedField.class);
 
         if (isVersionProperty() && getType() != Long.class) {
-            throw new MappingException(String.format("Version property %s must be of TYPE Long!", property.getName()));
+            throw new MappingException(String.format("Version property %s must be of type Long!", property.getName()));
         }
 
         if (isScore && !Arrays.asList(Float.TYPE, Float.class).contains(getType())) {
             throw new MappingException(
-                    String.format("Score property %s must be either of TYPE float or Float!", property.getName()));
+                    String.format("Score property %s must be either of type float or Float!", property.getName()));
         }
 
         if (isParent && getType() != String.class) {
-            throw new MappingException(String.format("Parent property %s must be of TYPE String!", property.getName()));
+            throw new MappingException(String.format("Parent property %s must be of type String!", property.getName()));
         }
 
         if (isIndexName && getType() != String.class) {
-            throw new MappingException(String.format("IndexName property %s must be of TYPE String!", property.getName()));
+            throw new MappingException(String.format("IndexName property %s must be of type String!", property.getName()));
         }
 
         if (isCompletion && getType() != Completion.class
                 && Collection.class.isAssignableFrom(getType()) && (getType().getTypeParameters()[0]).getGenericDeclaration() != Completion.class) {
-            throw new MappingException(String.format("Completion property %s must be of TYPE Completion or Collection<Completion> !", property.getName()));
+            throw new MappingException(String.format("Completion property %s must be of type Completion or Collection<Completion> !", property.getName()));
         }
     }
 

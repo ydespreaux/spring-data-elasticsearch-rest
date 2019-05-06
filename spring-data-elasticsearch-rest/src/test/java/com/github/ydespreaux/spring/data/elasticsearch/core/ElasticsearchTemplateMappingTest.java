@@ -91,7 +91,7 @@ public class ElasticsearchTemplateMappingTest {
         assertThat(settings.get("index.refresh_interval"), Matchers.is(equalTo("1s")));
         assertThat(settings.get("index.number_of_shards"), Matchers.is(equalTo("1")));
         assertThat(settings.get("index.number_of_replicas"), Matchers.is(equalTo("1")));
-        assertThat(settings.get("index.store.TYPE"), Matchers.is(equalTo("fs")));
+        assertThat(settings.get("index.store.type"), Matchers.is(equalTo("fs")));
         assertThat(template.aliases().containsKey("articles"), Matchers.is(true));
         assertThat(template.mappings().type(), Matchers.is(equalTo("_doc")));
         //
@@ -114,7 +114,7 @@ public class ElasticsearchTemplateMappingTest {
         assertThat(settings.get("index.refresh_interval"), Matchers.is(equalTo("1s")));
         assertThat(settings.get("index.number_of_shards"), Matchers.is(equalTo("1")));
         assertThat(settings.get("index.number_of_replicas"), Matchers.is(equalTo("1")));
-        assertThat(settings.get("index.store.TYPE"), Matchers.is(equalTo("fs")));
+        assertThat(settings.get("index.store.type"), Matchers.is(equalTo("fs")));
         assertThat(template.aliases().containsKey("cities"), Matchers.is(true));
         assertThat(template.mappings().type(), Matchers.is(equalTo("_doc")));
         //
@@ -144,7 +144,7 @@ public class ElasticsearchTemplateMappingTest {
         assertThat(settings.get("index.refresh_interval"), is(equalTo("1s")));
         assertThat(settings.get("index.number_of_shards"), is(equalTo("1")));
         assertThat(settings.get("index.number_of_replicas"), is(equalTo("1")));
-        assertThat(settings.get("index.store.TYPE"), is(equalTo("fs")));
+        assertThat(settings.get("index.store.type"), is(equalTo("fs")));
     }
 
     @Configuration

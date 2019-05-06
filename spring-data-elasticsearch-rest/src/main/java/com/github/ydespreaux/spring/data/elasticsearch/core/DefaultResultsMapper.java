@@ -80,7 +80,7 @@ public class DefaultResultsMapper implements ResultsMapper {
     }
 
     /**
-     * Map a single {@link GetResult} to an instance of the given TYPE.
+     * Map a single {@link GetResult} to an instance of the given type.
      *
      * @param response must not be {@literal null}.
      * @param clazz    must not be {@literal null}.
@@ -97,7 +97,7 @@ public class DefaultResultsMapper implements ResultsMapper {
     }
 
     /**
-     * Map a single {@link SearchHit} to an instance of the given TYPE.
+     * Map a single {@link SearchHit} to an instance of the given type.
      *
      * @param hit must not be {@literal null}.
      * @param type      must not be {@literal null}.
@@ -129,7 +129,7 @@ public class DefaultResultsMapper implements ResultsMapper {
     /**
      * @param response the response
      * @param clazz    the entity class
-     * @param <T>      the generic TYPE
+     * @param <T>      the generic type
      * @return the new {@link Page}
      */
     @Override

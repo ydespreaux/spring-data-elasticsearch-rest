@@ -56,6 +56,8 @@ import org.elasticsearch.client.GetAliasesResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.Validatable;
+import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.client.indices.*;
 import org.elasticsearch.client.indices.rollover.RolloverRequest;
 import org.elasticsearch.client.indices.rollover.RolloverResponse;
@@ -255,6 +257,11 @@ public class DefaultReactiveRestElasticsearchClient implements ReactiveRestElast
     @Override
     public Mono<MultiSearchResponse> multiSearch(MultiSearchRequest request, RequestOptions options) {
         return Mono.create(sink -> this.client.msearchAsync(request, options, listenerToSink(logRequest(request), sink)));
+    }
+
+    @Override
+    public Mono<CountResponse> count(CountRequest request, RequestOptions options) {
+        return Mono.create(sink -> this.client.countAsync(request, options, listenerToSink(logRequest(request), sink)));
     }
 
     /**

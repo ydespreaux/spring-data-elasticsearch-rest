@@ -45,6 +45,8 @@ import org.elasticsearch.action.search.SearchResponseSections;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.GetAliasesResponse;
 import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.rollover.RolloverRequest;
 import org.elasticsearch.client.indices.rollover.RolloverResponse;
@@ -512,7 +514,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
     }
 
     /**
-     * @param clazz      the domain TYPE
+     * @param clazz      the domain type
      * @param documentId the document id.
      * @return true if the document corresponding to the id exists
      */
@@ -677,12 +679,12 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
     }
 
     /**
-     * @param searchRequest
+     * @param countRequest
      * @return
      */
-    private Mono<Long> executeCount(SearchRequest searchRequest) {
-        return Mono.from(execute(c -> c.search(searchRequest)))
-                .map(searchResponse -> searchResponse.getHits().getTotalHits())
+    private Mono<Long> executeCount(CountRequest countRequest) {
+        return Mono.from(execute(c -> c.count(countRequest)))
+                .map(CountResponse::getCount)
                 .onErrorResume(IndexNotFoundException.class, error -> Mono.just(0L));
     }
 
@@ -691,7 +693,7 @@ public class ReactiveElasticsearchTemplate extends ElasticsearchTemplateSupport 
      *
      * @param query the given {@link SearchRequest} instance.
      * @param clazz  the given clazz.
-     * @return a {@link List} of the method generic TYPE.
+     * @return a {@link List} of the method generic type.
      */
     @Override
     public <S extends T, T> Flux<S> search(SearchQuery query, Class<T> clazz) {

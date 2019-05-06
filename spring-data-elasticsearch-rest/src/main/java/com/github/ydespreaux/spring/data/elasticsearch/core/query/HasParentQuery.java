@@ -71,7 +71,7 @@ public class HasParentQuery extends JoinQuery<HasParentQuery> {
     @Override
     public void afterPropertiesSet() {
         Assert.notNull(getQuery(), "[has_parent] requires 'query' field");
-        Assert.notNull(getType(), "[has_parent] requires 'TYPE' field");
+        Assert.notNull(getType(), "[has_parent] requires 'type' field");
     }
 
     /**

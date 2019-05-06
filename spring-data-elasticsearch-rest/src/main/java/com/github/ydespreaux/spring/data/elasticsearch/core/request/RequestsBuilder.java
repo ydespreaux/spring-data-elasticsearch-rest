@@ -37,6 +37,7 @@ import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Requests;
+import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.PutIndexTemplateRequest;
@@ -232,6 +233,10 @@ public class RequestsBuilder {
 
     public GetRequest getRequest(String indexName, String typeName, String documentId) {
         return new GetRequest(indexName, typeName, documentId);
+    }
+
+    public CountRequest countRequest(String[] indexName) {
+        return new CountRequest(indexName);
     }
 
     public SearchScrollRequest searchScrollRequest(String scrollId, Duration scrollTime) {

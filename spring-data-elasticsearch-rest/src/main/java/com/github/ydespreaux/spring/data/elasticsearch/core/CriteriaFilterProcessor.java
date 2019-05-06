@@ -178,11 +178,11 @@ final class CriteriaFilterProcessor {
 
         if (valArray.length == 1) {
             //GeoEnvelop
-            Assert.isTrue(valArray[0] instanceof Box, "single-element of boundedBy filter must be TYPE of Box");
+            Assert.isTrue(valArray[0] instanceof Box, "single-element of boundedBy filter must be type of Box");
             Box box = (Box) valArray[0];
             filter.setCorners(box.getFirst().getX(), box.getFirst().getY(), box.getSecond().getX(), box.getSecond().getY());
         } else if (valArray.length == 2) {
-            Assert.isTrue(isType(valArray, GeoPoint.class) || isType(valArray, String.class), " both elements of boundedBy filter must be TYPE of GeoPoint or text(format lat,lon or geohash)");
+            Assert.isTrue(isType(valArray, GeoPoint.class) || isType(valArray, String.class), " both elements of boundedBy filter must be type of GeoPoint or text(format lat,lon or geohash)");
             if (valArray[0] instanceof GeoPoint) {
                 GeoPoint topLeft = (GeoPoint) valArray[0];
                 GeoPoint bottomRight = (GeoPoint) valArray[1];

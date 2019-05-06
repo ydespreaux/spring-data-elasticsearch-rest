@@ -280,7 +280,9 @@ public class ShapeEntityRepositoryTest {
     void insertGeoShapeWithGeometrycollectionType() {
         ShapeEntity shape = this.repository.save(ShapeEntity.builder()
                 .name("plot with geometrycollection")
-                .geometry(new GeometryCollectionShape(new PointShape(new Coordinate(20, 50))))
+                .geometry(new GeometryCollectionShape(
+                        new PointShape(new Coordinate(20, 50)),
+                        new CircleShape(new Coordinate(25.65, 35.20), 50.0, DistanceUnit.METERS)))
                 .build());
         this.repository.refresh();
         Optional<ShapeEntity> optional = this.repository.findById(shape.getId());

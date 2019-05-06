@@ -55,7 +55,7 @@ public class ParentIdQuery extends JoinQuery<ParentIdQuery> {
     @Override
     public void afterPropertiesSet() {
         Assert.notNull(parentId, "[parent_id] requires 'parentId' field");
-        Assert.notNull(getType(), "[parent_id] requires 'TYPE' field");
+        Assert.notNull(getType(), "[parent_id] requires 'type' field");
     }
 
     /**

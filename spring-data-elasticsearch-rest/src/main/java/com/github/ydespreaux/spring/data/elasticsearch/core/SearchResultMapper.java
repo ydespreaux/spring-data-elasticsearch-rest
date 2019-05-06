@@ -32,7 +32,7 @@ public interface SearchResultMapper {
     /**
      * @param response the response
      * @param clazz    the entity class
-     * @param <T>      the generic TYPE
+     * @param <T>      the generic type
      * @return a new {@link Page}
      */
     <S extends T, T> Page<S> mapResults(SearchResponse response, Class<T> clazz);

@@ -37,8 +37,8 @@ import java.util.*;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
- * @param <T> generic TYPE
- * @param <S> generic TYPE
+ * @param <T> generic type
+ * @param <S> generic type
  * @author Yoann Despréaux
  * @since 1.0.0
  */

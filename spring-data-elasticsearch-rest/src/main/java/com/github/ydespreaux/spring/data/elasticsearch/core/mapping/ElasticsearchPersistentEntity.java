@@ -38,16 +38,16 @@ import java.util.Set;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 /**
- * @param <T> generic TYPE
+ * @param <T> generic type
  * @author Yoann Despréaux
  * @since 1.0.0
  */
 public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, ElasticsearchPersistentProperty>, ElasticsearchEntityInformation<T, String> {
 
     /**
-     * Retourne le TYPE de document de l'entité courante.
+     * Retourne le type de document de l'entité courante.
      *
-     * @return the TYPE name
+     * @return the type name
      */
     String getTypeName();
 

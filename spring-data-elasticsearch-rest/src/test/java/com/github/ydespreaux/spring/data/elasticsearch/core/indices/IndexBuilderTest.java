@@ -42,7 +42,7 @@ public class IndexBuilderTest {
         assertThat(request.settings().get("number_of_shards"), is(equalTo("1")));
         assertThat(request.settings().get("refresh_interval"), is(equalTo("1s")));
         assertThat(request.settings().get("number_of_replicas"), is(equalTo("1")));
-        assertThat(request.settings().get("store.TYPE"), is(equalTo("fs")));
+        assertThat(request.settings().get("store.type"), is(equalTo("fs")));
         assertThat(request.mappings(), is(notNullValue()));
     }
 

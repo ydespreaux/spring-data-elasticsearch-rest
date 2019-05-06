@@ -38,6 +38,7 @@ import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -148,7 +149,7 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
 
     /**
      * @param clazz the entity class
-     * @param <T>   generic TYPE
+     * @param <T>   generic type
      * @return the {@link ElasticsearchPersistentEntity}
      * @see ElasticsearchOperations#getPersistentEntityFor(Class)  method
      */
@@ -416,7 +417,7 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
      * @param <T>
      * @return
      */
-    protected <T> SearchRequest prepareCount(Query query, Class<T> clazz) {
+    protected <T> CountRequest prepareCount(Query query, Class<T> clazz) {
         setPersistentEntityIndexAndTypeAndSourceFilter(query, clazz);
         return prepareCount(query);
     }
@@ -425,60 +426,51 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
      * @param query
      * @return
      */
-    protected SearchRequest prepareCount(Query query) {
+    protected CountRequest prepareCount(Query query) {
         assertNotNullIndices(query);
-        SearchRequest countRequestBuilder = new SearchRequest(toArray(query.getIndices()));
-        if (!isEmpty(query.getTypes())) {
-            countRequestBuilder.types(toArray(query.getTypes()));
-        }
-        // Fix size at 0
-        countRequestBuilder.source().size(0);
-        return countRequestBuilder;
+        return requestsBuilder.countRequest(toArray(query.getIndices()));
     }
 
     /**
-     * @param searchRequest
+     * @param countRequest
      * @param query
      * @return
      */
-    protected SearchRequest doCount(SearchRequest searchRequest, SearchQuery query) {
-        return doCount(searchRequest, Optional.ofNullable(query.getQuery()), Optional.ofNullable(query.getFilter()));
+    protected CountRequest doCount(CountRequest countRequest, SearchQuery query) {
+        return doCount(countRequest, Optional.ofNullable(query.getQuery()), Optional.ofNullable(query.getFilter()));
     }
 
     /**
-     * @param searchRequest
+     * @param countRequest
      * @param criteriaQuery
      * @return
      */
-    protected SearchRequest doCount(SearchRequest searchRequest, CriteriaQuery criteriaQuery) {
+    protected CountRequest doCount(CountRequest countRequest, CriteriaQuery criteriaQuery) {
         Optional<QueryBuilder> query = new CriteriaQueryProcessor().createQueryFromCriteria(criteriaQuery.getCriteria());
         Optional<QueryBuilder> filter = new CriteriaFilterProcessor()
                 .createFilterFromCriteria(criteriaQuery.getCriteria());
-        return doCount(searchRequest, query, filter);
+        return doCount(countRequest, query, filter);
     }
 
     /**
      *
-     * @param searchRequest
+     * @param countRequest
      * @param query
      * @return
      */
-    protected SearchRequest doCount(SearchRequest searchRequest, StringQuery query) {
-        return doCount(searchRequest, Optional.of(wrapperQuery(query.getSource())), Optional.empty());
+    protected CountRequest doCount(CountRequest countRequest, StringQuery query) {
+        return doCount(countRequest, Optional.of(wrapperQuery(query.getSource())), Optional.empty());
     }
 
     /**
-     * @param searchRequest
+     * @param countRequest
      * @param elasticsearchQuery
      * @param elasticsearchFilter
      * @return
      */
-    private SearchRequest doCount(SearchRequest searchRequest, Optional<QueryBuilder> elasticsearchQuery, Optional<QueryBuilder> elasticsearchFilter) {
-        searchRequest.source().query(elasticsearchQuery.orElse(QueryBuilders.matchAllQuery()));
-        if (elasticsearchFilter.isPresent()) {
-            searchRequest.source().postFilter(elasticsearchFilter.get());
-        }
-        return searchRequest;
+    private CountRequest doCount(CountRequest countRequest, Optional<QueryBuilder> elasticsearchQuery, Optional<QueryBuilder> elasticsearchFilter) {
+        countRequest.source().query(elasticsearchQuery.orElse(elasticsearchFilter.orElse(QueryBuilders.matchAllQuery())));
+        return countRequest;
     }
 
     /**
@@ -635,7 +627,7 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
     }
 
     private void assertNotNullTypes(Query query) {
-        Assert.notNull(query.getTypes(), "No TYPE defined for Query");
+        Assert.notNull(query.getTypes(), "No type defined for Query");
     }
 
     private void assertNotNullPageable(Query query) {
@@ -657,6 +649,10 @@ public abstract class ElasticsearchTemplateSupport implements ApplicationContext
 
     protected ElasticsearchException buildSearchException(Exception e, SearchRequest request) {
         return new ElasticsearchException("Error for continueScroll request: " + request.toString(), e);
+    }
+
+    protected ElasticsearchException buildCountException(Exception e, CountRequest request) {
+        return new ElasticsearchException("Error for count request: " + request.toString(), e);
     }
 
     protected ElasticsearchException buildClearScrollException(Exception e, ClearScrollRequest request) {

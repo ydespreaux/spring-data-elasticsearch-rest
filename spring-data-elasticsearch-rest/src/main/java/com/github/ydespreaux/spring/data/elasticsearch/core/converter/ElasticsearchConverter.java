@@ -36,7 +36,7 @@ public interface ElasticsearchConverter {
      * Give the required {@link ElasticsearchPersistentEntity} for the given clazz parameter.
      *
      * @param clazz the given clazz.
-     * @param <T>   genereic TYPE
+     * @param <T>   genereic type
      * @return an {@link ElasticsearchPersistentEntity} of T.
      */
     <T> ElasticsearchPersistentEntity<T> getRequiredPersistentEntity(Class<T> clazz);

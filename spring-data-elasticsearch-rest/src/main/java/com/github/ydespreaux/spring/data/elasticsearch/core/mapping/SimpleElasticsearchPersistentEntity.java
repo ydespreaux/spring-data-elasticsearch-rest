@@ -48,7 +48,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * @param <T> generic TYPE
+ * @param <T> generic type
  * @author Yoann Despréaux
  * @since 1.0.0
  */
@@ -397,9 +397,9 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     }
 
     /**
-     * Retourne le TYPE de document de l'entité courante.
+     * Retourne le type de document de l'entité courante.
      *
-     * @return the TYPE name
+     * @return the type name
      */
     @Override
     public String getTypeName() {

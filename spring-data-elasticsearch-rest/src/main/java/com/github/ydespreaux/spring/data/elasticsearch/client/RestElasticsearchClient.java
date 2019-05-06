@@ -51,6 +51,8 @@ import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.GetAliasesResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.client.indices.*;
 import org.elasticsearch.client.indices.rollover.RolloverRequest;
 import org.elasticsearch.client.indices.rollover.RolloverResponse;
@@ -109,7 +111,7 @@ public interface RestElasticsearchClient {
         return putTemplate(request, getDefaultRequestOptions());
     }
 
-    default org.elasticsearch.client.indices.GetIndexTemplatesResponse getTemplates(org.elasticsearch.client.indices.GetIndexTemplatesRequest request) throws IOException {
+    default GetIndexTemplatesResponse getTemplates(GetIndexTemplatesRequest request) throws IOException {
         return getTemplates(request, getDefaultRequestOptions());
     }
 
@@ -205,6 +207,10 @@ public interface RestElasticsearchClient {
         return deleteBy(request, getDefaultRequestOptions());
     }
 
+    default CountResponse count(CountRequest request) throws IOException {
+        return count(request, getDefaultRequestOptions());
+    }
+
     ClusterHealthResponse clusterHealth(ClusterHealthRequest request, RequestOptions options) throws IOException;
 
     ClusterUpdateSettingsResponse clusterPutSettings(ClusterUpdateSettingsRequest request, RequestOptions options) throws IOException;
@@ -223,7 +229,7 @@ public interface RestElasticsearchClient {
 
     AcknowledgedResponse putTemplate(PutIndexTemplateRequest request, RequestOptions options) throws IOException;
 
-    org.elasticsearch.client.indices.GetIndexTemplatesResponse getTemplates(org.elasticsearch.client.indices.GetIndexTemplatesRequest request, RequestOptions options) throws IOException;
+    GetIndexTemplatesResponse getTemplates(GetIndexTemplatesRequest request, RequestOptions options) throws IOException;
 
     CreateIndexResponse createIndex(CreateIndexRequest request, RequestOptions options) throws IOException;
 
@@ -272,4 +278,6 @@ public interface RestElasticsearchClient {
     MultiSearchResponse multiSearch(MultiSearchRequest request, RequestOptions options) throws IOException;
 
     BulkByScrollResponse deleteBy(DeleteByQueryRequest request, RequestOptions options) throws IOException;
+
+    CountResponse count(CountRequest request, RequestOptions options) throws IOException;
 }

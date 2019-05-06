@@ -51,6 +51,8 @@ import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.GetAliasesResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.client.indices.*;
 import org.elasticsearch.client.indices.rollover.RolloverRequest;
 import org.elasticsearch.client.indices.rollover.RolloverResponse;
@@ -200,6 +202,9 @@ public interface ReactiveRestElasticsearchClient {
         return multiSearch(request, getDefaultRequestOptions());
     }
 
+    default Mono<CountResponse> count(CountRequest request) {
+        return count(request, getDefaultRequestOptions());
+    }
 
     Mono<ClusterHealthResponse> clusterHealth(ClusterHealthRequest request, RequestOptions options);
 
@@ -268,5 +273,7 @@ public interface ReactiveRestElasticsearchClient {
     Mono<ClearScrollResponse> clearScroll(ClearScrollRequest request, RequestOptions options);
 
     Mono<MultiSearchResponse> multiSearch(MultiSearchRequest request, RequestOptions options);
+
+    Mono<CountResponse> count(CountRequest request, RequestOptions options);
 
 }

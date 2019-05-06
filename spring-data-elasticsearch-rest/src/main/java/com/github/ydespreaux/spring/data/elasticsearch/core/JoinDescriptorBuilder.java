@@ -105,7 +105,7 @@ public class JoinDescriptorBuilder<T> {
             throw new MappingException("name attribute is mandatory. Check your mapping configuration!");
         }
         if (StringUtils.isEmpty(parentAnnotation.type())) {
-            throw new MappingException("TYPE attribute is mandatory. Check your mapping configuration!");
+            throw new MappingException("type attribute is mandatory. Check your mapping configuration!");
         }
         return new JoinDescriptor<T>()
                 .parentDocument(true)
@@ -131,7 +131,7 @@ public class JoinDescriptorBuilder<T> {
             throw new MappingException("routing attribute is mandatory. Check your mapping configuration!");
         }
         if (StringUtils.isEmpty(childAnnotation.type())) {
-            throw new MappingException("TYPE attribute is mandatory. Check your mapping configuration!");
+            throw new MappingException("type attribute is mandatory. Check your mapping configuration!");
         }
         String joinName = getEnvironmentValue(this.environment, rootParentAnnotation.name());
         String parentType = getEnvironmentValue(this.environment, findParentType(parentClass));

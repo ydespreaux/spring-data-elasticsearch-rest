@@ -60,6 +60,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Profile("test-no-template")
 public class CityRepositoryTest {
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private CityRepository repository;
 
