@@ -42,7 +42,7 @@ import static java.util.Collections.addAll;
  */
 abstract class AbstractQuery implements Query {
 
-    private static final Pageable DEFAULT_PAGE = PageRequest.of(0, 50);
+    private static final Pageable DEFAULT_PAGE = PageRequest.of(0, Query.MAX_PAGE_SIZE);
 
     protected Pageable pageable = DEFAULT_PAGE;
     protected Sort sort;
