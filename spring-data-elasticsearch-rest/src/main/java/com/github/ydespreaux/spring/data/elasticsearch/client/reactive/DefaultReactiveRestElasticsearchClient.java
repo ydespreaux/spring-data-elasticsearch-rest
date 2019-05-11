@@ -138,8 +138,13 @@ public class DefaultReactiveRestElasticsearchClient implements ReactiveRestElast
     }
 
     @Override
-    public Mono<org.elasticsearch.client.indices.GetIndexTemplatesResponse> getTemplates(org.elasticsearch.client.indices.GetIndexTemplatesRequest request, RequestOptions options) {
+    public Mono<GetIndexTemplatesResponse> getTemplates(GetIndexTemplatesRequest request, RequestOptions options) {
         return Mono.create(sink -> this.client.indices().getIndexTemplateAsync(request, options, listenerToSink(logRequest(request), sink)));
+    }
+
+    @Override
+    public Mono<Boolean> existsTemplates(IndexTemplatesExistRequest request, RequestOptions options) {
+        return Mono.create(sink -> this.client.indices().existsTemplateAsync(request, options, listenerToSink(logRequest(request), sink)));
     }
 
     @Override

@@ -99,6 +99,10 @@ public interface RestElasticsearchClient {
         return getIndex(request, getDefaultRequestOptions());
     }
 
+    default CreateIndexResponse createIndex(CreateIndexRequest request) throws IOException {
+        return createIndex(request, getDefaultRequestOptions());
+    }
+
     default Boolean indicesExist(GetIndexRequest request) throws IOException {
         return indicesExist(request, getDefaultRequestOptions());
     }
@@ -115,8 +119,12 @@ public interface RestElasticsearchClient {
         return getTemplates(request, getDefaultRequestOptions());
     }
 
-    default CreateIndexResponse createIndex(CreateIndexRequest request) throws IOException {
-        return createIndex(request, getDefaultRequestOptions());
+    default GetIndexTemplatesResponse existsTemplates(GetIndexTemplatesRequest request) throws IOException {
+        return getTemplates(request, getDefaultRequestOptions());
+    }
+
+    default boolean existsTemplates(IndexTemplatesExistRequest request) throws IOException {
+        return existsTemplates(request, getDefaultRequestOptions());
     }
 
     default AcknowledgedResponse deleteIndex(DeleteIndexRequest request) throws IOException {
@@ -230,6 +238,8 @@ public interface RestElasticsearchClient {
     AcknowledgedResponse putTemplate(PutIndexTemplateRequest request, RequestOptions options) throws IOException;
 
     GetIndexTemplatesResponse getTemplates(GetIndexTemplatesRequest request, RequestOptions options) throws IOException;
+
+    boolean existsTemplates(IndexTemplatesExistRequest request, RequestOptions options) throws IOException;
 
     CreateIndexResponse createIndex(CreateIndexRequest request, RequestOptions options) throws IOException;
 

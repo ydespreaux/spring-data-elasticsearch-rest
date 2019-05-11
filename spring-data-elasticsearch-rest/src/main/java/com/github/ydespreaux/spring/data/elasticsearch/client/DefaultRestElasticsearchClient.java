@@ -138,8 +138,13 @@ public class DefaultRestElasticsearchClient implements RestElasticsearchClient {
     }
 
     @Override
-    public org.elasticsearch.client.indices.GetIndexTemplatesResponse getTemplates(org.elasticsearch.client.indices.GetIndexTemplatesRequest request, RequestOptions options) throws IOException {
+    public GetIndexTemplatesResponse getTemplates(GetIndexTemplatesRequest request, RequestOptions options) throws IOException {
         return this.client.indices().getIndexTemplate(request, options);
+    }
+
+    @Override
+    public boolean existsTemplates(IndexTemplatesExistRequest request, RequestOptions options) throws IOException {
+        return this.client.indices().existsTemplate(request, options);
     }
 
     @Override

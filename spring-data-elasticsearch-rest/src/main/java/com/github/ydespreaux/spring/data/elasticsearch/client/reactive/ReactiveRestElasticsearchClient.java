@@ -110,6 +110,10 @@ public interface ReactiveRestElasticsearchClient {
         return getTemplates(request, getDefaultRequestOptions());
     }
 
+    default Mono<Boolean> existsTemplates(IndexTemplatesExistRequest request) {
+        return existsTemplates(request, getDefaultRequestOptions());
+    }
+
     default Mono<CreateIndexResponse> createIndex(CreateIndexRequest request) {
         return createIndex(request, getDefaultRequestOptions());
     }
@@ -225,6 +229,8 @@ public interface ReactiveRestElasticsearchClient {
     Mono<AcknowledgedResponse> putTemplate(PutIndexTemplateRequest request, RequestOptions options);
 
     Mono<GetIndexTemplatesResponse> getTemplates(org.elasticsearch.client.indices.GetIndexTemplatesRequest request, RequestOptions options);
+
+    Mono<Boolean> existsTemplates(IndexTemplatesExistRequest request, RequestOptions options);
 
     Mono<CreateIndexResponse> createIndex(CreateIndexRequest request, RequestOptions options);
 
