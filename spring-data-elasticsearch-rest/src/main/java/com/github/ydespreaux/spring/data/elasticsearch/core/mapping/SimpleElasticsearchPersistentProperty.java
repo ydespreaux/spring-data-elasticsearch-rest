@@ -30,10 +30,7 @@ import org.springframework.data.mapping.model.Property;
 import org.springframework.data.mapping.model.SimpleTypeHolder;
 import org.springframework.lang.Nullable;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Elasticsearch specific {@link org.springframework.data.mapping.PersistentProperty} implementation processing
@@ -66,6 +63,9 @@ public class SimpleElasticsearchPersistentProperty extends
         this.isCompletion = isAnnotationPresent(CompletionField.class);
         this.isScript = isAnnotationPresent(ScriptedField.class);
 
+        if (isIdProperty() && !Arrays.asList(UUID.class, String.class).contains(getType())) {
+            throw new MappingException(String.format("Id property %s must be of type String or UUID. Check your mapping configuration!", property.getName()));
+        }
         if (isVersionProperty() && getType() != Long.class) {
             throw new MappingException(String.format("Version property %s must be of type Long!", property.getName()));
         }
@@ -75,8 +75,8 @@ public class SimpleElasticsearchPersistentProperty extends
                     String.format("Score property %s must be either of type float or Float!", property.getName()));
         }
 
-        if (isParent && getType() != String.class) {
-            throw new MappingException(String.format("Parent property %s must be of type String!", property.getName()));
+        if (isParent && !Arrays.asList(UUID.class, String.class).contains(getType())) {
+            throw new MappingException(String.format("Parent property %s must be of type String or UUID. Check your mapping configuration!", property.getName()));
         }
 
         if (isIndexName && getType() != String.class) {
