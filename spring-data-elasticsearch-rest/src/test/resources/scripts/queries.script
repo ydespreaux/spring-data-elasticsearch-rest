@@ -10,11 +10,11 @@ PUT:article-e1-2018/article/5:{ "name" : "Article5", "description": "Description
 # index books settings
 PUT:books:@resource(indices/book.index)
 # index books
-PUT:books/book/1:{"title": "Black City Parade", "description": "Exceptionnel : pour la 1ère fois ! Indochine records et Sony Music sont fiers de proposer les rééditions des 12 albums studio d’Indochine...", "price": 15, "publication": "2015-10-25"}
-PUT:books/book/2:{"title": "Blake et Mortimer - Tome 25 : La vallée des immortels", "description": "À Lhassa, le palais impérial du dictateur Basam-Damdu est anéanti par une escadrille d’Espadons, et le monde, soulagé, fête la fin de la troisième guerre mondiale...", "price": 25, "publication": "2016-05-01"}
-PUT:books/book/3:{"title": "Et puis Colette", "description": "Anouk, trentenaire parisienne enfermée dans la routine, vient d’apprendre le décès de sa soeur...", "price": 9.99, "publication": "2017-02-01"}
-PUT:books/book/4:{"title": "Live Is love Double Vinyle", "description": "Thomas s’est pour ce disque mis à nu, sans concession aucune...", "price": 12.20, "publication": "2018-07-10"}
-PUT:books/book/5:{"title": "Zorro - Cicatrices Tome 01 : Zorro", "description": "Zorro est toujours Don Diego de la Vega sous le masque, et il défend toujours la veuve et l’orphelin grâce à son fouet et son épée. Mais il est cette fois aux prises avec l’amour !", "price": 5}
+PUT:books/book/981ac3c2-3c5f-45c3-a0dc-389354b9d9f3:{"title": "Black City Parade", "description": "Exceptionnel : pour la 1ère fois ! Indochine records et Sony Music sont fiers de proposer les rééditions des 12 albums studio d’Indochine...", "price": 15, "publication": "2015-10-25"}
+PUT:books/book/1c61f91a-4ec9-4926-a89a-e4d736c10e09:{"title": "Blake et Mortimer - Tome 25 : La vallée des immortels", "description": "À Lhassa, le palais impérial du dictateur Basam-Damdu est anéanti par une escadrille d’Espadons, et le monde, soulagé, fête la fin de la troisième guerre mondiale...", "price": 25, "publication": "2016-05-01"}
+PUT:books/book/d080c5f1-eace-4efc-839d-d3f788f5e462:{"title": "Et puis Colette", "description": "Anouk, trentenaire parisienne enfermée dans la routine, vient d’apprendre le décès de sa soeur...", "price": 9.99, "publication": "2017-02-01"}
+PUT:books/book/2068ce3f-3383-4ead-9b3b-cb4ee56fd01d:{"title": "Live Is love Double Vinyle", "description": "Thomas s’est pour ce disque mis à nu, sans concession aucune...", "price": 12.20, "publication": "2018-07-10"}
+PUT:books/book/7d37cdb8-db2d-477a-bc5f-df4a1417b72c:{"title": "Zorro - Cicatrices Tome 01 : Zorro", "description": "Zorro est toujours Don Diego de la Vega sous le masque, et il défend toujours la veuve et l’orphelin grâce à son fouet et son épée. Mais il est cette fois aux prises avec l’amour !", "price": 5}
 
 # index cities settings
 PUT:_template/city:@resource(templates/city.template)

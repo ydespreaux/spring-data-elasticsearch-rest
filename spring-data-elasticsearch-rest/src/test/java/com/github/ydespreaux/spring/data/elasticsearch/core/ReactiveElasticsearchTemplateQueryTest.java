@@ -46,6 +46,8 @@ import org.springframework.context.annotation.Profile;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
+import java.util.UUID;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -162,7 +164,7 @@ public class ReactiveElasticsearchTemplateQueryTest
 
     @Test
     void existsByIdWithSampleIndex(){
-        StepVerifier.create(reactiveOperations.existsById(Book.class, "1"))
+        StepVerifier.create(reactiveOperations.existsById(Book.class, "981ac3c2-3c5f-45c3-a0dc-389354b9d9f3"))
                 .expectNext(true)
                 .verifyComplete();
     }
@@ -176,7 +178,7 @@ public class ReactiveElasticsearchTemplateQueryTest
 
     @Test
     void existsByIdNotFoundWithSampleIndex(){
-        StepVerifier.create(reactiveOperations.existsById(Book.class, "-1"))
+        StepVerifier.create(reactiveOperations.existsById(Book.class, UUID.randomUUID().toString()))
                 .expectNext(false)
                 .verifyComplete();
     }

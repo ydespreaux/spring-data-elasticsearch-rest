@@ -32,6 +32,7 @@ import org.elasticsearch.search.SearchHit;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.lang.Nullable;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.Set;
 
@@ -42,7 +43,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
  * @author Yoann Despréaux
  * @since 1.0.0
  */
-public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, ElasticsearchPersistentProperty>, ElasticsearchEntityInformation<T, String> {
+public interface ElasticsearchPersistentEntity<T> extends PersistentEntity<T, ElasticsearchPersistentProperty>, ElasticsearchEntityInformation<T, Serializable> {
 
     /**
      * Retourne le type de document de l'entité courante.

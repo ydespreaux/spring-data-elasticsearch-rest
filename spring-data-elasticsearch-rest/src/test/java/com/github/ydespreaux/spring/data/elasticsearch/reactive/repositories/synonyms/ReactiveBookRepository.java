@@ -26,12 +26,13 @@ import reactor.core.publisher.Flux;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.UUID;
 
 /**
  * @author Yoann Despréaux
  * @since 1.0.0
  */
-public interface ReactiveBookRepository extends ReactiveElasticsearchRepository<Book, String> {
+public interface ReactiveBookRepository extends ReactiveElasticsearchRepository<Book, UUID> {
 
     Flux<Book> findByDescriptionContains(String value);
 
