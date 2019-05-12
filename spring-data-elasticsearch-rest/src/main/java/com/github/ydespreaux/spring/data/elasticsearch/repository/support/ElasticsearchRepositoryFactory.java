@@ -37,6 +37,7 @@ import org.springframework.util.Assert;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Factory to create {@link ElasticsearchRepository}
@@ -71,6 +72,8 @@ public class ElasticsearchRepositoryFactory extends RepositoryFactorySupport {
     protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
         if (metadata.getIdType() == String.class) {
             return SimpleElasticsearchRepository.class;
+        } else if (metadata.getIdType() == UUID.class) {
+            return UUIDElasticsearchRepository.class;
         } else {
             throw new IllegalArgumentException("Unsupported ID TYPE " + metadata.getIdType());
         }

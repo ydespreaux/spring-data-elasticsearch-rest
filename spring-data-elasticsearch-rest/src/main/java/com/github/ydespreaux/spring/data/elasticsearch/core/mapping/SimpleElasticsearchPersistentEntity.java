@@ -41,11 +41,13 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import java.io.Serializable;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @param <T> generic type
@@ -59,6 +61,8 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     @Nullable
     private ApplicationContext context;
     private Class<T> entityClass;
+    private Class<Serializable> idClass;
+    private boolean isStringIdType;
     private org.elasticsearch.action.admin.indices.alias.Alias alias;
     private String indexName;
     private String indexPattern;
@@ -210,6 +214,9 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
             addPersistentCompletionProperty(property);
         } else if (property.isScriptProperty()) {
             addPersistentScriptProperty(property);
+        } else if (property.isIdProperty()) {
+            this.idClass = (Class<Serializable>) property.getType();
+            this.isStringIdType = String.class == property.getType();
         }
     }
 
@@ -248,9 +255,15 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
             }
             return;
         }
-        getPropertyAccessor(entity).setProperty(idProperty, id);
+        getPropertyAccessor(entity).setProperty(idProperty, convertId(id));
     }
 
+    private Serializable convertId(String id) {
+        if (id == null || isStringIdType()) {
+            return id;
+        }
+        return UUID.fromString(id);
+    }
     /**
      * @param entity  the entity
      * @param version the document version
@@ -282,17 +295,11 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     @Nullable
     @Override
     public String getPersistentEntityId(T source) {
-        if (getIdProperty() == null) {
-            if (log.isWarnEnabled()) {
-                log.warn("No propertyId defined for entity class {}", entityClass);
-            }
-            return null;
+        Serializable id = getId(source);
+        if (isStringIdType()) {
+            return (String) id;
         }
-        try {
-            return (String) getPropertyAccessor(source).getProperty(getIdProperty());
-        } catch (Exception e) {
-            throw new IllegalStateException("failed to load id field", e);
-        }
+        return id == null ? null : id.toString();
     }
 
     /**
@@ -496,13 +503,23 @@ public class SimpleElasticsearchPersistentEntity<T> extends BasicPersistentEntit
     }
 
     @Override
-    public String getId(T source) {
-        return getPersistentEntityId(source);
+    public Serializable getId(T source) {
+        if (getIdProperty() == null) {
+            if (log.isWarnEnabled()) {
+                log.warn("No propertyId defined for entity class {}", entityClass);
+            }
+            return null;
+        }
+        try {
+            return (Serializable) getPropertyAccessor(source).getProperty(getIdProperty());
+        } catch (Exception e) {
+            throw new IllegalStateException("failed to load id field", e);
+        }
     }
 
     @Override
-    public Class<String> getIdType() {
-        return String.class;
+    public Class<Serializable> getIdType() {
+        return this.idClass == null ? Serializable.class : this.idClass;
     }
 
     @Override

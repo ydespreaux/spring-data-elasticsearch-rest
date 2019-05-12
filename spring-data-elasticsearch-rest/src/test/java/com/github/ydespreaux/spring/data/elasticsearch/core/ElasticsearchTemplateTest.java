@@ -248,20 +248,21 @@ public class ElasticsearchTemplateTest {
     @Test
     void bulkEntities() {
         List entities = new ArrayList<>();
-        entities.add(createBook("1", "BOOK", "DESCRIPTION", 10d));
+        UUID bookID = UUID.randomUUID();
+        entities.add(createBook(bookID, "BOOK", "DESCRIPTION", 10d));
         entities.add(createArticle("1", "ARTICLE", "DESCRIPTION", Article.EnumEntrepot.E1));
         this.operations.bulkIndex(entities);
 
         this.operations.refresh(Article.class);
         this.operations.refresh(Book.class);
-        assertThat(this.operations.findById(Book.class, "1"), is(notNullValue()));
+        assertThat(this.operations.findById(Book.class, bookID.toString()), is(notNullValue()));
         assertThat(this.operations.findById(Article.class, "1"), is(notNullValue()));
     }
 
     @Test
     void startScroll() {
-        this.operations.index(createBook("1", "BOOK_1", "DESCRIPTION", 10d), Book.class);
-        this.operations.index(createBook("2", "BOOK_2", "DESCRIPTION", 10d), Book.class);
+        this.operations.index(createBook(UUID.randomUUID(), "BOOK_1", "DESCRIPTION", 10d), Book.class);
+        this.operations.index(createBook(UUID.randomUUID(), "BOOK_2", "DESCRIPTION", 10d), Book.class);
         this.operations.refresh(Book.class);
 
         SearchQuery query = new NativeSearchQuery.NativeSearchQueryBuilder().withQuery(QueryBuilders.matchAllQuery()).build();
@@ -427,8 +428,9 @@ public class ElasticsearchTemplateTest {
      * @param price
      * @return
      */
-    private Book createBook(String title, String description, Double price, LocalDate publication) {
+    private Book createBook(UUID id, String title, String description, Double price, LocalDate publication) {
         return Book.builder()
+                .documentId(id)
                 .title(title)
                 .description(description)
                 .price(price)
@@ -458,7 +460,7 @@ public class ElasticsearchTemplateTest {
 
     @Test
     void saveBook() {
-        Book book = createBook("New book", "Description", 10.5d, LocalDate.now(Clock.systemUTC()));
+        Book book = createBook(UUID.randomUUID(), "New book", "Description", 10.5d, LocalDate.now(Clock.systemUTC()));
         Book bookIndexed = this.operations.index(book, Book.class);
         this.operations.refresh(Book.class);
         assertThat(bookIndexed.getTitle(), is(equalTo(book.getTitle())));
@@ -471,11 +473,11 @@ public class ElasticsearchTemplateTest {
     @Test
     void saveBook_bulk() {
         List<Book> books = new ArrayList<>();
-        books.add(createBook("new_Livre1", "Description du livre 1", 10.5d, LocalDate.now(Clock.systemUTC())));
-        books.add(createBook("new_Livre2", "Description du livre 2", 8d, LocalDate.now(Clock.systemUTC())));
-        books.add(createBook("new_Livre3", "Description du livre 3", 20d, LocalDate.now(Clock.systemUTC())));
-        books.add(createBook("new_Livre4", "Description du livre 4", 5d, LocalDate.now(Clock.systemUTC())));
-        books.add(createBook("new_Livre5", "Description du livre 5", 8.5d, LocalDate.now(Clock.systemUTC())));
+        books.add(createBook(UUID.randomUUID(), "new_Livre1", "Description du livre 1", 10.5d, LocalDate.now(Clock.systemUTC())));
+        books.add(createBook(UUID.randomUUID(), "new_Livre2", "Description du livre 2", 8d, LocalDate.now(Clock.systemUTC())));
+        books.add(createBook(UUID.randomUUID(), "new_Livre3", "Description du livre 3", 20d, LocalDate.now(Clock.systemUTC())));
+        books.add(createBook(UUID.randomUUID(), "new_Livre4", "Description du livre 4", 5d, LocalDate.now(Clock.systemUTC())));
+        books.add(createBook(UUID.randomUUID(), "new_Livre5", "Description du livre 5", 8.5d, LocalDate.now(Clock.systemUTC())));
         List<Book> booksIndexed = this.operations.bulkIndex(books, Book.class);
         this.operations.refresh(Book.class);
         assertThat(booksIndexed.size(), is(equalTo(books.size())));
@@ -487,34 +489,34 @@ public class ElasticsearchTemplateTest {
 
     @Test
     void deleteBookById() {
-        Book book = createBook("New book", "Description", 10.5d, LocalDate.now(Clock.systemUTC()));
+        Book book = createBook(UUID.randomUUID(), "New book", "Description", 10.5d, LocalDate.now(Clock.systemUTC()));
         Book bookIndexed = this.operations.index(book, Book.class);
         this.operations.refresh(Book.class);
-        this.operations.deleteById(bookIndexed.getDocumentId(), Book.class);
+        this.operations.deleteById(bookIndexed.getDocumentId().toString(), Book.class);
         this.operations.refresh(Book.class);
-        Optional<Book> response = this.operations.findById(Book.class, bookIndexed.getDocumentId());
+        Optional<Book> response = this.operations.findById(Book.class, bookIndexed.getDocumentId().toString());
         assertThat(response.isPresent(), is(false));
     }
 
     @Test
     void deleteBook() {
-        Book book = createBook("New book", "Description", 10.5d, LocalDate.now(Clock.systemUTC()));
+        Book book = createBook(UUID.randomUUID(), "New book", "Description", 10.5d, LocalDate.now(Clock.systemUTC()));
         Book bookIndexed = this.operations.index(book, Book.class);
         this.operations.refresh(Book.class);
         this.operations.delete(bookIndexed, Book.class);
         this.operations.refresh(Book.class);
-        Optional<Book> response = this.operations.findById(Book.class, bookIndexed.getDocumentId());
+        Optional<Book> response = this.operations.findById(Book.class, bookIndexed.getDocumentId().toString());
         assertThat(response.isPresent(), is(false));
     }
 
     @Test
     void deleteAllBook() {
         List<Book> books = this.operations.bulkIndex(Arrays.asList(
-                createBook("Book1", "Description", 10.5d, LocalDate.now(Clock.systemUTC())),
-                createBook("Book2", "Description", 10.5d, LocalDate.now(Clock.systemUTC())),
-                createBook("Book3", "Description", 10.5d, LocalDate.now(Clock.systemUTC())),
-                createBook("Book4", "Description", 10.5d, LocalDate.now(Clock.systemUTC())),
-                createBook("Book5", "Description", 10.5d, LocalDate.now(Clock.systemUTC()))
+                createBook(UUID.randomUUID(), "Book1", "Description", 10.5d, LocalDate.now(Clock.systemUTC())),
+                createBook(UUID.randomUUID(), "Book2", "Description", 10.5d, LocalDate.now(Clock.systemUTC())),
+                createBook(UUID.randomUUID(), "Book3", "Description", 10.5d, LocalDate.now(Clock.systemUTC())),
+                createBook(UUID.randomUUID(), "Book4", "Description", 10.5d, LocalDate.now(Clock.systemUTC())),
+                createBook(UUID.randomUUID(), "Book5", "Description", 10.5d, LocalDate.now(Clock.systemUTC()))
         ), Book.class);
         this.operations.refresh(Book.class);
 
@@ -522,12 +524,12 @@ public class ElasticsearchTemplateTest {
         this.operations.deleteAll(books, Book.class);
         this.operations.refresh(Book.class);
         for (Book bookIndexed : booksToDelete) {
-            assertThat(this.operations.findById(Book.class, bookIndexed.getDocumentId()).isPresent(), is(false));
+            assertThat(this.operations.findById(Book.class, bookIndexed.getDocumentId().toString()).isPresent(), is(false));
         }
     }
 
 
-    private Book createBook(String id, String title, String description, Double price) {
+    private Book createBook(UUID id, String title, String description, Double price) {
         return Book.builder()
                 .documentId(id)
                 .title(title)

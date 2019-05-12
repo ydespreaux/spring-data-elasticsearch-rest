@@ -3,6 +3,8 @@
 ## [Unreleased]
 
 ### Added
+- Add UUIDElasticsearchRepository
+- Add ReactiveUUIDElasticsearchRepository
 
 ### Changed
 - Dependency elasticsearch version from 6.5.0 to 6.7.0
@@ -12,6 +14,11 @@
 
 ### Fixed
 
+## [1.1.3]
+### Changed
+- Pageable : Modified default value of parameter page.size to 10000 
+- Add UUIDElasticsearchRepository
+- Add ReactiveUUIDElasticsearchRepository
 
 ## [1.1.2]
 ### Added

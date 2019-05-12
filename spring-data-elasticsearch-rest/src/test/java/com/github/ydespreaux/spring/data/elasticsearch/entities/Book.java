@@ -29,6 +29,7 @@ import org.springframework.data.annotation.Version;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author Yoann Despréaux
@@ -49,7 +50,7 @@ import java.util.Objects;
 public class Book {
 
     @Id
-    private String documentId;
+    private UUID documentId;
     @Version
     private Long version;
     private String title;
@@ -74,4 +75,5 @@ public class Book {
     public int hashCode() {
         return Objects.hash(getDocumentId(), getTitle(), getDescription(), getPrice(), getPublication());
     }
+
 }

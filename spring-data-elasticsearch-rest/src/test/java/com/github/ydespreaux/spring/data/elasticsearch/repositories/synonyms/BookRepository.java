@@ -26,12 +26,13 @@ import com.github.ydespreaux.spring.data.elasticsearch.repository.ElasticsearchR
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Yoann Despréaux
  * @since 1.0.0
  */
-public interface BookRepository extends ElasticsearchRepository<Book, String> {
+public interface BookRepository extends ElasticsearchRepository<Book, UUID> {
 
     List<Book> findByDescriptionContains(String value);
 
