@@ -23,11 +23,12 @@ import com.github.ydespreaux.spring.data.elasticsearch.core.ElasticsearchOperati
 import com.github.ydespreaux.spring.data.elasticsearch.core.mapping.ElasticsearchPersistentProperty;
 import com.github.ydespreaux.spring.data.elasticsearch.core.query.CriteriaQuery;
 import com.github.ydespreaux.spring.data.elasticsearch.repository.query.parser.ElasticsearchQueryCreator;
-import org.elasticsearch.ElasticsearchException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.repository.query.ParametersParameterAccessor;
 import org.springframework.data.repository.query.parser.PartTree;
+import org.springframework.data.util.CloseableIterator;
+import org.springframework.data.util.StreamUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
@@ -61,7 +62,12 @@ public class ElasticsearchPartQuery extends AbstractElasticsearchRepositoryQuery
             query.setPageable(accessor.getPageable());
             return elasticsearchOperations.startScroll(query, queryMethod.getEntityInformation().getJavaType());
         } else if (queryMethod.isStreamQuery()) {
-            throw new ElasticsearchException("Stream query method not supported");
+            Class<?> entityType = queryMethod.getEntityInformation().getJavaType();
+            if (query.getPageable().isUnpaged()) {
+                int itemCount = (int) elasticsearchOperations.count(query, queryMethod.getEntityInformation().getJavaType());
+                query.setPageable(PageRequest.of(0, Math.max(1, itemCount)));
+            }
+            return StreamUtils.createStreamFromIterator((CloseableIterator<Object>) elasticsearchOperations.stream(query, entityType));
         } else if (queryMethod.isCollectionQuery()) {
             if (!accessor.getPageable().isPaged()) {
                 int itemCount = (int) elasticsearchOperations.count(query, queryMethod.getEntityInformation().getJavaType());
