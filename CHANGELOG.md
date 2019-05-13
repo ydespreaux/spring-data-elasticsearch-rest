@@ -6,9 +6,11 @@
 
 ### Changed
 - Pageable : Modified default value of parameter page.size to 10000 
+- Add Stream operations
 
 ### Fixed
 
+- Fix bug when GeoPoint type is serializer
 
 ## [1.1.2]
 ### Added
