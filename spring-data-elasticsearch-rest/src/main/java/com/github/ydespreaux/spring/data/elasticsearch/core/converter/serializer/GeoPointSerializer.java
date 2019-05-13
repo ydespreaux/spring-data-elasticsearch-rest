@@ -43,7 +43,7 @@ public class GeoPointSerializer extends JsonSerializer<GeoPoint> {
         }
         jsonGenerator.writeStartObject();
         jsonGenerator.writeNumberField("lat", value.getLat());
-        jsonGenerator.writeNumberField("lon", value.getLat());
+        jsonGenerator.writeNumberField("lon", value.getLon());
         jsonGenerator.writeEndObject();
     }
 

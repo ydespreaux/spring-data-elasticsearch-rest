@@ -14,6 +14,8 @@
 
 ### Fixed
 
+- Fix bug when GeoPoint type is serializer
+
 ## [1.1.3]
 ### Changed
 - Pageable : Modified default value of parameter page.size to 10000 
