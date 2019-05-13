@@ -9,6 +9,8 @@
 
 ### Fixed
 
+- Fix bug when GeoPoint type is serializer
+
 ## [1.0.3]
 
 ### Added

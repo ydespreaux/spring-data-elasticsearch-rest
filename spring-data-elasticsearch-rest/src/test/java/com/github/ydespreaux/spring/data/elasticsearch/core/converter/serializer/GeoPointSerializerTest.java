@@ -41,6 +41,6 @@ public class GeoPointSerializerTest {
                 .location(new GeoPoint(40.2, 53.65))
                 .build();
         DefaultEntityMapper mapper = new DefaultEntityMapper(new JacksonProperties());
-        assertThat(mapper.mapToString(city), is(equalTo("{\"name\":\"Castries\",\"location\":{\"lat\":40.2,\"lon\":40.2}}")));
+        assertThat(mapper.mapToString(city), is(equalTo("{\"name\":\"Castries\",\"location\":{\"lat\":40.2,\"lon\":53.65}}")));
     }
 }
