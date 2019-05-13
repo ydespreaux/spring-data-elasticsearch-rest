@@ -19,6 +19,7 @@ The library supports the following types of indexes:
 
 |   spring-data-elasticsearch-rest   |   spring-boot    |   elasticsearch  |
 |:----------------------------------:|:----------------:|:----------------:|
+|   1.1.3                            |       2.1.x      |       6.5.x      |
 |   1.1.2                            |       2.1.x      |       6.5.x      |
 |   1.0.3                            |       2.1.x      |       6.4.2      |
 
@@ -39,6 +40,8 @@ The library supports the following types of indexes:
 ##### @Id / @Version
 
 The org.springframework.data.annotation.Id annotation is used to declare an attribute representing the identifier of the document. The type of the attribute must be of type String.
+Since 1.1.3 version, the type of the attribut can be of type UUID.
+
 An annotated @Id attribute is not stored in the document (stored in the _id metadata).
 
 ```java

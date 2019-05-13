@@ -3,6 +3,7 @@ package com.github.ydespreaux.spring.data.elasticsearch.repository.support;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -65,7 +66,7 @@ public abstract class AbstractElasticsearchRepositorySupport<T, K> {
         if (genericSuperclass instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
             Type rawtype = parameterizedType.getRawType();
-            if (SimpleElasticsearchRepository.class.equals(rawtype)) {
+            if (ClassUtils.isAssignable(AbstractElasticsearchRepository.class, (Class<?>) rawtype)) {
                 return parameterizedType;
             }
         }
